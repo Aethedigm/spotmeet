@@ -123,6 +123,7 @@ func (u *User) Insert(theUser User) (int, error) {
 		return 0, err
 	}
 
+	theUser.Active = 1
 	theUser.CreatedAt = time.Now()
 	theUser.UpdatedAt = time.Now()
 	theUser.Password = string(newHash)
