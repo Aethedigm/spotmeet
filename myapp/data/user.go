@@ -11,11 +11,11 @@ import (
 // User is the type for a user
 type User struct {
 	ID        int       `db:"id,omitempty"`
-	FirstName string    `db:"first_name"`
-	LastName  string    `db:"last_name"`
-	Email     string    `db:"email"`
+	FirstName string    `db:"first_name" json:"first_name"`
+	LastName  string    `db:"last_name" json:"last_name"`
+	Email     string    `db:"email" json:"email"`
 	Active    int       `db:"user_active"`
-	Password  string    `db:"password"`
+	Password  string    `db:"password" json:"password"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 	Token     Token     `db:"-"`

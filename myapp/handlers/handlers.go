@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"myapp/data"
 	"net/http"
 
@@ -48,4 +50,26 @@ func (h *Handlers) SessionTest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}
+}
+
+func (h *Handlers) CreateUser(w http.ResponseWriter, r *http.Request) {
+	u := &data.User{}
+
+	err := json.NewDecoder(r.Body).Decode(u)
+	if err != nil {
+		fmt.Println("Error decoding json:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	id, err := u.Insert(*u)
+	if err != nil {
+		fmt.Println("Error inserting user:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Fprintf(w, "User created with id: %d", id)
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fmt.Sprintf("%d", id)))
 }
