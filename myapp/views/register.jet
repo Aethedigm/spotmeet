@@ -7,11 +7,75 @@
 {{end}}
 
 {{block pageContent()}}
+<h2 class="mt-5 text-center">Register</h2>
 
+<hr>
+
+<form method="post" action=""
+    name="register-form" id="register-form"
+    class="d-block needs-validation"
+    autocomplete="off" novalidate="">
+
+    <div class="mb-3">
+        <label for="first_name">First Name</label>
+        <input type="text" class="form-control" id="first_name" name="first_name"
+            required="" autocomplete="given-name" autofocus>
+    </div>
+
+    <div class="mb-3">
+        <label for="last_name">Last Name</label>
+        <input type="text" class="form-control" id="last_name" name="last_name"
+            required="" autocomplete="family-name">
+    </div>
+
+    <div class="mb-3">
+        <label for="email">Email</label>
+        <input type="email" class="form-control" id="email" name="email"
+            required="" autocomplete="email">
+    </div>
+
+    <div class="mb-3">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" name="password"
+            required="" autocomplete="new-password">
+    </div>
+
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="evaluateRegisterForm()">Register</a>
+</form>
 
 {{end}}
 
 
 {{block js()}}
+<script>
+const evaluateRegisterForm = () => {
+    const form = document.getElementById('register-form');
+    if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+    }
+    form.classList.add('was-validated');
 
+    var creds = new Object();
+    creds.first_name = document.getElementById('first_name').value;
+    creds.last_name = document.getElementById('last_name').value;
+    creds.email = document.getElementById('email').value;
+    creds.password = document.getElementById('password').value;
+
+    register(creds);
+}
+
+const register = (creds) => {
+    fetch('/users/create', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(creds)
+    })
+        .then(response => console.log(response))
+}
+</script>
 {{end}}
