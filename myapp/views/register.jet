@@ -76,6 +76,9 @@ const register = (creds) => {
         body: JSON.stringify(creds)
     })
         .then(response => console.log(response))
+        .then(() => {
+            window.location.href = "/";
+        });
 }
 </script>
 {{end}}
