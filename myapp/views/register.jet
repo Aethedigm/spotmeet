@@ -1,0 +1,17 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}Register{{end}}
+
+{{block css()}}
+
+{{end}}
+
+{{block pageContent()}}
+
+
+{{end}}
+
+
+{{block js()}}
+
+{{end}}

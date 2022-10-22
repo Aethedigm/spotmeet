@@ -20,9 +20,10 @@ func (a *application) routes() *chi.Mux {
 
 	a.App.Routes.Route("/users", func(r chi.Router) {
 		r.Get("/login", a.Handlers.UserLogin)
-		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Get("/logout", a.Handlers.Logout)
+		r.Get("/register", a.Handlers.UserRegister)
 
+		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUser)
 	})
 
