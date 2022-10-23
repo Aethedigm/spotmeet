@@ -118,6 +118,8 @@ func (u *User) Delete(id int) error {
 
 // Insert inserts a new user, and returns the newly inserted id
 func (u *User) Insert(theUser User) (int, error) {
+	collection := upper.Collection(u.Table())
+
 	newHash, err := bcrypt.GenerateFromPassword([]byte(theUser.Password), 12)
 	if err != nil {
 		return 0, err
@@ -128,7 +130,6 @@ func (u *User) Insert(theUser User) (int, error) {
 	theUser.UpdatedAt = time.Now()
 	theUser.Password = string(newHash)
 
-	collection := upper.Collection(u.Table())
 	res, err := collection.Insert(theUser)
 	if err != nil {
 		return 0, err
