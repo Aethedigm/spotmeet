@@ -4,7 +4,7 @@ Capstone - Team E
 # Progress
 - [ ] Pages
   - [X]  Home Page
-  - [ ] Login Page
+  - [X] Login Page
   - [ ] Register Page
   - [ ] Matches Page
   - [ ] Messages Page
