@@ -21,6 +21,9 @@ jobs:
       with:
         go-version: 1.18
 
+    - name: Migrate
+      run: cd celeritas && make build_cli && cd ../myapp/ && ./celeritas migrate
+
     - name: Build
       run: cd myapp && go mod vendor && go build -v .
       
