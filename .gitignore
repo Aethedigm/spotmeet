@@ -9,3 +9,6 @@
 
 # Go 
 /backend/.idea/*
+
+# Database
+/myapp/db-data/
