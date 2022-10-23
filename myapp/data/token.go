@@ -66,7 +66,7 @@ func (t *Token) GetTokensForUser(id int) ([]*Token, error) {
 func (t *Token) Get(id int) (*Token, error) {
 	var token Token
 	collection := upper.Collection(t.Table())
-	res := collection.Find(up.Cond{"id":id})
+	res := collection.Find(up.Cond{"id": id})
 	err := res.One(&token)
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ func (t *Token) Insert(token Token, u User) error {
 
 func (t *Token) GenerateToken(userID int, ttl time.Duration) (*Token, error) {
 	token := &Token{
-		UserID: userID,
+		UserID:  userID,
 		Expires: time.Now().Add(ttl),
 	}
 

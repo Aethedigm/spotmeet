@@ -7,11 +7,11 @@ import (
 )
 
 var pageData = []struct {
-	name string
-	renderer string
-	template string
+	name          string
+	renderer      string
+	template      string
 	errorExpected bool
-	errorMessage string
+	errorMessage  string
 }{
 	{"go_page", "go", "home", false, "error rendering go template"},
 	{"go_page_no_template", "go", "no-file", true, "no error rendering non-existent go template, when one is expected"},
@@ -21,7 +21,7 @@ var pageData = []struct {
 }
 
 func TestRender_Page(t *testing.T) {
-	for _, e := range pageData{
+	for _, e := range pageData {
 		r, err := http.NewRequest("GET", "/some-url", nil)
 		if err != nil {
 			t.Error(err)
@@ -55,7 +55,7 @@ func TestRender_GoPage(t *testing.T) {
 	testRenderer.Renderer = "go"
 	testRenderer.RootPath = "./testdata"
 
-	err = testRenderer.Page(w, r, "home", nil, nil)
+	err = testRenderer.GoPage(w, r, "home", nil)
 	if err != nil {
 		t.Error("Error rendering page", err)
 	}
@@ -70,10 +70,11 @@ func TestRender_JetPage(t *testing.T) {
 	}
 
 	testRenderer.Renderer = "jet"
+	testRenderer.RootPath = "./testdata"
 
-	err = testRenderer.Page(w, r, "home", nil, nil)
+	err = testRenderer.JetPage(w, r, "home", nil, nil)
 	if err != nil {
 		t.Error("Error rendering page", err)
 	}
-	
+
 }
