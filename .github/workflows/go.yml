@@ -21,11 +21,14 @@ jobs:
       with:
         go-version: 1.18
 
-    - name: BuildCLI
-      run: go build -v ./...
+    - name: Build
+      run: cd myapp && go mod vendor && go build -v .
       
-    - name: Test
-      run: go test -v ./...
+    - name: TestCeleritas
+      run: cd celeritas && go test -v ./...
+    
+    - name: TestMyApp
+      run: cd myapp/data && go test -v ./...
       
     - name: TestIntegration
-      run: go test -v ./... --tags integration --count=1
+      run: cd myapp/data && go test -v ./... --tags integration --count=1
