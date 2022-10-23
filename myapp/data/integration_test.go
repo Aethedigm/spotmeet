@@ -7,9 +7,12 @@ package data
 import (
 	"database/sql"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -104,70 +107,43 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+func compileMigrations(ext string) (string, error) {
+	var res []string
+	err := filepath.WalkDir("../migrations", func(s string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		_, file := filepath.Split(s)
+
+		if strings.HasSuffix(file, ext) {
+			f, err := os.ReadFile(s)
+			if err != nil {
+				return err
+			}
+
+			res = append(res, string(f))
+		}
+
+		return nil
+	})
+
+	fmt.Println("res: ", res)
+
+	if err != nil {
+		return "", err
+	}
+
+	return strings.Join(res, " "), nil
+}
+
 func createTables(db *sql.DB) error {
-	stmt := `
-	CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+	stmt, err := compileMigrations(".up.sql")
+	if err != nil {
+		return err
+	}
 
-drop table if exists users cascade;
-
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    first_name character varying(255) NOT NULL,
-    last_name character varying(255) NOT NULL,
-    user_active integer NOT NULL DEFAULT 0,
-    email character varying(255) NOT NULL UNIQUE,
-    password character varying(60) NOT NULL,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now()
-);
-
-CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON users
-    FOR EACH ROW
-    EXECUTE PROCEDURE trigger_set_timestamp();
-
-drop table if exists remember_tokens;
-
-CREATE TABLE remember_tokens (
-    id SERIAL PRIMARY KEY,
-    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    remember_token character varying(100) NOT NULL,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now()
-);
-
-CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON remember_tokens
-    FOR EACH ROW
-    EXECUTE PROCEDURE trigger_set_timestamp();
-
-drop table if exists tokens;
-
-CREATE TABLE tokens (
-    id SERIAL PRIMARY KEY,
-    user_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    first_name character varying(255) NOT NULL,
-    email character varying(255) NOT NULL,
-    token character varying(255) NOT NULL,
-    token_hash bytea NOT NULL,
-    created_at timestamp without time zone NOT NULL DEFAULT now(),
-    updated_at timestamp without time zone NOT NULL DEFAULT now(),
-    expiry timestamp without time zone NOT NULL
-);
-
-CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON tokens
-    FOR EACH ROW
-    EXECUTE PROCEDURE trigger_set_timestamp();
-	`
-
-	_, err := db.Exec(stmt)
+	_, err = db.Exec(stmt)
 	if err != nil {
 		return err
 	}
