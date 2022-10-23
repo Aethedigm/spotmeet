@@ -21,8 +21,14 @@ jobs:
       with:
         go-version: 1.18
 
-    - name: Build
-      run: go build -v ./...
+    - name: BuildCLI
+      run: go build -v ./celeritas/cmd/cli
+      
+    - name: BuildCeleritas
+      run: go build -v ./celeritas
+      
+    - name: BuildMyApp
+      run: go build -v ./myapp
 
     - name: TestRender
       run: go test -v ./celeritas/render
