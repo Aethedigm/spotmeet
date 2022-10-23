@@ -22,22 +22,10 @@ jobs:
         go-version: 1.18
 
     - name: BuildCLI
-      run: go build -v ./celeritas/cmd/cli
+      run: go build -v ./...
       
-    - name: BuildCeleritas
-      run: go build -v ./celeritas
+    - name: Test
+      run: go test -v ./...
       
-    - name: BuildMyApp
-      run: go build -v ./myapp
-
-    - name: TestRender
-      run: go test -v ./celeritas/render
-    
-    - name: TestSession
-      run: go test -v ./celeritas/session
-      
-    - name: TestDataModels
-      run: go test -v ./myapp/data
-      
-    - name: TestDataIntegration
-      run: go test -v ./myapp/data --tags integration --count=1
+    - name: TestIntegration
+      run: go test -v ./... --tags integration --count=1
