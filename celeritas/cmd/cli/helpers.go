@@ -66,6 +66,8 @@ func initDB() {
 		"pg_commit_ts",
 		"pg_dynshmem",
 		"pg_logical",
+		"pg_logical/mappings",
+		"pg_logical/snapshots",
 		"pg_multixact",
 		"pg_notify",
 		"pg_replslot",
