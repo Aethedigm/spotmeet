@@ -19,7 +19,6 @@ type User struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 	Token     Token     `db:"-"`
-	Profile   *Profile
 }
 
 // Table returns the table name associated with this model in the database

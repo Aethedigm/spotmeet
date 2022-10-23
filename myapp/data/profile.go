@@ -14,7 +14,6 @@ type Profile struct {
 	ImageURL    string    `db:"profile_image_url" json:"profile_image_url"`
 	CreatedAt   time.Time `db:"created_at"`
 	UpdatedAt   time.Time `db:"updated_at"`
-	User        *User
 }
 
 // Table returns the table name associated with this model in the database
