@@ -47,6 +47,9 @@ func main() {
 			exitGracefully(err)
 		}
 
+	case "init-db":
+		initDB()
+
 	default:
 		showHelp()
 	}
