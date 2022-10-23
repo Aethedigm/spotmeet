@@ -1,4 +1,4 @@
-# spotmeet
+# spotmeet    [![Build](https://github.com/Aethedigm/spotmeet/actions/workflows/go.yml/badge.svg)](https://github.com/Aethedigm/spotmeet/actions/workflows/go.yml)
 Capstone - Team E
 
 # Progress
