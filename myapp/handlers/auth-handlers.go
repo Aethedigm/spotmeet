@@ -19,7 +19,7 @@ func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
@@ -28,18 +28,18 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Models.Users.GetByEmail(email)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	matches, err := user.PasswordMatches(password)
 	if err != nil {
-		w.Write([]byte("Error validating password"))
+		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	if !matches {
-		w.Write([]byte("Invalid password!"))
+		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 

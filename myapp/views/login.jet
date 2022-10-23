@@ -4,7 +4,17 @@
 Login
 {{end}}
 
-{{block css()}} {{end}}
+{{block css()}}
+<style>
+    .hidden {
+        display: none;
+    }
+
+    .login-failed {
+        color: red;
+    }
+</style>
+{{end}}
 
 {{block pageContent()}}
 <h2 class="mt-5 text-center">Login</h2>
@@ -18,6 +28,10 @@ Login
     autocomplete="off" novalidate="">
 
     <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+    <div class="hidden" id="login-status">
+        Login Failed
+    </div>
 
     <div class="mb-3">
         <label for="email" class="form-label">Email</label>
@@ -50,6 +64,16 @@ Login
 
 {{block js()}}
 <script>
+window.onload = function() {
+    const loginFailed = new URLSearchParams(window.location.search)
+        .get('loginFailed');
+
+    if (loginFailed) {
+        document.getElementById("login-status").classList.remove("hidden");
+        document.getElementById("login-status").classList.add("login-failed");
+    }
+}
+
 function val() {
     let form = document.getElementById("login-form");
     if (form.checkValidity() === false){
