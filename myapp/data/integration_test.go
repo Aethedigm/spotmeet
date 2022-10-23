@@ -128,8 +128,6 @@ func compileMigrations(ext string) (string, error) {
 		return nil
 	})
 
-	fmt.Println("res: ", res)
-
 	if err != nil {
 		return "", err
 	}
