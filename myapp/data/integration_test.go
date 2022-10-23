@@ -541,3 +541,75 @@ func TestToken_ValidToken(t *testing.T) {
 		t.Error("no error reported when validating non-existent token")
 	}
 }
+
+func TestMatch_MissingUserA(t *testing.T) {
+	m := Match{
+		User_B_ID: 1,
+	}
+
+	_, err := m.Insert(m)
+	if err == nil {
+		t.Error("failed to catch missing User_A")
+	}
+}
+
+func TestMatch_MissingUserB(t *testing.T) {
+	m := Match{
+		User_A_ID: 1,
+	}
+
+	_, err := m.Insert(m)
+	if err == nil {
+		t.Error("failed to catch missing User_B")
+	}
+}
+
+func TestMatch_GetAllForOneUser(t *testing.T) {
+	ua := &User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "test@test.com",
+		Active:    1,
+	}
+
+	ub := &User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "test2@test.com",
+		Active:    1,
+	}
+
+	uaID, err := ua.Insert(*ua)
+	if err != nil {
+		t.Error(err)
+	}
+
+	ubID, err := ub.Insert(*ub)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m := Match{
+		User_A_ID:    uaID,
+		User_B_ID:    ubID,
+		PercentMatch: 100,
+	}
+
+	mID, err := m.Insert(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	matches, err := m.GetAllForOneUser(uaID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(matches) < 1 {
+		t.Error("no matches returned")
+	}
+
+	if mID != matches[0].ID {
+		t.Error("incorrect match returned")
+	}
+}
