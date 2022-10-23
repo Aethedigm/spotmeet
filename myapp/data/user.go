@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User is the type for a user
+// Profile is the type for a user
 type User struct {
 	ID        int       `db:"id,omitempty"`
 	FirstName string    `db:"first_name" json:"first_name"`

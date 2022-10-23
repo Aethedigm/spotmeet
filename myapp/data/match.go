@@ -6,7 +6,7 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// Match is the type for a match
+// Settings is the type for a match
 type Match struct {
 	ID           int       `db:"id,omitempty"`
 	User_A_ID    int       `db:"user_A_id" json:"user_A_id"`
@@ -38,12 +38,12 @@ func (m *Match) GetAll() ([]Match, error) {
 }
 
 // GetByUserID returns a slice of all matches for a user.
-func (m *Match) GetAllForOneUser(userID int) ([]*Match, error) {
+func (m *Match) GetAllForOneUser(userID int) ([]Match, error) {
 
-	var all []*Match
+	var all []Match
 	collection := upper.Collection(m.Table())
 	res := collection.Find(up.Cond{"user_A_id =": userID, "user_B_id =": userID})
-	err := res.All(&all)
+	err := res.All(all)
 	if err != nil {
 		return nil, err
 	}
