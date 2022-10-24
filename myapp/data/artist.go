@@ -17,13 +17,13 @@ func (a *Artist) Table() string {
 }
 
 // GetAll returns a slice of all artists
-func (a *Artist) GetAll() ([]Artist, error) {
+func (a *Artist) GetAll() ([]*Artist, error) {
 	collection := upper.Collection(a.Table())
 
-	var all []Artist
+	var all []*Artist
 
 	res := collection.Find().OrderBy("artist_name")
-	err := res.All(all)
+	err := res.All(&all)
 	if err != nil {
 		return nil, err
 	}

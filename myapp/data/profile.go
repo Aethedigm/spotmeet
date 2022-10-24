@@ -22,13 +22,13 @@ func (p *Profile) Table() string {
 }
 
 // GetAll returns a slice of all profiles
-func (p *Profile) GetAll() ([]Profile, error) {
+func (p *Profile) GetAll() ([]*Profile, error) {
 	collection := upper.Collection(p.Table())
 
-	var all []Profile
+	var all []*Profile
 
 	res := collection.Find().OrderBy("user_id")
-	err := res.All(all)
+	err := res.All(&all)
 	if err != nil {
 		return nil, err
 	}

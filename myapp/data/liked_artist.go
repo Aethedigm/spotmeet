@@ -18,13 +18,13 @@ func (l *LikedArtist) Table() string {
 }
 
 // GetAll returns a slice of all liked artists
-func (l *LikedArtist) GetAll() ([]LikedArtist, error) {
+func (l *LikedArtist) GetAll() ([]*LikedArtist, error) {
 	collection := upper.Collection(l.Table())
 
-	var all []LikedArtist
+	var all []*LikedArtist
 
 	res := collection.Find().OrderBy("id")
-	err := res.All(all)
+	err := res.All(&all)
 	if err != nil {
 		return nil, err
 	}

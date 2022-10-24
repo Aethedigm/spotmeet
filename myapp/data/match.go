@@ -24,13 +24,13 @@ func (m *Match) Table() string {
 }
 
 // GetAll returns a slice of all matches.
-func (m *Match) GetAll() ([]Match, error) {
+func (m *Match) GetAll() ([]*Match, error) {
 	collection := upper.Collection(m.Table())
 
-	var all []Match
+	var all []*Match
 
 	res := collection.Find().OrderBy("user_A_id")
-	err := res.All(all)
+	err := res.All(&all)
 	if err != nil {
 		return nil, err
 	}
