@@ -18,17 +18,17 @@ type Profile struct {
 
 // Table returns the table name associated with this model in the database
 func (p *Profile) Table() string {
-	return "profile"
+	return "profiles"
 }
 
 // GetAll returns a slice of all profiles
-func (p *Profile) GetAll() ([]Profile, error) {
+func (p *Profile) GetAll() ([]*Profile, error) {
 	collection := upper.Collection(p.Table())
 
-	var all []Profile
+	var all []*Profile
 
 	res := collection.Find().OrderBy("user_id")
-	err := res.All(all)
+	err := res.All(&all)
 	if err != nil {
 		return nil, err
 	}
