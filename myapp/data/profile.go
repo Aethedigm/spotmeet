@@ -18,7 +18,7 @@ type Profile struct {
 
 // Table returns the table name associated with this model in the database
 func (p *Profile) Table() string {
-	return "profile"
+	return "profiles"
 }
 
 // GetAll returns a slice of all profiles

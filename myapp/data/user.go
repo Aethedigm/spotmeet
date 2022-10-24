@@ -8,7 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Profile is the type for a user
+// User is the type for a user
 type User struct {
 	ID        int       `db:"id,omitempty"`
 	FirstName string    `db:"first_name" json:"first_name"`
@@ -27,13 +27,13 @@ func (u *User) Table() string {
 }
 
 // GetAll returns a slice of all users
-func (u *User) GetAll() ([]*User, error) {
+func (u *User) GetAll() ([]User, error) {
 	collection := upper.Collection(u.Table())
 
-	var all []*User
+	var all []User
 
 	res := collection.Find().OrderBy("last_name")
-	err := res.All(&all)
+	err := res.All(all)
 	if err != nil {
 		return nil, err
 	}
