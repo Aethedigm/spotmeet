@@ -24,7 +24,7 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/register", a.Handlers.UserRegister)
 
 		r.Post("/login", a.Handlers.PostUserLogin)
-		r.Post("/create", a.Handlers.CreateUser)
+		r.Post("/create", a.Handlers.CreateUserAndProfile)
 	})
 
 	// a.App.Routes.Get("/get-user/{id}", func(w http.ResponseWriter, r *http.Request) {
