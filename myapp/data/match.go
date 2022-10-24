@@ -24,13 +24,13 @@ func (m *Match) Table() string {
 }
 
 // GetAll returns a slice of all matches.
-func (m *Match) GetAll() ([]Match, error) {
+func (m *Match) GetAll() ([]*Match, error) {
 	collection := upper.Collection(m.Table())
 
-	var all []Match
+	var all []*Match
 
-	res := collection.Find().OrderBy("user_A_id")
-	err := res.All(all)
+	res := collection.Find().OrderBy("user_a_id")
+	err := res.All(&all)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +101,10 @@ func (m *Match) Insert(thematch Match) (int, error) {
 
 	if thematch.User_A_ID == 0 || thematch.User_B_ID == 0 {
 		return 0, errors.New("User_A_ID and User_B_ID must be set")
+	}
+
+	if thematch.User_A_ID == thematch.User_B_ID {
+		return 0, errors.New("User_A_ID and User_B_ID cannot be the same")
 	}
 
 	thematch.CreatedAt = time.Now()

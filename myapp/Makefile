@@ -37,3 +37,11 @@ stop:
 	@echo "Stopped Celeritas!"
 
 restart: stop start
+
+## cover: opens coverage in browser
+cover:
+	@go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
+
+## coverage: displays test coverage
+coverage:
+	@go test -cover ./...

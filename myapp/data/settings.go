@@ -20,6 +20,21 @@ func (s *Settings) Table() string {
 	return "settings"
 }
 
+// GetAll returns a slice of all settings configurations
+func (s *Settings) GetAll() ([]*Settings, error) {
+	collection := upper.Collection(s.Table())
+
+	var all []*Settings
+
+	res := collection.Find().OrderBy("id")
+	err := res.All(&all)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+}
+
 // Get gets one settings record by settings id
 func (s *Settings) Get(id int) (*Settings, error) {
 	var settings Settings

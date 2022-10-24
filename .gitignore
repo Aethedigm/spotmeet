@@ -12,3 +12,6 @@
 
 # Database
 /myapp/db-data/
+
+# Test Coverage
+/myapp/coverage.out
