@@ -29,7 +29,7 @@ func (m *Match) GetAll() ([]*Match, error) {
 
 	var all []*Match
 
-	res := collection.Find().OrderBy("user_A_id")
+	res := collection.Find().OrderBy("user_a_id")
 	err := res.All(&all)
 	if err != nil {
 		return nil, err
@@ -101,6 +101,10 @@ func (m *Match) Insert(thematch Match) (int, error) {
 
 	if thematch.User_A_ID == 0 || thematch.User_B_ID == 0 {
 		return 0, errors.New("User_A_ID and User_B_ID must be set")
+	}
+
+	if thematch.User_A_ID == thematch.User_B_ID {
+		return 0, errors.New("User_A_ID and User_B_ID cannot be the same")
 	}
 
 	thematch.CreatedAt = time.Now()
