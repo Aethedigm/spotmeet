@@ -63,6 +63,7 @@ func (t *Token) GetTokensForUser(id int) ([]*Token, error) {
 	return tokens, nil
 }
 
+// This function doesn't make much sense to have
 func (t *Token) Get(id int) (*Token, error) {
 	var token Token
 	collection := upper.Collection(t.Table())
@@ -107,6 +108,20 @@ func (t *Token) DeleteByToken(plainText string) error {
 	}
 
 	return nil
+}
+
+func (t *Token) GenerateAndInsert(u User, ttl time.Duration) (*Token, error) {
+	tok, err := t.GenerateToken(u.ID, ttl)
+	if err != nil {
+		return nil, err
+	}
+
+	err = t.Insert(*tok, u)
+	if err != nil {
+		return nil, err
+	}
+
+	return tok, nil
 }
 
 func (t *Token) Insert(token Token, u User) error {
