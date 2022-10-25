@@ -52,9 +52,12 @@ func (h *Handlers) SessionTest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handlers) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) {
+
+	// create empty user struct
 	u := &data.User{}
 
+	// convert the body of the http request to json, and decode it into the empty user struct
 	err := json.NewDecoder(r.Body).Decode(u)
 	if err != nil {
 		fmt.Println("Error decoding json:", err)
@@ -62,14 +65,36 @@ func (h *Handlers) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := u.Insert(*u)
+	// insert the new user information into the users table
+	userID, err := u.Insert(*u)
 	if err != nil {
 		fmt.Println("Error inserting user:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	fmt.Fprintf(w, "User created with id: %d", id)
+	// Record the user-insert success message into the outgoing http response
+	fmt.Fprintf(w, "User created with id: %d", userID)
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(fmt.Sprintf("%d", id)))
+	w.Write([]byte(fmt.Sprintf("%d", userID)))
+
+	// create profile struct with the new user id, and default information
+	p := &data.Profile{
+		UserID:      userID,
+		Description: "Hello, I'm new to SpotMeet! This is a default message.",
+		ImageURL:    "/public/images/default-profile-pic.png",
+	}
+
+	// insert the new profile into the database
+	profileID, err := p.Insert(*p)
+	if err != nil {
+		fmt.Println("Error inserting profile:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Record the profile-insert success message into the outgoing http response
+	fmt.Fprintf(w, "Profile created with id: %d", profileID)
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fmt.Sprintf("%d", profileID)))
 }
