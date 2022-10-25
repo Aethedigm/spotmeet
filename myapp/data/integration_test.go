@@ -32,14 +32,6 @@ var (
 	dsn      = "host=%s port=%s user=%s password=%s dbname=%s sslmode=disable timezone=UTC connect_timeout=5"
 )
 
-var dummyUser = User{
-	FirstName: "Some",
-	LastName:  "Guy",
-	Email:     "me@here.com",
-	Active:    1,
-	Password:  "password",
-}
-
 var models Models
 var testDB *sql.DB
 var resource *dockertest.Resource
@@ -156,13 +148,42 @@ func TestUser_Table(t *testing.T) {
 }
 
 func TestUser_Insert(t *testing.T) {
-	id, err := models.Users.Insert(dummyUser)
+
+	u := User{
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "user_insert@test.com",
+	}
+
+	id, err := u.Insert(u)
 	if err != nil {
 		t.Error("failed to insert user: ", err)
 	}
 
 	if id == 0 {
 		t.Error("0 returned as id after insert")
+	}
+}
+
+func TestUser_Insert_Duplicate(t *testing.T) {
+	u1 := User{
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "user_insert_duplicate",
+	}
+
+	id, err := u1.Insert(u1)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	if id == 0 {
+		t.Error("0 returned as id after insert")
+	}
+
+	_, err = u1.Insert(u1)
+	if err == nil {
+		t.Error("no error returned when inserting duplicate")
 	}
 }
 
@@ -185,7 +206,19 @@ func TestUser_GetAll(t *testing.T) {
 }
 
 func TestUser_GetByEmail(t *testing.T) {
-	u, err := models.Users.GetByEmail("me@here.com")
+
+	u1 := User{
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "user_getbyemail@test.com",
+	}
+
+	_, err := u1.Insert(u1)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	u, err := models.Users.GetByEmail(u1.Email)
 	if err != nil {
 		t.Error("failed to get user: ", err)
 	}
@@ -218,7 +251,20 @@ func TestUser_Update(t *testing.T) {
 }
 
 func TestUser_PasswordMatches(t *testing.T) {
-	u, err := models.Users.Get(1)
+
+	u1 := User{
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "user_passwordmatches@test.com",
+		Password:  "password",
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	u, err := models.Users.Get(u1ID)
 	if err != nil {
 		t.Error("failed to get user: ", err)
 	}
@@ -229,7 +275,7 @@ func TestUser_PasswordMatches(t *testing.T) {
 	}
 
 	if !matches {
-		t.Error("password does match when it should")
+		t.Error("password doesn't match when it should")
 	}
 
 	matches, err = u.PasswordMatches("123")
@@ -243,12 +289,24 @@ func TestUser_PasswordMatches(t *testing.T) {
 }
 
 func TestUser_ResetPassword(t *testing.T) {
-	err := models.Users.ResetPassword(1, "new_password")
+
+	u := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "resetpassword@test.com",
+	}
+
+	id, err := models.Users.Insert(u)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	err = models.Users.ResetPassword(id, "new_password")
 	if err != nil {
 		t.Error("error resetting password: ", err)
 	}
 
-	err = models.Users.ResetPassword(2, "new_password")
+	err = models.Users.ResetPassword(1000, "new_password")
 	if err == nil {
 		t.Error("did not get an error when trying to reset password for non-existent user")
 	}
@@ -274,9 +332,16 @@ func TestToken_Table(t *testing.T) {
 }
 
 func TestToken_GenerateToken(t *testing.T) {
-	id, err := models.Users.Insert(dummyUser)
+
+	u := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "generatetoken@test.com",
+	}
+
+	id, err := models.Users.Insert(u)
 	if err != nil {
-		t.Error("error inserting user: ", err)
+		t.Error("failed to insert user: ", err)
 	}
 
 	_, err = models.Tokens.GenerateToken(id, time.Hour*24*365)
@@ -286,17 +351,23 @@ func TestToken_GenerateToken(t *testing.T) {
 }
 
 func TestToken_Insert(t *testing.T) {
-	u, err := models.Users.GetByEmail(dummyUser.Email)
-	if err != nil {
-		t.Error("failed to get user")
+	u := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "tokeninsert@test.com",
 	}
 
-	token, err := models.Tokens.GenerateToken(u.ID, time.Hour*24*365)
+	id, err := models.Users.Insert(u)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	token, err := models.Tokens.GenerateToken(id, time.Hour*24*365)
 	if err != nil {
 		t.Error("error generating token: ", err)
 	}
 
-	err = models.Tokens.Insert(*token, *u)
+	err = models.Tokens.Insert(*token, u)
 	if err != nil {
 		t.Error("error insering token: ", err)
 	}
@@ -309,7 +380,28 @@ func TestToken_GetUserForToken(t *testing.T) {
 		t.Error("error expected but not recieved when getting user with a bad token")
 	}
 
-	u, err := models.Users.GetByEmail(dummyUser.Email)
+	u1 := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "getuserfortoken@test.com",
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	tok, err := models.Tokens.GenerateToken(u1ID, time.Hour*24*365)
+	if err != nil {
+		t.Error("error generating token: ", err)
+	}
+
+	err = tok.Insert(*tok, u1)
+	if err != nil {
+		t.Error("error inserting token: ", err)
+	}
+
+	u, err := u1.GetByEmail(u1.Email)
 	if err != nil {
 		t.Error("failed to get user")
 	}
@@ -331,25 +423,35 @@ func TestToken_GetTokensForUser(t *testing.T) {
 	}
 }
 
-func TestToken_Get(t *testing.T) {
-	u, err := models.Users.GetByEmail(dummyUser.Email)
-	if err != nil {
-		t.Error("failed to get user")
-	}
-
-	_, err = models.Tokens.Get(u.Token.ID)
-	if err != nil {
-		t.Error("error getting token by id: ", err)
-	}
-}
-
 func TestToken_GetByToken(t *testing.T) {
-	u, err := models.Users.GetByEmail(dummyUser.Email)
+
+	u1 := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "token_getbytoken@test.com",
+	}
+
+	_, err := u1.Insert(u1)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	u, err := models.Users.GetByEmail(u1.Email)
 	if err != nil {
 		t.Error("failed to get user")
 	}
 
-	_, err = models.Tokens.GetByToken(u.Token.PlainText)
+	tok, err := models.Tokens.GenerateToken(u.ID, time.Hour*24*365)
+	if err != nil {
+		t.Error("error generating token: ", err)
+	}
+
+	err = tok.Insert(*tok, u1)
+	if err != nil {
+		t.Error("error inserting token: ", err)
+	}
+
+	_, err = models.Tokens.GetByToken(tok.PlainText)
 	if err != nil {
 		t.Error("error getting token by token: ", err)
 	}
@@ -360,60 +462,75 @@ func TestToken_GetByToken(t *testing.T) {
 	}
 }
 
-var authData = []struct {
-	name          string
-	token         string
-	email         string
-	errorExpected bool
-	message       string
-}{
-	{"invalid", "abcdefghijklmnopqrstuvwxyz", "a@here.com", true, "invalid token accepted as valid"},
-	{"invalid_length", "abcdefghijklmnopqrstuvwxy", "a@here.com", true, "token of wrong length token accepted as valid"},
-	{"no_user", "abcdefghijklmnopqrstuvwxyz", "a@here.com", true, "no user, but token accepted as valid"},
-	{"valid", "", "me@here.com", false, "valid token reported as invalid"},
-}
-
 func TestToken_AuthenticateToken(t *testing.T) {
-	for _, tt := range authData {
-		token := ""
-		if tt.email == dummyUser.Email {
-			user, err := models.Users.GetByEmail(tt.email)
-			if err != nil {
-				t.Error("failed to get user: ", err)
-			}
-			token = user.Token.PlainText
-		} else {
-			token = tt.token
-		}
 
-		req, _ := http.NewRequest("GET", "/", nil)
-		req.Header.Add("Authorization", "Bearer "+token)
+	dummyUser := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "token_authenticatetoken@test.com",
+	}
 
-		_, err := models.Tokens.AuthenticateToken(req)
-		if tt.errorExpected && err == nil {
-			t.Errorf("%s: %s", tt.name, tt.message)
-		} else if !tt.errorExpected && err != nil {
-			t.Errorf("%s: %s - %s", tt.name, tt.message, err)
-		} else {
-			t.Logf("passed %s", tt.name)
-		}
+	dID, err := dummyUser.Insert(dummyUser)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	dummyUser.ID = dID
+
+	tok, err := models.Tokens.GenerateAndInsert(dummyUser, time.Hour*24*365)
+	if err != nil {
+		t.Error("error generating token: ", err)
+	}
+
+	req, _ := http.NewRequest("GET", "/", nil)
+	req.Header.Set("Authorization", "Bearer "+tok.PlainText)
+
+	_, err = models.Tokens.AuthenticateToken(req)
+	if err != nil {
+		t.Error("error authenticating token: ", err)
 	}
 }
 
 func TestToken_Delete(t *testing.T) {
-	u, err := models.Users.GetByEmail(dummyUser.Email)
-	if err != nil {
-		t.Error(err)
+
+	dummyUser := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "token_delete@test.com",
 	}
 
-	err = models.Tokens.DeleteByToken(u.Token.PlainText)
+	dID, err := dummyUser.Insert(dummyUser)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	dummyUser.ID = dID
+
+	tok, err := models.Tokens.GenerateAndInsert(dummyUser, time.Hour*24*365)
+	if err != nil {
+		t.Error("error generating token: ", err)
+	}
+
+	err = models.Tokens.DeleteByToken(tok.PlainText)
 	if err != nil {
 		t.Error("error deleting token: ", err)
 	}
 }
 
 func TestToken_ExpiredToken(t *testing.T) {
-	// insert a token
+	dummyUser := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "token_expiredtoken@test.com",
+	}
+
+	dID, err := dummyUser.Insert(dummyUser)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	dummyUser.ID = dID
+
 	u, err := models.Users.GetByEmail(dummyUser.Email)
 	if err != nil {
 		t.Error(err)
@@ -498,6 +615,19 @@ func TestToken_DeleteNonExistentToken(t *testing.T) {
 }
 
 func TestToken_ValidToken(t *testing.T) {
+	dummyUser := User{
+		FirstName: "Test",
+		LastName:  "User",
+		Email:     "token_validtoken@test.com",
+	}
+
+	dID, err := dummyUser.Insert(dummyUser)
+	if err != nil {
+		t.Error("failed to insert user: ", err)
+	}
+
+	dummyUser.ID = dID
+
 	u, err := models.Users.GetByEmail(dummyUser.Email)
 	if err != nil {
 		t.Error(err)
