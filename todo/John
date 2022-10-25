@@ -1,0 +1,111 @@
+I'm putting my plans here so everyone can see what I'm planning to do or what I'm already working on. They are in no
+particular order.
+
+
+- add thread_id (FK) to matches table
+- add threads table (id, user_A_id (FK), user_B_id (FK), created_at)
+- add messages table (id, thread_id (fk), user_id (FK), created_at)
+
+- write a function that returns a slice of all liked_artists of a single user
+
+- write function that adds artist to database if not already there. Use this when importing listened-to songs from
+user's spotify
+
+- add expiry to liked_artists table, so each entry will be auto-deleted a month from being created (people's musical
+tastes change over time)
+
+- add "linked" field to matches table as type bool
+    false by default
+    this should turn true the moment both users of a match have sent a message to the other
+    "linked" means the expiry timestamp should be removed (or ignored)
+        the match can now only be removed if one of the users selects "remove match" from the message page
+
+- add minimum_percentage field to settings
+    this represents an integer from 1 to 100
+    This will be the minimum percentage a user would like to match on
+- add liked_artist_sensitivity field to settings (integer 1 - 100, representing percentage)
+    this will control how sensitive the app is in saving artists a user has listened to as actual liked_artists. Without
+    this, for every user the app would save every single listened-to artist as a liked_artist. For the moment, I'd like
+    to hide this from the user, and just set every user's liked_artist_sensitivity to a default of 5, or, 5%. This way,
+    when SpotMeet pulls in all songs the user has listened to in the past month (each time they log in), it can filter
+    out the listened-to artists whose songs accounted for less than 5% of the total songs listened to by the user in the
+    past month.
+
+
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
+
+- Upon authenticating each user, every time they log in, or are auto-authenticated because the app (really, the browser)
+saves their credentials, do these things---------
+
+	1). Access spotify to get user's spotify information
+		see all their listened-to artists
+		see how many songs of each artist was played
+		build logic that picks the strongest artists for the user:
+			- add all artists they've listened to in the last month into artists table, if not already there
+			- create liked_artist entries for the user (if not already in the liked_artists table)
+				- the liked_level field in liked_artists table will be a number 1 (min) to 100 (max), representing how
+				prevalent that artist is within 100% of all songs listened to IN THE PAST MONTH by the user in spotify.
+				- the liked_artist entry will be created only if the calculated liked_level is AT or ABOVE the user's
+				liked_artist_sensitivity value (1-100) from their settings.
+
+    2.) - Get user's geolocation
+            do this by adding current_latitude and current_longitude integer fields to Users table
+            these fields will update upon each login/opening of the app (browser)
+                client's IP address will be ran through a geolocation tool
+                    longitude and latitude will be acquired, and applied to the user's record in the users table
+
+    3.) - Update matches table upon every user login or opening of the app (website)
+            ( -------------------- This Is How Matches Are Created -------------------- )
+            - first, compare the given user's looking_for value (from their settings table record) will all other users
+                - within the procedure, save user ids of all users with identical looking_for values
+            - if any matches:
+            - then, get the value of the given user's distance field from the settings table
+                  (this is the max radius of the search we will conduct)
+                - compare the given user's location data (stored in users table) against all users saved from last step
+                - within the procedure, save user ids of users with locations that are within the radius we got from
+                    the settings table
+
+            - if any user ids left, then: (the fun part) --------------------------
+
+            - create a map called NewMatches
+
+            - for EACH remaining user id (we're talking about the users that are being checked against our given user)
+                - check to see if our given user shares any artists within their liked_artists in common with the
+                currently iterated user's. Save in a two-dimensional array, the matching liked_artists
+                (they share the same artist ids)
+
+                - if our two-dimensional array is not empty:
+
+                - then for EACH pairing in that array,
+
+                    - with our current user's minimum_percentage value in hand (from their settings),
+                    check to see if the shared liked_artist FROM THE OTHER USER has a liked_level (1-100)
+                    that is AT or ABOVE our current user's minimum_percentage setting.
+                        - if this is true, perform the same task from the other user's perspective
+                            - if that passes, then:
+                                find the average between the given user's liked_artist's liked_level, and the other
+                                    user's liked_level for that liked_artist they share in common.
+                                        - within this procedure (and still for this one other user we are checking
+                                        against) save in a map, the artist next to the average liked_level we just found
+
+                - REPEAT this for each block
+
+                - Now that that map has been filled with all artists (and the corresponding average liked_levels)
+                the user shares with the current other user (and liked_levels satisfy each other's individual
+                minimum_percentages), from within that map, return the artist with the highest value associated
+                with it, along with that value.
+                - Append the artist and its corresponding value (the "percentage matched on"), and the user id of the
+                other user, to our NewMatches map (these are our Matches for our given user!!!).
+
+            - REPEAT this for each block
+
+            - If our NewMatches map is not empty, we can run this map through a procedure that calls Match.Insert() for
+            each record in our map, IF, purely based on ID-pairing, that match does not exist. (Matches should expire
+            after a few days, if the linked field in a match is not set to true.)
+
+                        (this algorithm is very basic and can be expanded upon in the future)
+
+------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------
