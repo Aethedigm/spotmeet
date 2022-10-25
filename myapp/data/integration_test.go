@@ -462,19 +462,6 @@ func TestToken_GetByToken(t *testing.T) {
 	}
 }
 
-var authData = []struct {
-	name          string
-	token         string
-	email         string
-	errorExpected bool
-	message       string
-}{
-	{"invalid", "abcdefghijklmnopqrstuvwxyz", "a@here.com", true, "invalid token accepted as valid"},
-	{"invalid_length", "abcdefghijklmnopqrstuvwxy", "a@here.com", true, "token of wrong length token accepted as valid"},
-	{"no_user", "abcdefghijklmnopqrstuvwxyz", "a@here.com", true, "no user, but token accepted as valid"},
-	{"valid", "", "me@here.com", false, "valid token reported as invalid"},
-}
-
 func TestToken_AuthenticateToken(t *testing.T) {
 
 	dummyUser := User{
