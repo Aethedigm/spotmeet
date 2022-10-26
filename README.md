@@ -5,8 +5,8 @@ Capstone - Team E
 - [ ] Pages
   - [X]  Home Page
   - [X] Login Page
-  - [ ] Register Page
-  - [ ] Matches Page
+  - [X] Register Page
+  - [X] Matches Page
   - [ ] Messages Page
     - [ ] Message Threads
   - [ ] Settings
