@@ -12,6 +12,7 @@ type Message struct {
 	ID        int       `db:"id,omitempty"`
 	UserID    int       `db:"user_id" json:"user_id"`
 	MatchID   int       `db:"match_id" json:"match_id"`
+	Content   string    `db:"content" json:"content"`
 	CreatedAt time.Time `db:"created_at"`
 	SentAt    time.Time `db:"sent_at"`
 }
