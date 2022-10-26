@@ -46,8 +46,8 @@ window.onload = function() {
 
 const addMatch = (match) => {
     const matchTemplate = `
-    <div id="match_container-${match.id}" class="container-fluid mt-3">
-        <div id="top_row-${match.id}" class="row mb-2">
+    <div id="match_container-${match.ID}" class="container-fluid mt-3">
+        <div id="top_row-${match.ID}" class="row mb-2">
             <div class="col-3">
                 <i class="fa-solid fa-user fa-2xl"></i>
             </div>
@@ -58,12 +58,12 @@ const addMatch = (match) => {
                 ${match.artist_id}
             </div>
         </div>
-        <div id="bottom_row-${match.id}" class="row">
+        <div id="bottom_row-${match.ID}" class="row">
             <div class="col">
-                <a href="/matches/accept?id=${match.id}" class="btn btn-success rounded w-100">Link</a>
+                <a href="/matches/accept?id=${match.ID}" class="btn btn-success rounded w-100">Link</a>
             </div>
             <div class="col">
-                <a href="/matches/decline?id=${match.id}" class="btn btn-danger rounded w-100">Pass</a>
+                <a href="/matches/decline?id=${match.ID}" class="btn btn-danger rounded w-100">Pass</a>
             </div>
         </div>
     </div>
