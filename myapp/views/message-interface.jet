@@ -1,0 +1,56 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}Welcome{{end}}
+
+{{block css()}}
+<style>
+span.avoidwrap {
+    display:inline-block;
+}
+
+.welcome {
+    font-size: 70px;
+}
+
+@media only screen and (max-width: 768px) {
+    .break {
+        display: block;
+        margin-top: -10px;
+        margin-bottom: -10px;
+    }
+}
+</style>
+{{end}}
+
+{{block pageContent()}}
+
+<div class="col text-center">
+    <div class="d-flex align-items-center justify-content-center mt-5 mb-5">
+        <div>
+            <h3 class="font-weight-bold">spotmeet</h3>
+            <div class="text-muted mt-5 welcome">
+                <span class="break">Welcome</span> <span class="break">to</span> <span class="break">spotmeet!</span>
+            </div>
+        </div>
+    </div>
+
+    
+
+    {{ if !.IsAuthenticated}}
+    <a href="/users/login" class="btn btn-secondary rounded-pill mb-3 w-25 mt-5">Log In</a>
+    <br>
+    <a href="/users/register" class="btn btn-primary rounded-pill mb-3 w-25 mt-3">Sign Up</a>
+    {{end}}
+
+    {{ if .IsAuthenticated}}
+    <a href="/users/logout" class="btn btn-primary rounded-pill mb-3">Logout</a>
+    {{end}}
+    
+</div>
+
+{{end}}
+
+
+{{block js()}}
+
+{{end}}
