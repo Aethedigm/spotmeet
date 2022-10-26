@@ -50,7 +50,7 @@ func (p *Profile) Get(id int) (*Profile, error) {
 	return &profile, nil
 }
 
-// Get gets one user by user id
+// GetByUserID gets one user by user id
 func (p *Profile) GetByUserID(user_id int) (*Profile, error) {
 	var profile Profile
 	collection := upper.Collection(p.Table())
@@ -87,7 +87,7 @@ func (p *Profile) Delete(id int) error {
 	return nil
 }
 
-// Delete deletes a profile by user id
+// DeleteByUserID deletes a profile by user id
 func (p *Profile) DeleteByUserID(user_id int) error {
 	collection := upper.Collection(p.Table())
 	res := collection.Find(up.Cond{"user_id =": user_id})

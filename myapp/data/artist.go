@@ -95,16 +95,24 @@ func (a *Artist) DeleteByName(artistName int) error {
 func (a *Artist) Insert(theArtist Artist) (int, error) {
 	collection := upper.Collection(a.Table())
 
-	// check incoming struct to see if any of it is empty
-	//var empty Artist
-	//if theArtist.ID == empty.ID || theArtist.SpotifyID == empty.SpotifyID || theArtist.Name == empty.Name {
-	//	return 0, errors.New("artist struct not completely filled before inserting to DB")
-	//}
+	// NEED TO CHECK IF LINES 100-110 WORK
+
+	// grab the artist if it already exists in the database
+	checkIfExists, err1 := a.GetByName(theArtist.Name)
+	if err1 != nil {
+		return 0, err1
+	}
+
+	// if empty
+	blankArtist := Artist{}
+	if *checkIfExists != blankArtist {
+		return 0, nil
+	}
 
 	// make the insert
-	res, err := collection.Insert(theArtist)
-	if err != nil {
-		return 0, err
+	res, err2 := collection.Insert(theArtist)
+	if err2 != nil {
+		return 0, err2
 	}
 
 	// get the id from the insert

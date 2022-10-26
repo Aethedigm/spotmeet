@@ -7,13 +7,16 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// Settings is the type for a match
+// Match is the type for a match
 type Match struct {
-	ID           int       `db:"id,omitempty"`
-	User_A_ID    int       `db:"user_a_id" json:"user_A_id"`
-	User_B_ID    int       `db:"user_b_id" json:"user_B_id"`
+	ID        int `db:"id,omitempty"`
+	User_A_ID int `db:"user_a_id" json:"user_A_id"`
+	User_B_ID int `db:"user_b_id" json:"user_B_id"`
+	// // MessageStatus status numbers:
+	// // 0 = no message sent, 1 = message(s) only sent from A, 2 = message(s) only sent from B, 3 = both messaged (linked)
+	// MessageStatus int       `db:"message_status" json:"message_status"`
 	PercentMatch int       `db:"percent_match" json:"percent_match"`
-	Artist_ID    int       `db:"artist_id" json:"artist_id"`
+	ArtistID     int       `db:"artist_id" json:"artist_id"`
 	CreatedAt    time.Time `db:"created_at"`
 	Expires      time.Time `db:"expiry" json:"expiry"`
 }
@@ -29,7 +32,7 @@ func (m *Match) GetAll() ([]*Match, error) {
 
 	var all []*Match
 
-	res := collection.Find().OrderBy("user_a_id")
+	res := collection.Find().OrderBy("id")
 	err := res.All(&all)
 	if err != nil {
 		return nil, err
@@ -38,7 +41,7 @@ func (m *Match) GetAll() ([]*Match, error) {
 	return all, nil
 }
 
-// GetByUserID returns a slice of all matches for a user.
+// GetAllForOneUser returns a slice of all matches for a user.
 func (m *Match) GetAllForOneUser(userID int) ([]Match, error) {
 
 	var all []Match
@@ -94,11 +97,6 @@ func (m *Match) Delete(id int) error {
 // Insert inserts a new match, and returns the newly inserted match's id
 func (m *Match) Insert(thematch Match) (int, error) {
 
-	// ------------------
-	// create something here that ensures thematch has all fields filled except for CreatedAt and
-	// Expires
-	// ------------------
-
 	if thematch.User_A_ID == 0 || thematch.User_B_ID == 0 {
 		return 0, errors.New("User_A_ID and User_B_ID must be set")
 	}
@@ -107,6 +105,7 @@ func (m *Match) Insert(thematch Match) (int, error) {
 		return 0, errors.New("User_A_ID and User_B_ID cannot be the same")
 	}
 
+	// thematch.MessageStatus = 0
 	thematch.CreatedAt = time.Now()
 	thematch.Expires = time.Now().Add(time.Hour * 24 * 5) // expires after 5 days
 
