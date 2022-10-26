@@ -12,14 +12,14 @@ type Match struct {
 	ID        int `db:"id,omitempty"`
 	User_A_ID int `db:"user_a_id" json:"user_A_id"`
 	User_B_ID int `db:"user_b_id" json:"user_B_id"`
-	// MessageStatus status numbers:
-	// 0 = no message sent, 1 = message(s) only sent from A, 2 = message(s) only sent from B, 3 = both messaged (linked)
+	// // MessageStatus status numbers:
+	// // 0 = no message sent, 1 = message(s) only sent from A, 2 = message(s) only sent from B, 3 = both messaged (linked)
 	// MessageStatus int       `db:"message_status" json:"message_status"`
-	PercentMatch int       `db:"percent_match" json:"percent_match"`
-	ArtistID     int       `db:"artist_id" json:"artist_id"`
-	ThreadID     int       `db:"thread_id" json:"thread_id"`
-	CreatedAt    time.Time `db:"created_at"`
-	Expires      time.Time `db:"expiry" json:"expiry"`
+	PercentMatch int `db:"percent_match" json:"percent_match"`
+	ArtistID     int `db:"artist_id" json:"artist_id"`
+	// ThreadID     int       `db:"thread_id" json:"thread_id"`
+	CreatedAt time.Time `db:"created_at"`
+	Expires   time.Time `db:"expiry" json:"expiry"`
 }
 
 // Table returns the table name associated with this model in the database
