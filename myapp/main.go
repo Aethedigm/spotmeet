@@ -6,6 +6,7 @@ import (
 	"myapp/middleware"
 
 	"github.com/aethedigm/celeritas"
+	_ "github.com/zmb3/spotify"
 )
 
 type application struct {
