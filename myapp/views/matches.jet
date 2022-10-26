@@ -1,0 +1,77 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}Matches{{end}}
+
+{{block css()}}
+
+{{end}}
+
+{{block pageContent()}}
+<div id="navbar" class="navbar fixed-top mb-5">
+    <div class="container-fluid">
+        <div></div>
+        <a href="/user/profile" class="btn btn-primary float-right rounded-pill">View Profile</a>
+    </div>
+</div>
+
+<div id="matches_container" class="mt-5">
+</div>
+
+<div id="footbar" class="navbar fixed-bottom bg-light">
+    <div class="container-fluid">
+        <a href="/messages" class="btn float-left rounded-pill">Messages</a>
+        <a href="#" class="btn btn-primary float-left w-50">Matches</a>
+        <a href="/settings" class="btn float-left rounded-pill">Settings</a>
+    </div>
+</div>
+{{end}}
+
+{{block js()}}
+<script>
+
+
+window.onload = function() {
+
+    // Fetch data from server
+    fetch("/matches/myresults")
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            
+            for (let i = 0; i < data.length; i++) {
+                addMatch(data[i]);
+            }
+        });
+}
+
+const addMatch = (match) => {
+    const matchTemplate = `
+    <div id="match_container-${match.id}" class="container-fluid mt-3">
+        <div id="top_row-${match.id}" class="row mb-2">
+            <div class="col-3">
+                <i class="fa-solid fa-user fa-2xl"></i>
+            </div>
+            <div class="col-4 mt-2">
+                ${match.percent_match}% Match
+            </div>
+            <div class="col-5  mt-2">
+                ${match.artist_id}
+            </div>
+        </div>
+        <div id="bottom_row-${match.id}" class="row">
+            <div class="col">
+                <a href="/matches/accept?id=${match.id}" class="btn btn-success rounded w-100">Link</a>
+            </div>
+            <div class="col">
+                <a href="/matches/decline?id=${match.id}" class="btn btn-danger rounded w-100">Pass</a>
+            </div>
+        </div>
+    </div>
+    `
+
+    const matchContainer = document.getElementById("matches_container");
+    matchContainer.innerHTML += matchTemplate;
+}
+
+</script>
+{{end}}
