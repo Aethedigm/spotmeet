@@ -14,7 +14,6 @@ type Link struct {
 	User_B_ID   int       `db:"user_b_id" json:"user_B_id"`
 	PercentLink int       `db:"percent_match" json:"percent_match"`
 	ArtistID    int       `db:"artist_id" json:"artist_id"`
-	ThreadID    int       `db:"thread_id" json:"thread_id"`
 	CreatedAt   time.Time `db:"created_at"`
 }
 
@@ -99,10 +98,6 @@ func (m *Link) Insert(thelink Link) (int, error) {
 
 	if thelink.User_A_ID == thelink.User_B_ID {
 		return 0, errors.New("User_A_ID and User_B_ID cannot be the same")
-	}
-
-	if thelink.ThreadID == 0 {
-		return 0, errors.New("ThreadID must be set")
 	}
 
 	thelink.CreatedAt = time.Now()
