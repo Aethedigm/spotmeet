@@ -7,15 +7,19 @@ import (
 	up "github.com/upper/db/v4"
 )
 
-// Settings is the type for a match
+// Match is the type for a match
 type Match struct {
-	ID           int       `db:"id,omitempty"`
-	User_A_ID    int       `db:"user_a_id" json:"user_A_id"`
-	User_B_ID    int       `db:"user_b_id" json:"user_B_id"`
-	PercentMatch int       `db:"percent_match" json:"percent_match"`
-	Artist_ID    int       `db:"artist_id" json:"artist_id"`
-	CreatedAt    time.Time `db:"created_at"`
-	Expires      time.Time `db:"expiry" json:"expiry"`
+	ID           int `db:"id,omitempty"`
+	User_A_ID    int `db:"user_a_id" json:"user_A_id"`
+	User_B_ID    int `db:"user_b_id" json:"user_B_id"`
+	PercentMatch int `db:"percent_match" json:"percent_match"`
+	ArtistID     int `db:"artist_id" json:"artist_id"`
+	ThreadID     int `db:"thread_id" json:"thread_id"`
+	// Linked as 'true' indicates that the users have messaged each other at least once, and the expiry will
+	// now be ignored.
+	Linked    bool      `db:"linked" json:"linked"`
+	CreatedAt time.Time `db:"created_at"`
+	Expires   time.Time `db:"expiry" json:"expiry"`
 }
 
 // Table returns the table name associated with this model in the database
@@ -107,6 +111,7 @@ func (m *Match) Insert(thematch Match) (int, error) {
 		return 0, errors.New("User_A_ID and User_B_ID cannot be the same")
 	}
 
+	thematch.Linked = false
 	thematch.CreatedAt = time.Now()
 	thematch.Expires = time.Now().Add(time.Hour * 24 * 5) // expires after 5 days
 
