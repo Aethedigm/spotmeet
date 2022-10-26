@@ -18,6 +18,11 @@ func (a *application) routes() *chi.Mux {
 	// add routes here
 	a.App.Routes.Get("/", a.Handlers.Home)
 
+	a.App.Routes.Route("/matches", func(r chi.Router) {
+		r.Get("/", a.Handlers.Matches)
+		r.Get("/myresults", a.Handlers.MyMatchResults)
+	})
+
 	a.App.Routes.Route("/users", func(r chi.Router) {
 		r.Get("/login", a.Handlers.UserLogin)
 		r.Get("/logout", a.Handlers.Logout)
@@ -26,37 +31,6 @@ func (a *application) routes() *chi.Mux {
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
 	})
-
-	// a.App.Routes.Get("/get-user/{id}", func(w http.ResponseWriter, r *http.Request) {
-	// 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-
-	// 	u, err := a.Models.Users.Get(id)
-	// 	if err != nil {
-	// 		a.App.ErrorLog.Println(err)
-	// 		return
-	// 	}
-
-	// 	fmt.Fprintf(w, "%s %s %s", u.FirstName, u.LastName, u.Email)
-	// })
-
-	// a.App.Routes.Get("/update-user/{id}", func(w http.ResponseWriter, r *http.Request) {
-	// 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-	// 	u, err := a.Models.Users.Get(id)
-	// 	if err != nil {
-	// 		a.App.ErrorLog.Println(err)
-	// 		return
-	// 	}
-
-	// 	u.LastName = a.App.RandomString(10)
-	// 	err = u.Update(*u)
-	// 	if err != nil {
-	// 		a.App.ErrorLog.Println(err)
-	// 		return
-	// 	}
-
-	// 	fmt.Fprintf(w, "updated last name to %s", u.LastName)
-
-	// })
 
 	// static routes
 	fileServer := http.FileServer(http.Dir("./public"))

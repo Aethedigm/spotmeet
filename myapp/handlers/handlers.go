@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"myapp/data"
 	"net/http"
+	"time"
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/aethedigm/celeritas"
@@ -13,6 +14,63 @@ import (
 type Handlers struct {
 	App    *celeritas.Celeritas
 	Models data.Models
+}
+
+func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
+	var matches []data.Match
+
+	// Temporarily provide fake data
+	m1 := data.Match{
+		ID:           1,
+		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
+		User_B_ID:    2,
+		PercentMatch: 100,
+		ArtistID:     1,
+		CreatedAt:    time.Now(),
+		Expires:      time.Now().Add(1 * time.Hour),
+	}
+
+	matches = append(matches, m1)
+
+	m2 := data.Match{
+		ID:           1,
+		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
+		User_B_ID:    3,
+		PercentMatch: 90,
+		ArtistID:     3,
+		CreatedAt:    time.Now(),
+		Expires:      time.Now().Add(1 * time.Hour),
+	}
+
+	matches = append(matches, m2)
+
+	m3 := data.Match{
+		ID:           1,
+		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
+		User_B_ID:    4,
+		PercentMatch: 50,
+		ArtistID:     2,
+		CreatedAt:    time.Now(),
+		Expires:      time.Now().Add(24 * 5 * time.Hour),
+	}
+
+	matches = append(matches, m3)
+
+	js, err := json.Marshal(matches)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(js)
+}
+
+func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
+	err := h.App.Render.Page(w, r, "matches", nil, nil)
+	if err != nil {
+		h.App.ErrorLog.Println("error rendering:", err)
+	}
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
