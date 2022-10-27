@@ -10,12 +10,18 @@ Capstone - Team E
   - [ ] Messages Page
     - [ ] Message Threads
   - [ ] Settings
+    - [ ] Logout Button
   - [X] Profiles
+    - [ ] Edit Profiles
   - [ ] About
 - [ ] Backend
-  - TODO
+  - [ ] Models
+  - [ ] Migrations
+  - [ ] 80%+ Testing
 - [ ] Middleware
-  - TODO
+  - [ ] Spotify Auth
+  - [ ] Spotify Music Capture
+  - [ ] Trigger Matches
 
 # Setup
 - Inside of the myapp folder
