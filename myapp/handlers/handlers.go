@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"myapp/data"
 	"net/http"
-	"time"
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/aethedigm/celeritas"
@@ -17,53 +16,21 @@ type Handlers struct {
 }
 
 func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
-	var matches []data.Match
-
-	// Temporarily provide fake data
-	m1 := data.Match{
-		ID:           1,
-		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
-		User_B_ID:    2,
-		PercentMatch: 100,
-		ArtistID:     1,
-		CreatedAt:    time.Now(),
-		Expires:      time.Now().Add(1 * time.Hour),
-	}
-
-	matches = append(matches, m1)
-
-	m2 := data.Match{
-		ID:           1,
-		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
-		User_B_ID:    3,
-		PercentMatch: 90,
-		ArtistID:     3,
-		CreatedAt:    time.Now(),
-		Expires:      time.Now().Add(1 * time.Hour),
-	}
-
-	matches = append(matches, m2)
-
-	m3 := data.Match{
-		ID:           1,
-		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
-		User_B_ID:    4,
-		PercentMatch: 50,
-		ArtistID:     2,
-		CreatedAt:    time.Now(),
-		Expires:      time.Now().Add(24 * 5 * time.Hour),
-	}
-
-	matches = append(matches, m3)
-
-	js, err := json.Marshal(matches)
+	matches, err := h.Models.Matches.GetAllForOneUser(h.App.Session.GetInt(r.Context(), "userID"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		fmt.Println("Error getting matches:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	matchesJSON, err := json.Marshal(matches)
+	if err != nil {
+		fmt.Println("Error marshalling matches:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	w.Write(matchesJSON)
 }
 
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +41,13 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
+	if h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "/matches", http.StatusSeeOther)
+		return
+	}
+
 	err := h.App.Render.Page(w, r, "home", nil, nil)
+
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}
