@@ -10,7 +10,7 @@ Capstone - Team E
   - [ ] Messages Page
     - [ ] Message Threads
   - [ ] Settings
-  - [ ] Profiles
+  - [X] Profiles
   - [ ] About
 - [ ] Backend
   - TODO
