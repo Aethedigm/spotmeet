@@ -35,16 +35,34 @@ window.onload = function() {
     fetch("/matches/myresults")
         .then(response => response.json())
         .then(data => {
-            // Sort matches
-            data.sort(function(a, b) {
-                return a.match_percentage - b.match_percentage;
-            });
+            if (data.length !== 0) {
+                // Sort matches
+                data.sort(function(a, b) {
+                    return a.match_percentage - b.match_percentage;
+                });
 
-            // Display matches
-            for (let i = 0; i < data.length; i++) {
-                addMatch(data[i]);
+                // Display matches
+                for (let i = 0; i < data.length; i++) {
+                    addMatch(data[i]);
+                }
+            } else {
+                noMatches();
             }
         });
+}
+
+const noMatches = () => {
+    const noMatchTemplate = `
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h1>No Matches</h1>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("matches_container").innerHTML = noMatchTemplate;
 }
 
 const addMatch = (match) => {
