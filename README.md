@@ -30,6 +30,8 @@ Capstone - Team E
 - `docker-compose up`
 - Migrate data into database
 - `./celeritas migrate`
+- Start service
+- `go run .`
 
 # Tear Down / Restart
 - Inside of the myapp folder
@@ -42,3 +44,5 @@ Capstone - Team E
 - `docker-compose up`
 - Migrate data
 - `./celeritas migrate`
+- Start service
+- `go run .`
