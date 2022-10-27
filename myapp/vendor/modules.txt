@@ -212,6 +212,8 @@ github.com/xeipuuv/gojsonschema
 # github.com/zmb3/spotify v1.3.0
 ## explicit; go 1.14
 github.com/zmb3/spotify
+# github.com/zmb3/spotify/v2 v2.3.0
+## explicit; go 1.16
 # go.uber.org/atomic v1.7.0
 ## explicit; go 1.13
 go.uber.org/atomic
