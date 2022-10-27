@@ -10,7 +10,7 @@
 <div id="navbar" class="navbar fixed-top mb-5">
     <div class="container-fluid">
         <div></div>
-        <a href="/user/profile" class="btn btn-primary float-right rounded-pill">View Profile</a>
+        <a href="/users/profile" class="btn btn-primary float-right rounded-pill">View Profile</a>
     </div>
 </div>
 
@@ -28,7 +28,6 @@
 
 {{block js()}}
 <script>
-
 
 window.onload = function() {
 

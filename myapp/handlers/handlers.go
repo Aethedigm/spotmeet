@@ -15,6 +15,13 @@ type Handlers struct {
 	Models data.Models
 }
 
+func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
+	err := h.App.Render.Page(w, r, "profile", nil, nil)
+	if err != nil {
+		h.App.ErrorLog.Println("error rendering:", err)
+	}
+}
+
 func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	matches, err := h.Models.Matches.GetAllForOneUser(h.App.Session.GetInt(r.Context(), "userID"))
 	if err != nil {

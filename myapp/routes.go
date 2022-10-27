@@ -27,9 +27,11 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/login", a.Handlers.UserLogin)
 		r.Get("/logout", a.Handlers.Logout)
 		r.Get("/register", a.Handlers.UserRegister)
+		r.Get("/profile", a.Handlers.Profile)
 
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
+
 	})
 
 	// static routes
