@@ -15,7 +15,6 @@ type Message struct {
 	LinkID    int       `db:"link_id" json:"link_id"`
 	Content   string    `db:"content" json:"content"`
 	CreatedAt time.Time `db:"created_at"`
-	SentAt    time.Time `db:"sent_at"`
 }
 
 // Table returns the table name associated with this model in the database
@@ -97,23 +96,4 @@ func (m *Message) Insert(themessage Message) (int, error) {
 	id := getInsertID(res.ID())
 
 	return id, nil
-}
-
-// SetSentAt sets the sent_at field in database. Returns time.
-func (m *Message) SetSentAt(message_id int) (time.Time, error) {
-	message, _ := m.Get(message_id)
-	message.SentAt = time.Now()
-	collection := upper.Collection(message.Table())
-	res := collection.Find(message.ID)
-
-	// not sure about this-- Trying to update a single message record
-	// with the new message struct containing everything that's already
-	// in the record, but now including the SentAt time.
-	err := res.Update(message)
-
-	if err != nil {
-		return time.Time{}, err
-	}
-
-	return message.SentAt, nil
 }
