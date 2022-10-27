@@ -12,7 +12,7 @@ Capstone - Team E
   - [ ] Settings
     - [ ] Logout Button
   - [X] Profiles
-    - [ ] Edit Profiles
+    - [X] Edit Profiles
   - [ ] About
 - [ ] Backend
   - [ ] Models

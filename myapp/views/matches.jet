@@ -30,7 +30,6 @@
 <script>
 
 window.onload = function() {
-
     // Fetch data from server
     fetch("/matches/myresults")
         .then(response => response.json())
