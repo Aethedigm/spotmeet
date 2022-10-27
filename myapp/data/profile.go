@@ -100,12 +100,12 @@ func (p *Profile) DeleteByUserID(user_id int) error {
 
 // Insert inserts a new profile, and returns the newly inserted profile id
 func (p *Profile) Insert(profile Profile) (int, error) {
-
-	// enable this once default image is found.
 	// ensure a default image is set if one was not set while user was creating profile
-	//if profile.ImageURL == nil {
-	//	profile.ImageURL = //////// some default image in public folder
-	//}
+	if profile.ImageURL == "" {
+		profile.ImageURL = "/public/images/default-profile-pic"
+	}
+
+	profile.Description = "Hi! I'm new!"
 
 	profile.CreatedAt = time.Now()
 	profile.UpdatedAt = time.Now()

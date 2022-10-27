@@ -135,9 +135,9 @@ func (u *User) Insert(theUser User) (int, error) {
 		return 0, err
 	}
 
-	id := getInsertID(res.ID())
+	uID := getInsertID(res.ID())
 
-	return id, nil
+	return uID, nil
 }
 
 // ResetPassword resets a users's password, by id, using supplied password

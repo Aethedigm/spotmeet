@@ -28,6 +28,7 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/logout", a.Handlers.Logout)
 		r.Get("/register", a.Handlers.UserRegister)
 		r.Get("/profile", a.Handlers.Profile)
+		r.Get("/profile/{profileID:[0-9]+}", a.Handlers.ProfileByID)
 
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
