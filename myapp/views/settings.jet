@@ -11,7 +11,7 @@
 <div id="footbar" class="navbar fixed-bottom bg-light">
     <div class="container-fluid">
         <a href="/messages" class="btn float-left rounded-pill w-25">Messages</a>
-        <a href="#" class="btn rounded-pill float-left w-25">Matches</a>
+        <a href="/matches" class="btn rounded-pill float-left w-25">Matches</a>
         <a href="/settings" class="btn btn-primary float-left w-25">Settings</a>
     </div>
 </div>
