@@ -27,10 +27,14 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/login", a.Handlers.UserLogin)
 		r.Get("/logout", a.Handlers.Logout)
 		r.Get("/register", a.Handlers.UserRegister)
+		r.Get("/spotauth", a.Handlers.SpotifyAuthorization)
 
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
 	})
+
+	a.App.Routes.Get("/callback", a.Handlers.SpotifyAuthorizationCallback)
+	a.App.Routes.Post("/callback", a.Handlers.SpotifyAuthorizationCallback)
 
 	// static routes
 	fileServer := http.FileServer(http.Dir("./public"))
