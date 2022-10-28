@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS links cascade;
+
+CREATE TABLE links (
+    id SERIAL PRIMARY KEY,
+    user_a_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_b_id INTEGER NOT NULL  REFERENCES users(id) ON DELETE CASCADE,
+    percent_match NUMERIC NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

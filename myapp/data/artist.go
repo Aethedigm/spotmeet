@@ -81,9 +81,9 @@ func (a *Artist) Delete(id int) error {
 }
 
 // DeleteByName deletes an artist record by name
-func (a *Artist) DeleteByName(artistName int) error {
+func (a *Artist) DeleteByName(artistName string) error {
 	collection := upper.Collection(a.Table())
-	res := collection.Find(up.Cond{"artist_name =": artistName})
+	res := collection.Find(up.Cond{"artist_name": artistName})
 	err := res.Delete()
 	if err != nil {
 		return err
@@ -95,28 +95,12 @@ func (a *Artist) DeleteByName(artistName int) error {
 func (a *Artist) Insert(theArtist Artist) (int, error) {
 	collection := upper.Collection(a.Table())
 
-	// NEED TO CHECK IF LINES 100-110 WORK
-
-	// grab the artist if it already exists in the database
-	checkIfExists, err1 := a.GetByName(theArtist.Name)
-	if err1 != nil {
-		return 0, err1
+	res, err := collection.Insert(&theArtist)
+	if err != nil {
+		return 0, err
 	}
 
-	// if empty
-	blankArtist := Artist{}
-	if *checkIfExists != blankArtist {
-		return 0, nil
-	}
+	aID := getInsertID(res.ID())
 
-	// make the insert
-	res, err2 := collection.Insert(theArtist)
-	if err2 != nil {
-		return 0, err2
-	}
-
-	// get the id from the insert
-	id := getInsertID(res.ID())
-
-	return id, nil
+	return aID, nil
 }
