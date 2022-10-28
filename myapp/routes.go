@@ -27,6 +27,7 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/login", a.Handlers.UserLogin)
 		r.Get("/logout", a.Handlers.Logout)
 		r.Get("/register", a.Handlers.UserRegister)
+		r.Get("/spotauth", a.Handlers.SpotifyAuthorization)
 		r.Get("/profile", a.Handlers.Profile)
 		r.Get("/profile/{profileID:[0-9]+}", a.Handlers.ProfileByID)
 		r.Get("/edit-profile/{profileID:[0-9]+}", a.Handlers.EditProfile)
@@ -35,6 +36,8 @@ func (a *application) routes() *chi.Mux {
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
 		r.Put("/update-profile/{profileID:[0-9]+}", a.Handlers.UpdateProfile)
 	})
+
+	a.App.Routes.Get("/spotauth/callback", a.Handlers.SpotifyAuthorizationCallback)
 
 	a.App.Routes.Route("/messages", func(r chi.Router) {
 		r.Get("/", a.Handlers.Messages)
