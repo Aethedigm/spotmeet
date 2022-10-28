@@ -959,3 +959,616 @@ func TestMatch_Delete(t *testing.T) {
 		t.Error("Failed to delete match ", err)
 	}
 }
+
+func TestArtist_GetAll(t *testing.T) {
+	a := Artist{
+		Name:      "test",
+		SpotifyID: "123",
+	}
+
+	aID, err := a.Insert(a)
+	if err != nil {
+		t.Error(err)
+	}
+	a.ID = aID
+
+	b := Artist{
+		Name:      "test2",
+		SpotifyID: "1234",
+	}
+
+	bID, err := b.Insert(b)
+	if err != nil {
+		t.Error(err)
+	}
+	b.ID = bID
+
+	artists, err := a.GetAll()
+
+	if ArtistInArray(a, artists) == false {
+		t.Error("failed to return artist")
+	}
+
+	if ArtistInArray(b, artists) == false {
+		t.Error("failed to return artist")
+	}
+}
+
+func TestArtist_GetByName(t *testing.T) {
+	a := Artist{
+		Name:      "test3",
+		SpotifyID: "123",
+	}
+
+	aID, err := a.Insert(a)
+	if err != nil {
+		t.Error(err)
+	}
+	a.ID = aID
+
+	artist, err := a.GetByName(a.Name)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if artist.ID != aID {
+		t.Error("incorrect artist returned")
+	}
+}
+
+func TestArtist_Get(t *testing.T) {
+	a := Artist{
+		Name:      "test4",
+		SpotifyID: "123",
+	}
+
+	aID, err := a.Insert(a)
+	if err != nil {
+		t.Error(err)
+	}
+	a.ID = aID
+
+	artist, err := a.Get(aID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if artist.ID != aID {
+		t.Error("incorrect artist returned")
+	}
+}
+
+func TestArtist_Update(t *testing.T) {
+	a := Artist{
+		Name:      "test5",
+		SpotifyID: "123",
+	}
+
+	aID, err := a.Insert(a)
+	if err != nil {
+		t.Error(err)
+	}
+	a.ID = aID
+
+	a.Name = "test6"
+
+	err = a.Update(a)
+	if err != nil {
+		t.Error(err)
+	}
+
+	artist, err := a.Get(aID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if artist.Name != "test6" {
+		t.Error("incorrect artist returned")
+	}
+}
+
+func TestArtist_Delete(t *testing.T) {
+	a := Artist{
+		Name:      "test7",
+		SpotifyID: "123",
+	}
+
+	aID, err := a.Insert(a)
+	if err != nil {
+		t.Error(err)
+	}
+	a.ID = aID
+
+	err = a.Delete(aID)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestArtist_DeleteByName(t *testing.T) {
+	a := Artist{
+		Name:      "test8",
+		SpotifyID: "123",
+	}
+
+	aID, err := a.Insert(a)
+	if err != nil {
+		t.Error(err)
+	}
+	a.ID = aID
+
+	err = a.DeleteByName(a.Name)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func ArtistInArray(a Artist, arr []*Artist) bool {
+	for _, v := range arr {
+		if v.ID == a.ID {
+			return true
+		}
+	}
+	return false
+}
+
+func TestMessage_Insert(t *testing.T) {
+	u1 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "message1@test.com",
+		Active:    1,
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	u2 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "message2@test.com",
+		Active:    1,
+	}
+
+	u2ID, err := u2.Insert(u2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m := Message{
+		UserID:  u1ID,
+		MatchID: u2ID,
+		Content: "test",
+	}
+
+	mID, err := m.Insert(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if mID == 0 {
+		t.Error("failed to insert message")
+	}
+
+}
+
+func TestMessage_Get(t *testing.T) {
+	u1 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "message3@test.com",
+		Active:    1,
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	u2 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "message4@test.com",
+		Active:    1,
+	}
+
+	u2ID, err := u2.Insert(u2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m := Message{
+		UserID:  u1ID,
+		MatchID: u2ID,
+		Content: "test",
+	}
+
+	mID, err := m.Insert(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m.ID = mID
+
+	message, err := m.Get(mID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if message.ID != mID {
+		t.Error("incorrect message returned")
+	}
+}
+
+func TestMessage_GetAllForMatch(t *testing.T) {
+	u1 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "gafm1@test.com",
+		Active:    1,
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	u2 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "gafm2@test.com",
+		Active:    1,
+	}
+
+	u2ID, err := u2.Insert(u2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m := Message{
+		UserID:  u1ID,
+		MatchID: u2ID,
+		Content: "test",
+	}
+
+	mID, err := m.Insert(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m.ID = mID
+
+	m2 := Message{
+		UserID:  u2ID,
+		MatchID: u1ID,
+		Content: "test2",
+	}
+
+	m2ID, err := m2.Insert(m2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m2.ID = m2ID
+
+	messages, err := m.GetAllForOneMatch(u1ID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(messages) != 2 {
+		t.Error("incorrect number of messages returned")
+	}
+
+	if !MessageInArray(m, messages) {
+		t.Error("incorrect message returned")
+	}
+}
+
+func TestMessage_GetAll(t *testing.T) {
+	u1 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "ga1@test.com",
+		Active:    1,
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	u2 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "ga2@test.com",
+		Active:    1,
+	}
+
+	u2ID, err := u2.Insert(u2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m := Message{
+		UserID:  u1ID,
+		MatchID: u2ID,
+		Content: "test",
+	}
+
+	mID, err := m.Insert(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m.ID = mID
+
+	m2 := Message{
+		UserID:  u2ID,
+		MatchID: u1ID,
+		Content: "test2",
+	}
+
+	m2ID, err := m2.Insert(m2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m2.ID = m2ID
+
+	messages, err := m.GetAll()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !MessageInArray(m, messages) {
+		t.Error("incorrect message returned")
+	}
+}
+
+func MessageInArray(m Message, arr []*Message) bool {
+	for _, v := range arr {
+		if v.ID == m.ID {
+			return true
+		}
+	}
+	return false
+}
+
+func TestMessage_Delete(t *testing.T) {
+	u1 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "d1@test.com",
+		Active:    1,
+	}
+
+	u1ID, err := u1.Insert(u1)
+	if err != nil {
+		t.Error(err)
+	}
+
+	u2 := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "d2@test.com",
+		Active:    1,
+	}
+
+	u2ID, err := u2.Insert(u2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m := Message{
+		UserID:  u1ID,
+		MatchID: u2ID,
+		Content: "test",
+	}
+
+	mID, err := m.Insert(m)
+	if err != nil {
+		t.Error(err)
+	}
+
+	m.ID = mID
+
+	err = m.Delete(mID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = m.Get(mID)
+	if err == nil {
+		t.Error("message not deleted")
+	}
+}
+
+func TestProfile_Get(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "tpg1@test.com",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p := Profile{
+		UserID: uID,
+	}
+
+	pID, err := p.Insert(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.ID = pID
+
+	profile, err := p.Get(pID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if profile.ID != pID {
+		t.Error("incorrect profile returned")
+	}
+}
+
+func TestProfile_GetByUserID(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "gbui1@test.com",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p := Profile{
+		UserID: uID,
+	}
+
+	pID, err := p.Insert(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.ID = pID
+
+	profile, err := p.GetByUserID(uID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if profile.ID != pID {
+		t.Error("incorrect profile returned")
+	}
+}
+
+func TestProfile_Update(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p := Profile{
+		UserID: uID,
+	}
+
+	pID, err := p.Insert(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.ID = pID
+
+	p.Description = "test"
+
+	err = p.Update(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	profile, err := p.Get(pID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if profile.Description != "test" {
+		t.Error("incorrect profile returned")
+	}
+}
+
+func TestProfile_Delete(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "del@test.com",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p := Profile{
+		UserID: uID,
+	}
+
+	pID, err := p.Insert(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.ID = pID
+
+	err = p.Delete(pID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = p.Get(pID)
+	if err == nil {
+		t.Error("profile not deleted")
+	}
+}
+
+func TestProfile_GetAll(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "gall@test.com",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p := Profile{
+		UserID: uID,
+	}
+
+	pID, err := p.Insert(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.ID = pID
+
+	profiles, err := p.GetAll()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !ProfileInArray(p, profiles) {
+		t.Error("missing profile")
+	}
+}
+
+func ProfileInArray(p Profile, arr []*Profile) bool {
+	for _, v := range arr {
+		if v.ID == p.ID {
+			return true
+		}
+	}
+	return false
+}

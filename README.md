@@ -10,12 +10,18 @@ Capstone - Team E
   - [ ] Messages Page
     - [ ] Message Threads
   - [ ] Settings
-  - [ ] Profiles
+    - [ ] Logout Button
+  - [X] Profiles
+    - [X] Edit Profiles
   - [ ] About
 - [ ] Backend
-  - TODO
+  - [ ] Models
+  - [ ] Migrations
+  - [ ] 80%+ Testing
 - [ ] Middleware
-  - TODO
+  - [ ] Spotify Auth
+  - [ ] Spotify Music Capture
+  - [ ] Trigger Matches
 
 # Setup
 - Inside of the myapp folder
@@ -24,6 +30,8 @@ Capstone - Team E
 - `docker-compose up`
 - Migrate data into database
 - `./celeritas migrate`
+- Start service
+- `go run .`
 
 # Tear Down / Restart
 - Inside of the myapp folder
@@ -36,3 +44,5 @@ Capstone - Team E
 - `docker-compose up`
 - Migrate data
 - `./celeritas migrate`
+- Start service
+- `go run .`

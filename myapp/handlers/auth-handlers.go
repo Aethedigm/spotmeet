@@ -55,6 +55,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	h.App.Session.Put(r.Context(), "userID", user.ID)
 
+
 	// Need to get the specific Spotify redirect and access tokens for the user_id we just found.
 	// If we do not do this, then if the browser signs in as a new or other user, it keeps the tokens from the
 	// last user who was logged in.

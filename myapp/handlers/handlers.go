@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"myapp/data"
 	"net/http"
-	"time"
+	"strconv"
+
+	"github.com/go-chi/chi/v5"
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/aethedigm/celeritas"
@@ -16,54 +18,211 @@ type Handlers struct {
 	Models data.Models
 }
 
-func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
-	var matches []data.Match
-
-	// Temporarily provide fake data
-	m1 := data.Match{
-		ID:           1,
-		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
-		User_B_ID:    2,
-		PercentMatch: 100,
-		ArtistID:     1,
-		CreatedAt:    time.Now(),
-		Expires:      time.Now().Add(1 * time.Hour),
-	}
-
-	matches = append(matches, m1)
-
-	m2 := data.Match{
-		ID:           1,
-		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
-		User_B_ID:    3,
-		PercentMatch: 90,
-		ArtistID:     3,
-		CreatedAt:    time.Now(),
-		Expires:      time.Now().Add(1 * time.Hour),
-	}
-
-	matches = append(matches, m2)
-
-	m3 := data.Match{
-		ID:           1,
-		User_A_ID:    h.App.Session.GetInt(r.Context(), "user_id"),
-		User_B_ID:    4,
-		PercentMatch: 50,
-		ArtistID:     2,
-		CreatedAt:    time.Now(),
-		Expires:      time.Now().Add(24 * 5 * time.Hour),
-	}
-
-	matches = append(matches, m3)
-
-	js, err := json.Marshal(matches)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "users/login", http.StatusSeeOther)
 		return
 	}
 
+	err := h.App.Render.JetPage(w, r, "settings", nil, nil)
+	if err != nil {
+		h.App.ErrorLog.Println("error rendering:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func (h *Handlers) Messages(w http.ResponseWriter, r *http.Request) {
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		return
+	}
+
+	err := h.App.Render.JetPage(w, r, "messages", nil, nil)
+	if err != nil {
+		h.App.ErrorLog.Println("error rendering:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func (h *Handlers) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println("Error parsing form:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("body:" + r.Form.Encode())
+
+	desc := r.Form.Get("description")
+
+	fmt.Println("Description:", desc)
+
+	if profileID := chi.URLParam(r, "profileID"); profileID != "" {
+		pID, err := strconv.Atoi(profileID)
+		if err != nil {
+			fmt.Println("Error converting profileID to int:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		profile, err := h.Models.Profiles.Get(pID)
+		if err != nil {
+			fmt.Println("Error getting profile:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		profile.Description = desc
+
+		err = h.Models.Profiles.Update(*profile)
+		if err != nil {
+			fmt.Println("Error updating profile:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("success"))
+	}
+
+	http.Error(w, "Error updating profile", http.StatusBadRequest)
+}
+
+func (h *Handlers) EditProfile(w http.ResponseWriter, r *http.Request) {
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		return
+	}
+
+	if profileID := chi.URLParam(r, "profileID"); profileID != "" {
+		pID, err := strconv.Atoi(profileID)
+		if err != nil {
+			fmt.Println("Error converting profileID to int:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		profile, err := h.Models.Profiles.Get(pID)
+		if err != nil {
+			fmt.Println("Error getting profile:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if profile.UserID != h.App.Session.GetInt(r.Context(), "userID") {
+			http.Error(w, "You are not authorized to edit this profile", http.StatusForbidden)
+			return
+		} else {
+
+			user, err := h.Models.Users.Get(profile.UserID)
+			if err != nil {
+				fmt.Println("Error getting user:", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
+			vars := make(jet.VarMap)
+			vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
+			vars.Set("profileID", profile.ID)
+			vars.Set("description", profile.Description)
+			vars.Set("FirstName", user.FirstName)
+
+			err = h.App.Render.JetPage(w, r, "editprofile", vars, nil)
+			if err != nil {
+				h.App.ErrorLog.Println("error rendering:", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+			}
+		}
+	} else {
+		http.Redirect(w, r, "matches", http.StatusSeeOther)
+	}
+}
+
+func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		return
+	}
+
+	if profileID := chi.URLParam(r, "profileID"); profileID != "" {
+
+		pID, err := strconv.Atoi(profileID)
+		if err != nil {
+			fmt.Println("Error converting profileID to int:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		profile, err := h.Models.Profiles.Get(pID)
+		if err != nil {
+			fmt.Println("Error getting profile:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		user, err := h.Models.Users.Get(profile.UserID)
+		if err != nil {
+			fmt.Println("Error getting user:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		vars := make(jet.VarMap)
+		vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
+		vars.Set("profileID", profile.ID)
+		vars.Set("usersProfileID", profile.UserID)
+		vars.Set("FirstName", user.FirstName)
+		vars.Set("imgurl", profile.ImageURL)
+		vars.Set("description", profile.Description)
+
+		// GET TOP 3 ARTISTS
+		vars.Set("Artist1", "Artist#1")
+		vars.Set("Artist2", "Artist#2")
+		vars.Set("Artist3", "Artist#3")
+
+		err = h.App.Render.JetPage(w, r, "profile", vars, nil)
+		if err != nil {
+			h.App.ErrorLog.Println("error rendering:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+	} else {
+		http.Error(w, "No ID provided", http.StatusBadRequest)
+	}
+}
+
+func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
+	if userID := h.App.Session.GetInt(r.Context(), "userID"); userID != 0 {
+		profile, err := h.Models.Profiles.GetByUserID(userID)
+		if err != nil {
+			fmt.Println("Error getting profile:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		http.Redirect(w, r, "/users/profile/"+fmt.Sprint(profile.ID), http.StatusSeeOther)
+	} else {
+		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+		return
+	}
+}
+
+func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
+	matches, err := h.Models.Matches.GetAllForOneUser(h.App.Session.GetInt(r.Context(), "userID"))
+	if err != nil {
+		fmt.Println("Error getting matches:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	matchesJSON, err := json.Marshal(matches)
+	if err != nil {
+		fmt.Println("Error marshalling matches:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(js)
+	w.Write(matchesJSON)
 }
 
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +233,13 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
+	if h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "/matches", http.StatusSeeOther)
+		return
+	}
+
 	err := h.App.Render.Page(w, r, "home", nil, nil)
+
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}

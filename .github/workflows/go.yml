@@ -32,6 +32,3 @@ jobs:
     
     - name: TestMyApp
       run: cd myapp/data && go test -v ./...
-      
-    - name: TestIntegration
-      run: cd myapp/data && go test -v ./... --tags integration --count=1

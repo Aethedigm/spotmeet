@@ -41,10 +41,6 @@ span.avoidwrap {
     <br>
     <a href="/users/register" class="btn btn-primary rounded-pill mb-3 w-25 mt-3">Sign Up</a>
     {{end}}
-
-    {{ if .IsAuthenticated}}
-    <a href="/users/logout" class="btn btn-primary rounded-pill mb-3">Logout</a>
-    {{end}}
     
 </div>
 

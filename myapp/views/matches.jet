@@ -10,7 +10,7 @@
 <div id="navbar" class="navbar fixed-top mb-5">
     <div class="container-fluid">
         <div></div>
-        <a href="/user/profile" class="btn btn-primary float-right rounded-pill">View Profile</a>
+        <a href="/users/profile" class="btn btn-primary float-right rounded-pill">View Profile</a>
     </div>
 </div>
 
@@ -19,9 +19,9 @@
 
 <div id="footbar" class="navbar fixed-bottom bg-light">
     <div class="container-fluid">
-        <a href="/messages" class="btn float-left rounded-pill">Messages</a>
-        <a href="#" class="btn btn-primary float-left w-50">Matches</a>
-        <a href="/settings" class="btn float-left rounded-pill">Settings</a>
+        <a href="/messages" class="btn float-left rounded-pill w-25">Messages</a>
+        <a href="#" class="btn btn-primary float-left w-25">Matches</a>
+        <a href="/settings" class="btn float-left rounded-pill w-25">Settings</a>
     </div>
 </div>
 {{end}}
@@ -29,19 +29,39 @@
 {{block js()}}
 <script>
 
-
 window.onload = function() {
-
     // Fetch data from server
     fetch("/matches/myresults")
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            
-            for (let i = 0; i < data.length; i++) {
-                addMatch(data[i]);
+            if (data.length !== 0) {
+                // Sort matches
+                data.sort(function(a, b) {
+                    return a.match_percentage - b.match_percentage;
+                });
+
+                // Display matches
+                for (let i = 0; i < data.length; i++) {
+                    addMatch(data[i]);
+                }
+            } else {
+                noMatches();
             }
         });
+}
+
+const noMatches = () => {
+    const noMatchTemplate = `
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h1>No Matches</h1>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("matches_container").innerHTML = noMatchTemplate;
 }
 
 const addMatch = (match) => {

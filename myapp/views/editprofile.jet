@@ -1,0 +1,52 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}Edit Profile{{end}}
+
+{{block css()}}
+
+{{end}}
+
+{{block pageContent()}}
+<div class="mt-5 text-center justify-content-center">
+    <div>
+        <h1>Edit Profile</h1>
+        <h1 class="mt-5">{{ FirstName }}</h1>
+    </div>
+    <div class="mt-5">
+        <input type="text" class="form-control" placeholder="{{ description }}" id="description">
+    </div>
+
+    <div class="container">
+        <a href="#submit" class="btn btn-success mt-5" onclick="updateProfile()">Submit</a>
+        <a href="#cancel" class="btn btn-danger mt-5" onclick="cancel()">Cancel</a>
+    </div>
+</div>
+{{end}}
+
+{{block js()}}
+<script>
+const updateProfile = () => {
+    const data = new URLSearchParams();
+    data.append("description", document.getElementById("description").value);
+
+    fetch('/users/update-profile/{{ profileID }}', {
+        method: 'PUT',
+        mode: 'same-origin',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: data,
+    }).then(res => {
+        if (res.status === 200) {            
+            window.location.href = '/users/profile/{{ profileID }}';
+        } else {
+            alert('Error updating profile - Try again later');
+        }
+    })
+}
+
+const cancel = () => {
+    window.location.href = "/users/profile/{{ profileID }}";
+}
+</script>
+{{end}}
