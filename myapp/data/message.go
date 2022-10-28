@@ -12,7 +12,6 @@ type Message struct {
 	ID        int       `db:"id,omitempty"`
 	UserID    int       `db:"user_id" json:"user_id"`
 	MatchID   int       `db:"match_id" json:"match_id"`
-	LinkID    int       `db:"link_id" json:"link_id"`
 	Content   string    `db:"content" json:"content"`
 	CreatedAt time.Time `db:"created_at"`
 }
@@ -38,17 +37,26 @@ func (m *Message) GetAll() ([]*Message, error) {
 }
 
 // GetAllForOneMatch returns a slice of all messages for a match.
-func (m *Message) GetAllForOneMatch(matchID int) ([]Message, error) {
+func (m *Message) GetAllForOneMatch(matchID int) ([]*Message, error) {
 
-	var all []Message
+	var all []*Message
+	var tmp []*Message
 
 	collection := upper.Collection(m.Table())
-	res := collection.Find(up.Cond{"match_id =": matchID})
+	res1 := collection.Find(up.Cond{"match_id": matchID})
+	res2 := collection.Find(up.Cond{"user_id": matchID})
 
-	err := res.All(&all)
+	err := res1.All(&all)
 	if err != nil {
 		return nil, err
 	}
+
+	err = res2.All(&tmp)
+	if err != nil {
+		return nil, err
+	}
+
+	all = append(all, tmp...)
 
 	return all, nil
 }
@@ -57,7 +65,7 @@ func (m *Message) GetAllForOneMatch(matchID int) ([]Message, error) {
 func (m *Message) Get(id int) (*Message, error) {
 	var themessage Message
 	collection := upper.Collection(m.Table())
-	res := collection.Find(up.Cond{"id =": id})
+	res := collection.Find(up.Cond{"id": id})
 
 	err := res.One(&themessage)
 	if err != nil {
