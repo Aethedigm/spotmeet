@@ -2,16 +2,14 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/zmb3/spotify"
 	"log"
+	"myapp/data"
 	"net/http"
 	"os"
-
-	"github.com/zmb3/spotify"
 )
 
 var auth = spotify.Authenticator{}
-
-var ch = make(chan *spotify.Client)
 var state = "abc123"
 
 func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +55,12 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	h.App.Session.Put(r.Context(), "userID", user.ID)
 
+	// Need to get the specific Spotify redirect and access tokens for the user_id we just found.
+	// If we do not do this, then if the browser signs in as a new or other user, it keeps the tokens from the
+	// last user who was logged in.
+	// Also, we need to wipe these spotify tokens from the session data once the app user purposefully
+	// logs out of SpotMeet.
+
 	http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 	// http.Redirect(w, r, "/", http.StatusSeeOther)
 
@@ -72,11 +76,12 @@ func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) 
 	callback := os.Getenv("LOCALHOST_URL") + "/spotauth/callback"
 	auth = spotify.NewAuthenticator(
 		callback,
+		// these scopes may need to be changed out for this app
 		spotify.ScopeUserTopRead,
 		spotify.ScopeUserReadRecentlyPlayed)
 
 	url := auth.AuthURL(state)
-	//fmt.Println("Please log in to Spotify by visiting the following page:", url)
+	//fmt.Println("Log in to Spotify by visiting this page:", url)
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
 
@@ -102,5 +107,24 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 	}
 	fmt.Println("You are logged in as:", user.ID)
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	// get the user_id of the user who has gained access to spotify
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+	if userID == 0 {
+		log.Fatal("The user_id of the current user could not be found in the session data.")
+	}
+
+	// Write the new refresh token and new access token to a new
+	// spotifytoken struct, and assign that to the current User's SpotifyToken variable.
+	spottoken := data.SpotifyToken{
+		UserID:            userID,
+		AccessToken:       tok.AccessToken,
+		RefreshToken:      tok.RefreshToken,
+		AccessTokenExpiry: tok.Expiry,
+		// TokenType: tok.TokenType, // I don't think we need this b/c a user will always be a 'bearer'
+	}
+
+	// insert the new SpotifyToken into the database
+	spottoken.Insert(spottoken) // need error-handling here once migrations have been made
+
+	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
