@@ -33,8 +33,7 @@ func (a *application) routes() *chi.Mux {
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
 	})
 
-	a.App.Routes.Get("/callback", a.Handlers.SpotifyAuthorizationCallback)
-	a.App.Routes.Post("/callback", a.Handlers.SpotifyAuthorizationCallback)
+	a.App.Routes.Get("/spotauth/callback", a.Handlers.SpotifyAuthorizationCallback)
 
 	// static routes
 	fileServer := http.FileServer(http.Dir("./public"))

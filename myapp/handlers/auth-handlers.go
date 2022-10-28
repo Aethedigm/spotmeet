@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/zmb3/spotify"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/zmb3/spotify"
 )
 
 var auth = spotify.Authenticator{}
@@ -68,9 +69,9 @@ func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) {
+	callback := os.Getenv("LOCALHOST_URL") + "/spotauth/callback"
 	auth = spotify.NewAuthenticator(
-		// os.Getenv("GO_SERVER_EXTERNAL_URL")+"/spotauth/callback",
-		os.Getenv("LOCALHOST_URL")+"/spotauth/callback",
+		callback,
 		spotify.ScopeUserTopRead,
 		spotify.ScopeUserReadRecentlyPlayed)
 
