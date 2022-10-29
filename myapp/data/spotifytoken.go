@@ -27,7 +27,7 @@ type SpotifyToken struct {
 }
 
 func (t *SpotifyToken) Table() string {
-	return "spotifytokens"
+	return "spotify_token"
 }
 
 // GetUserForRefreshToken returns a User for the given refresh_token string.
@@ -80,7 +80,7 @@ func (t *SpotifyToken) GetUserForAccessToken(accesstoken string) (*User, error) 
 func (t *SpotifyToken) GetSpotifyTokenForUser(id int) (*SpotifyToken, error) {
 	var spotifytoken *SpotifyToken
 	collection := upper.Collection(t.Table())
-	res := collection.Find(up.Cond{"user_id": id})
+	res := collection.Find(up.Cond{"user_id": id, "access_expiry >": time.Now()})
 	err := res.One(&spotifytoken)
 	if err != nil {
 		return nil, err
@@ -126,9 +126,9 @@ func (t *SpotifyToken) DeleteByUserID(userID int) error {
 	return nil
 }
 
-// Insert inserts a new spotifytoken record into the spotifytokens table.
+// Upsert inserts a new spotifytoken record into the spotifytokens table.
 // This returns the ID of the new spotifytoken record, and type error.
-func (t *SpotifyToken) Insert(spotifytoken SpotifyToken) (int, error) {
+func (t *SpotifyToken) Upsert(spotifytoken SpotifyToken) (int, error) {
 	collection := upper.Collection(t.Table())
 
 	// make sure AccessToken and RefreshToken are set
