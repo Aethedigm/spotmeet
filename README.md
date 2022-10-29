@@ -10,7 +10,7 @@ Capstone - Team E
   - [ ] Messages Page
     - [ ] Message Threads
   - [ ] Settings
-    - [ ] Logout Button
+    - [X] Logout Button
   - [X] Profiles
     - [X] Edit Profiles
   - [ ] About
