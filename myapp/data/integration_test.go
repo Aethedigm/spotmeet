@@ -182,3 +182,12 @@ func SettingsInArray(s Settings, arr []*Settings) bool {
 	}
 	return false
 }
+
+func LikedArtistInArray(l LikedArtist, arr []*LikedArtist) bool {
+	for _, v := range arr {
+		if v.ID == l.ID {
+			return true
+		}
+	}
+	return false
+}
