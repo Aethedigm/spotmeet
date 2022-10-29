@@ -39,7 +39,6 @@ func (a *application) routes() *chi.Mux {
 	})
 
 	a.App.Routes.Get("/spotauth/callback", a.Handlers.SpotifyAuthorizationCallback)
-	a.App.Routes.Get("/spotauth/callback", a.Handlers.SpotifyAuthorizationCallback)
 
 	a.App.Routes.Route("/messages", func(r chi.Router) {
 		r.Get("/", a.Handlers.Messages)
