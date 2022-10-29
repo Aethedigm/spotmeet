@@ -19,15 +19,49 @@ type Handlers struct {
 }
 
 func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
+
+	// if a session with a user does not exist, go to login page
 	if !h.App.Session.Exists(r.Context(), "userID") {
 		http.Redirect(w, r, "users/login", http.StatusSeeOther)
 		return
 	}
 
-	err := h.App.Render.JetPage(w, r, "settings", nil, nil)
-	if err != nil {
-		h.App.ErrorLog.Println("error rendering:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	// get user ID from the session
+	if userID := h.App.Session.GetInt(r.Context(), "userID"); userID != 0 {
+
+		// get the user's profile data from the database
+		profile, err := h.Models.Profiles.GetByUserID(userID)
+		if err != nil {
+			fmt.Println("Error getting profile:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		//// get the user's user data from the database
+		//user, err := h.Models.Users.Get(profile.UserID)
+		//if err != nil {
+		//	fmt.Println("Error getting user:", err)
+		//	http.Error(w, err.Error(), http.StatusBadRequest)
+		//	return
+		//}
+
+		// create variables from the grabbed data to send to our view
+		vars := make(jet.VarMap)
+		vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
+		vars.Set("profileID", profile.ID)
+		vars.Set("usersProfileID", profile.UserID)
+
+		err2 := h.App.Render.JetPage(w, r, "settings", vars, nil)
+		if err2 != nil {
+			h.App.ErrorLog.Println("error rendering:", err2)
+			http.Error(w, err2.Error(), http.StatusBadRequest)
+		}
+
+	} else {
+		// if the user's id was unable to be grabbed (or missing) from app session data,
+		// go back to the login page
+		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+		return
 	}
 }
 
