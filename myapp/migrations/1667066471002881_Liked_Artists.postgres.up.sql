@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS "Liked_Artists" CASCADE;
+
+CREATE TABLE liked_artists (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    artist_id INTEGER NOT NULL REFERENCES artists(id) ON DELETE CASCADE,
+    liked_level INTEGER NOT NULL,
+    expiry TIMESTAMP NOT NULL
+);

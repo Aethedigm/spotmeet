@@ -1,0 +1,2 @@
+ALTER TABLE settings
+ADD COLUMN match_sensitivity INTEGER NOT NULL DEFAULT 10;

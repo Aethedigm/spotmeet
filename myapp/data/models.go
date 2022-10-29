@@ -3,10 +3,8 @@ package data
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	db2 "github.com/upper/db/v4"
-	"github.com/upper/db/v4/adapter/mysql"
 	"github.com/upper/db/v4/adapter/postgresql"
 )
 
@@ -28,11 +26,7 @@ type Models struct {
 func New(databasePool *sql.DB) Models {
 	db = databasePool
 
-	if os.Getenv("DATABASE_TYPE") == "mysql" || os.Getenv("DATABASE_TYPE") == "mariadb" {
-		upper, _ = mysql.New(databasePool)
-	} else {
-		upper, _ = postgresql.New(databasePool)
-	}
+	upper, _ = postgresql.New(databasePool)
 
 	return Models{
 		Users:  User{},
