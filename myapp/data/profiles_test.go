@@ -181,3 +181,38 @@ func TestProfile_GetAll(t *testing.T) {
 		t.Error("missing profile")
 	}
 }
+
+func TestProfile_DeleteByUserID(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "delbyuid@test.com",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p := Profile{
+		UserID: uID,
+	}
+
+	pID, err := p.Insert(p)
+	if err != nil {
+		t.Error(err)
+	}
+
+	p.ID = pID
+
+	err = p.DeleteByUserID(uID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	_, err = p.Get(pID)
+	if err == nil {
+		t.Error("profile not deleted")
+	}
+}

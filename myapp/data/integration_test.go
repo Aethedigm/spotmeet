@@ -173,3 +173,12 @@ func ProfileInArray(p Profile, arr []*Profile) bool {
 	}
 	return false
 }
+
+func SettingsInArray(s Settings, arr []*Settings) bool {
+	for _, v := range arr {
+		if v.ID == s.ID {
+			return true
+		}
+	}
+	return false
+}
