@@ -260,6 +260,11 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		return
+	}
+
 	err := h.App.Render.Page(w, r, "matches", nil, nil)
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)

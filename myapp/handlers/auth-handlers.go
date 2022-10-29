@@ -3,12 +3,13 @@ package handlers
 import (
 	"encoding/base32"
 	"fmt"
-	"github.com/zmb3/spotify"
 	"log"
 	"math/rand"
 	"myapp/data"
 	"net/http"
 	"os"
+
+	"github.com/zmb3/spotify"
 )
 
 var auth = spotify.Authenticator{}
@@ -65,9 +66,14 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 	// Also, we need to wipe these spotify tokens from the session data once the app user purposefully
 	// logs out of SpotMeet.
 
-	http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
-	// http.Redirect(w, r, "/", http.StatusSeeOther)
+	_, err = h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
+	if err != nil {
+		// User does not have current token, so redirect to Spotify auth
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
+	}
 
+	// User has current token, so redirect to matches page
+	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
 func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
@@ -121,19 +127,16 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		log.Fatalf("State mismatch: %s != %s\n", st, state)
 	}
 
-	// use the token to get an authenticated client
-	client := auth.NewClient(tok)
+	spotclient := auth.NewClient(tok)
 	fmt.Fprintf(w, "Login Completed!")
 
-	user, err := client.CurrentUser()
+	_, err = spotclient.CurrentUser()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("You are logged in as:", user.ID) // (spotify ID, not app id)
 
-	// get the user_id of the user who has gained access to spotify
 	userID := h.App.Session.GetInt(r.Context(), "userID")
-	if userID == 0 {
+	if userID == 0 || userID == -1 {
 		log.Fatal("The user_id of the current user could not be found in the session data.")
 	}
 
@@ -144,11 +147,9 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		AccessToken:       tok.AccessToken,
 		RefreshToken:      tok.RefreshToken,
 		AccessTokenExpiry: tok.Expiry,
-		// TokenType: tok.TokenType, // I don't think we need this b/c a user will always be a 'bearer'
 	}
 
-	// insert the new SpotifyToken into the database
-	spottoken.Insert(spottoken) // need error-handling here once migrations have been made
+	spottoken.Upsert(spottoken)
 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }

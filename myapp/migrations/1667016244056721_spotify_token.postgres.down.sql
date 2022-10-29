@@ -1,0 +1,1 @@
+DROP IF EXISTS spotify_token cascade;
