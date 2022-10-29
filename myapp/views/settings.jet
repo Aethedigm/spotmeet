@@ -7,11 +7,36 @@
 {{end}}
 
 {{block pageContent()}}
-<div id="footbar" class="navbar fixed-bottom bg-light">
-    <div class="container-fluid">
-        <a href="/messages" class="btn float-left rounded-pill w-25">Messages</a>
-        <a href="/matches" class="btn rounded-pill w-25">Matches</a>
-        <a href="/#" class="btn btn-primary float-right w-25">Settings</a>
+<div class="mt-5 text-center justify-content-center">
+    <h1>Settings</h1>
+
+    <hr>
+
+    <div id="looking-for" style="padding-bottom: 7em;" class="container justify-content-center">
+        <div style="padding-bottom: 2px;" class="btn-group btn-group-justified" role="group">
+                <button id="friends" type="button" class="btn btn-primary float-right rounded-pill mt-5 btn-sm">Friends</button>
+                <button id="dating" type="button" class="btn btn-primary float-right rounded-pill mt-5 btn-sm">Dating</button>
+                <button id="workout_partner" type="button" class="btn btn-primary float-right rounded-pill mt-5 btn-sm">Workout Partner</button>
+        </div>
+        <div style="padding-top: 0px;" class="btn-group btn-group-justified" role="group">
+                <button id="musicians" type="button" class="btn btn-primary float-right rounded-pill mt-5 btn-sm">Musicians</button>
+                <button id="concert_goers" type="button" class="btn btn-primary float-right rounded-pill mt-5 btn-sm">Concert-Goers</button>
+                <button id="not_sure_yet" type="button" class="btn btn-primary float-right rounded-pill mt-5 btn-sm">Not Sure Yet</button>
+        </div>
+    </div>
+
+    <div id="buttons" class="mt-20">
+         <div><a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary rounded-pill btn-lg btn-block">Edit Profile</a></div>
+         <br>
+         <div><a href="/users/logout" class="btn btn-danger float-right rounded-pill btn-lg btn-block">Log Out</a></div>
+    </div>
+
+    <div id="footbar" class="navbar fixed-bottom bg-light">
+        <div class="container-fluid">
+            <a href="/messages" class="btn float-left rounded-pill w-25">Messages</a>
+            <a href="/matches" class="btn rounded-pill w-25">Matches</a>
+            <a href="/#" class="btn btn-primary float-right w-25">Settings</a>
+        </div>
     </div>
 </div>
 {{end}}

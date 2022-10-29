@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/base32"
 	"fmt"
 	"log"
+	"math/rand"
 	"myapp/data"
 	"net/http"
 	"os"
@@ -11,7 +13,7 @@ import (
 )
 
 var auth = spotify.Authenticator{}
-var state = "abc123"
+var state string
 
 func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 	err := h.App.Render.Page(w, r, "register", nil, nil)
@@ -21,6 +23,8 @@ func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
+	values := r.URL.Query()
+	values.Set("show_dialog", "true")
 	err := h.App.Render.Page(w, r, "login", nil, nil)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -56,6 +60,12 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	h.App.Session.Put(r.Context(), "userID", user.ID)
 
+	// Need to get the specific Spotify redirect and access tokens for the user_id we just found.
+	// If we do not do this, then if the browser signs in as a new or other user, it keeps the tokens from the
+	// last user who was logged in.
+	// Also, we need to wipe these spotify tokens from the session data once the app user purposefully
+	// logs out of SpotMeet.
+
 	_, err = h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
 		// User does not have current token, so redirect to Spotify auth
@@ -67,6 +77,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
+	// log out the user from the SpotMeet app
 	h.App.Session.RenewToken(r.Context())
 	h.App.Session.Remove(r.Context(), "userID")
 	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
@@ -80,8 +91,28 @@ func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) 
 		spotify.ScopeUserTopRead,
 		spotify.ScopeUserReadRecentlyPlayed)
 
+	randomBytes := make([]byte, 16)
+	_, err := rand.Read(randomBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// state is defined outside this function, so it can be used in other functions.
+	// It is created here, and sent with the request to Spotify to get an access and refresh token.
+	// Upon returning, it is checked in SpotifyAuthorizationCallback, ensure someone else
+	// besides Spotify has not initiated the request.
+	state = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
+
+	// use state, along with the Spotify client ID (inside of auth) to get a unique url from Spotify
+	// so that we can send the user to it, in order for them to log in with Spotify directly,
+	// and initiate a callback from Spotify containing our access and refresh tokens.
 	url := auth.AuthURL(state)
-	//fmt.Println("Log in to Spotify by visiting this page:", url)
+
+	// If the browser is already logged in to a Spotify account, use Spotify
+	// to ask them if they want to continue with that Spotify account.
+	url = url + "&show_dialog=true"
+
+	// redirecting to Spotify login!
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
 
