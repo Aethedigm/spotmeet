@@ -90,7 +90,7 @@ func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) {
-	callback := os.Getenv("SPOTIFY_CALLBACK_URL") + "/spotauth/callback"
+	callback := os.Getenv("LOCALHOST_URL") + "/spotauth/callback"
 	auth = spotify.NewAuthenticator(callback, spotScopes[0], spotScopes[1])
 	randomBytes := make([]byte, 16)
 	_, err := rand.Read(randomBytes)
@@ -156,7 +156,7 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 }
 
 func (h *Handlers) NewAccessTokenRequest(w http.ResponseWriter, r *http.Request) {
-	callback := os.Getenv("SPOTIFY_CALLBACK_URL") + "/newspotaccesstoken/callback"
+	callback := os.Getenv("LOCALHOST_URL") + "/newspotaccesstoken/callback"
 	auth = spotify.NewAuthenticator(callback, spotScopes[0], spotScopes[1])
 	randomBytes := make([]byte, 16)
 	_, err := rand.Read(randomBytes)

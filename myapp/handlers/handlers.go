@@ -44,10 +44,10 @@ func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 		vars.Set("profileID", profile.ID)
 		vars.Set("usersProfileID", profile.UserID)
 
-		err2 := h.App.Render.JetPage(w, r, "settings", vars, nil)
-		if err2 != nil {
-			h.App.ErrorLog.Println("error rendering:", err2)
-			http.Error(w, err2.Error(), http.StatusBadRequest)
+		err = h.App.Render.JetPage(w, r, "settings", vars, nil)
+		if err != nil {
+			h.App.ErrorLog.Println("error rendering:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
 	} else {

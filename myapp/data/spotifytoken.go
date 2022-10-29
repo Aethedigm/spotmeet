@@ -146,10 +146,10 @@ func (t *SpotifyToken) Upsert(spotifytoken SpotifyToken) (int, error) {
 	spotifytoken.CreatedAt = time.Now()
 	spotifytoken.UpdatedAt = time.Now()
 
-	res2, err2 := collection.Insert(spotifytoken)
+	res2, err := collection.Insert(spotifytoken)
 
-	if err2 != nil {
-		return 0, err2
+	if err != nil {
+		return 0, err
 	}
 
 	id := getInsertID(res2.ID())
