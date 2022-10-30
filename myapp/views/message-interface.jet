@@ -23,30 +23,115 @@ span.avoidwrap {
 {{end}}
 
 {{block pageContent()}}
-
-<div class="col text-center">
-    <div class="d-flex align-items-center justify-content-center mt-5 mb-5">
-        <div>
-            <h3 class="font-weight-bold">spotmeet</h3>
-            <div class="text-muted mt-5 welcome">
-                <span class="break">Welcome</span> <span class="break">to</span> <span class="break">spotmeet!</span>
-            </div>
+<head>
+    <title>Message</title>
+</head>
+<body class="d-flex flex-column justify-content-center" id="chat-body">
+    <header
+      id="other-user-info"
+      class="py-2 d-flex align-items-center fixed-top"
+    >
+      <img
+        src="OtherUser.JPG"
+        class="inline float-start rounded-circle me-2"
+        alt="Other User"
+      />
+      <h1>Zach</h1>
+    </header>
+    <main id="message-content" class="d-flex flex-column" style="height: 40rem">
+      <section class="d-flex flex-column" id="msgs">
+        <div class="overflow-scroll" id="msg-container">
+          <div class="d-flex from-me">
+            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-me">
+            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-me">
+            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-me">
+            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-me">
+            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
+          <div class="d-flex from-them">
+            <p class="txt-bbl">Hi!</p>
+          </div>
         </div>
+      </section>
+    </main>
+    <div id="txt-nav" class="fixed-bottom">
+      <section
+        id="msg-input"
+        class="d-flex justify-content-center align-items-center"
+      >
+        <div class="flex-fill me-1">
+          <input
+            type="text"
+            class="form-control"
+            id="text-message"
+            placeholder="type message"
+          />
+        </div>
+        <div>
+          <button type="submit" class="btn btn-success" id="send-msg-btn">
+            <i class="fas fa-reply"></i>
+          </button>
+        </div>
+      </section>
+      <footer id="nav-btns" class="">
+        <div class="text-center" style="padding: 0">
+          <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-between my-auto">
+              <li class="page-item active" id="" style="width: 100vw">
+                <a class="page-link py-2 nav-btn" href="#"
+                  ><i class="fas fa-comments"></i
+                ></a>
+              </li>
+              <li class="page-item" style="width: 100vw">
+                <a class="page-link py-2 nav-btn" href="#"
+                  ><i class="fas fa-user-friends"></i
+                ></a>
+              </li>
+              <li class="page-item" style="width: 100vw">
+                <a class="page-link py-2 nav-btn" href="#"
+                  ><i class="fas fa-cog"></i
+                ></a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
     </div>
-
-    
-
-    {{ if !.IsAuthenticated}}
-    <a href="/users/login" class="btn btn-secondary rounded-pill mb-3 w-25 mt-5">Log In</a>
-    <br>
-    <a href="/users/register" class="btn btn-primary rounded-pill mb-3 w-25 mt-3">Sign Up</a>
-    {{end}}
-
-    {{ if .IsAuthenticated}}
-    <a href="/users/logout" class="btn btn-primary rounded-pill mb-3">Logout</a>
-    {{end}}
-    
-</div>
 
 {{end}}
 
