@@ -21,6 +21,8 @@ func (a *application) routes() *chi.Mux {
 	a.App.Routes.Route("/matches", func(r chi.Router) {
 		r.Get("/", a.Handlers.Matches)
 		r.Get("/myresults", a.Handlers.MyMatchResults)
+
+		r.Post("/location", a.Handlers.Location)
 	})
 
 	a.App.Routes.Route("/users", func(r chi.Router) {

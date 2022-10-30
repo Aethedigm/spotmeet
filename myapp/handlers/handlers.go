@@ -289,7 +289,52 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(matchesJSON)
+	_, err = w.Write(matchesJSON)
+	if err != nil {
+		h.App.ErrorLog.Println("error writing json")
+		return
+	}
+}
+
+func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		h.App.ErrorLog.Println("error retrieving user_id from session")
+		return
+	}
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+
+	// get the current User from the database as a struct
+	user := data.User{}
+	currentUser, err := user.Get(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("error getting user object:", err)
+		return
+	}
+
+	// grab the body of the POST request, which was formatted as json
+	js := make([]byte, r.ContentLength)
+	_, err = r.Body.Read(js)
+	if err != nil {
+		fmt.Println("error while reading json from body", err)
+		// Not returning yet, here. There is an error happening, but the necessary data
+		// is still being read into the js variable.
+	}
+
+	// unpack the json data into our current User object
+	err = json.Unmarshal(js, &currentUser)
+	if err != nil {
+		h.App.ErrorLog.Println("error retrieving location data")
+		return
+	} else {
+		fmt.Println("User location: ", currentUser.Latitude, currentUser.Longitude)
+	}
+
+	// write the updated User to the database
+	err = user.Update(*currentUser)
+	if err != nil {
+		h.App.ErrorLog.Println("error updating user in database")
+		return
+	}
 }
 
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
