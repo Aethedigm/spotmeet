@@ -17,8 +17,6 @@
 <div id="matches_container" class="mt-5">
 </div>
 
-<p id="demo"></p>
-
 <div id="footbar" class="navbar fixed-bottom bg-light">
     <div class="container-fluid">
         <a href="/messages" class="btn float-left rounded-pill w-25">Messages</a>
@@ -30,8 +28,6 @@
 
 {{block js()}}
 <script>
-
-var x = document.getElementById("demo");
 
 window.onload = function() {
     getLocation();
@@ -102,8 +98,6 @@ const addMatch = (match) => {
 function getLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(sendLocationToServer);
-    } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
     }
 }
 
