@@ -197,3 +197,39 @@ func TestSettings_Get(t *testing.T) {
 		t.Error("settings not equal")
 	}
 }
+
+func TestSettings_Update(t *testing.T) {
+	u := User{
+		FirstName: "temp",
+		LastName:  "temp_last",
+		Email:     "settings_update@test.com",
+		Active:    1,
+	}
+
+	uID, err := u.Insert(u)
+	if err != nil {
+		t.Error(err)
+	}
+
+	s := Settings{
+		UserID:                 uID,
+		Distance:               10,
+		LookingFor:             "friends",
+		MatchSensitivity:       10,
+		LikedArtistSensitivity: 10,
+	}
+
+	sID, err := s.Insert(s)
+	if err != nil {
+		t.Error(err)
+	}
+
+	s.ID = sID
+
+	s.LookingFor = "dating"
+
+	err = s.Update(s)
+	if err != nil {
+		t.Error(err)
+	}
+}

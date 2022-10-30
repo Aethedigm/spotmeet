@@ -14,33 +14,34 @@
 
     <div style="text-align:left"><label for="looking-for" class="form-label">Looking for...</label></div>
     <div style="margin-bottom:2em; flex-wrap: wrap;" id="looking-for" class="btn-group" role="group" aria-label="Basic radio toggle button group">
-        <input type="radio" class="btn-check" name="btnradio" id="btn-friends" autocomplete="off" checked>
+        <input type="radio" class="btn-check" name="btnradio" id="btn-friends" autocomplete="off" checked value="friends">
         <label class="btn btn-outline-primary" for="btn-friends">Friends</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btn-dating" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="btn-dating" autocomplete="off" value="dating">
         <label class="btn btn-outline-primary" for="btn-dating">Dating</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btn-workout-partner" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="btn-workout-partner" autocomplete="off" value="workout">
         <label class="btn btn-outline-primary" for="btn-workout-partner">Workout partner</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btn-musicians" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="btn-musicians" autocomplete="off" value="music">
         <label class="btn btn-outline-primary" for="btn-musicians">Musicians</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btn-concert-goers" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="btn-concert-goers" autocomplete="off" value="concert">
         <label class="btn btn-outline-primary" for="btn-concert-goers">Concert-goers</label>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btn-not-sure-yet" autocomplete="off">
+        <input type="radio" class="btn-check" name="btnradio" id="btn-not-sure-yet" autocomplete="off" value="notsure">
         <label class="btn btn-outline-primary" for="btn-not-sure-yet">Not sure yet</label>
     </div>
 
-    <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within...</label></div>
+    <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within <div class="d-inline" id="matchPercentLabel">{{ distance }}</div> miles</label></div>
     <div style="margin-bottom:2em">
-        <input type="range" class="form-range" id="matchRange">
+        <input type="range" class="form-range" id="matchRange" min="25" max="100" step="5" value="{{ distance }}" oninput="matchRangeChange()">
     </div>
 
-    <div class="d-grid gap-4">
-      <button class="btn btn-primary" onclick="window.location.href='/users/edit-profile/{{ profileID }}'">Edit Profile</button>
-      <button class="btn btn-primary" onclick="window.location.href='/users/logout'">Log Out</button>
+    <div class="container">
+        <a href="#" class="btn btn-primary w-50 mb-4" onclick="setUserSettings()">Save Changes</a>
+        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary w-50 mb-4">Edit Profile</a>
+        <a href="/users/logout" class="btn btn-primary w-50 mb-4">Log Out</a>
     </div>
 
     <div id="footbar" class="navbar fixed-bottom bg-light">
@@ -54,4 +55,60 @@
 {{end}}
 
 {{block js()}}
+<script>
+window.onload = function() {
+    // Set looking for properly
+    var lookingFor = "{{ lookingFor }}";
+    switch (lookingFor) {
+        case "friends":
+            document.getElementById("btn-friends").checked = true;
+            break;
+        case "dating":
+            document.getElementById("btn-dating").checked = true;
+            break;
+        case "workout":
+            document.getElementById("btn-workout-partner").checked = true;
+            break;
+        case "music":
+            document.getElementById("btn-musicians").checked = true;
+            break;
+        case "concert":
+            document.getElementById("btn-concert-goers").checked = true;
+            break;
+        case "notsure":
+            document.getElementById("btn-not-sure-yet").checked = true;
+            break;
+        default:
+            document.getElementById("btn-friends").checked = true;
+            break;
+    }
+}
+
+const setUserSettings = () => {
+    const data = new URLSearchParams();
+
+    data.append("lookingFor", document.querySelector('input[name="btnradio"]:checked').value);
+    data.append("distance", document.getElementById('matchRange').value);
+
+    fetch('/users/settings/{{ settingsID }}', {
+        method: 'PUT',
+        mode: 'same-origin',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: data
+    }).then(res => {
+        if (res.status !== 200) {
+            alert('Error updating settings');
+        }
+        return false;
+    })
+}
+
+const matchRangeChange = () => {
+    const matchRange = document.getElementById("matchRange");
+    const matchPercentLabel = document.getElementById("matchPercentLabel");
+    matchPercentLabel.textContent = matchRange.value;
+}
+</script>
 {{end}}

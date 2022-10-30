@@ -20,6 +20,7 @@ type Models struct {
 	Matches       Match
 	Profiles      Profile
 	SpotifyTokens SpotifyToken
+	Settings      Settings
 }
 
 // New initializes the models package for use
