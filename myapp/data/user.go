@@ -19,6 +19,8 @@ type User struct {
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
 	Token     Token     `db:"-"`
+	Latitude  float64   `db:"lat" json:"lat"`
+	Longitude float64   `db:"long" json:"long"`
 }
 
 // Table returns the table name associated with this model in the database
