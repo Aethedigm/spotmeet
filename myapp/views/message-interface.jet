@@ -77,119 +77,136 @@
 {{end}}
 
 {{block pageContent()}}
-<head>
-    <title>Message</title>
-</head>
-<body class="d-flex flex-column justify-content-center" id="chat-body">
-    <header
-      id="other-user-info"
-      class="py-2 d-flex align-items-center fixed-top"
-    >
-      <img
-        src="OtherUser.JPG"
-        class="inline float-start rounded-circle me-2"
-        alt="Other User"
-      />
-      <h1>Zach</h1>
-    </header>
-    <main id="message-content" class="d-flex flex-column" style="height: 40rem">
-      <section class="d-flex flex-column" id="msgs">
-        <div class="overflow-scroll" id="msg-container">
-          <div class="d-flex from-me">
-            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-me">
-            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-me">
-            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-me">
-            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-me">
-            <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
-          <div class="d-flex from-them">
-            <p class="txt-bbl">Hi!</p>
-          </div>
+    <head>
+        <title>Message</title>
+    </head>
+    <body class="d-flex flex-column justify-content-center" id="chat-body">
+        <header
+        id="other-user-info"
+        class="py-2 d-flex align-items-center fixed-top"
+        >
+        <img
+            src="OtherUser.JPG"
+            class="inline float-start rounded-circle me-2"
+            alt="Other User"
+        />
+        <h1>Zach</h1>
+        </header>
+        <main id="message-content" class="d-flex flex-column" style="height: 40rem">
+        <section class="d-flex flex-column" id="msgs">
+            <div class="overflow-scroll" id="msg-container">
+            <div class="d-flex from-me">
+                <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-me">
+                <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-me">
+                <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-me">
+                <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-me">
+                <p class="txt-bbl">Hello My Name is Name, what's your name?</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            <div class="d-flex from-them">
+                <p class="txt-bbl">Hi!</p>
+            </div>
+            </div>
+        </section>
+        </main>
+        <div id="txt-nav" class="fixed-bottom">
+        <section
+            id="msg-input"
+            class="d-flex justify-content-center align-items-center"
+        >
+            <div class="flex-fill me-1">
+            <input
+                type="text"
+                class="form-control"
+                id="text-message"
+                placeholder="type message"
+            />
+            </div>
+            <div>
+            <button type="submit" class="btn btn-success" id="send-msg-btn">
+                <i class="fas fa-reply"></i>
+            </button>
+            </div>
+        </section>
+        <footer id="nav-btns" class="">
+            <div class="text-center" style="padding: 0">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-between my-auto">
+                <li class="page-item active" id="" style="width: 100vw">
+                    <a class="page-link py-2 nav-btn" href="#"
+                    ><i class="fas fa-comments"></i
+                    ></a>
+                </li>
+                <li class="page-item" style="width: 100vw">
+                    <a class="page-link py-2 nav-btn" href="#"
+                    ><i class="fas fa-user-friends"></i
+                    ></a>
+                </li>
+                <li class="page-item" style="width: 100vw">
+                    <a class="page-link py-2 nav-btn" href="#"
+                    ><i class="fas fa-cog"></i
+                    ></a>
+                </li>
+                </ul>
+            </nav>
+            </div>
+        </footer>
         </div>
-      </section>
-    </main>
-    <div id="txt-nav" class="fixed-bottom">
-      <section
-        id="msg-input"
-        class="d-flex justify-content-center align-items-center"
-      >
-        <div class="flex-fill me-1">
-          <input
-            type="text"
-            class="form-control"
-            id="text-message"
-            placeholder="type message"
-          />
-        </div>
-        <div>
-          <button type="submit" class="btn btn-success" id="send-msg-btn">
-            <i class="fas fa-reply"></i>
-          </button>
-        </div>
-      </section>
-      <footer id="nav-btns" class="">
-        <div class="text-center" style="padding: 0">
-          <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-between my-auto">
-              <li class="page-item active" id="" style="width: 100vw">
-                <a class="page-link py-2 nav-btn" href="#"
-                  ><i class="fas fa-comments"></i
-                ></a>
-              </li>
-              <li class="page-item" style="width: 100vw">
-                <a class="page-link py-2 nav-btn" href="#"
-                  ><i class="fas fa-user-friends"></i
-                ></a>
-              </li>
-              <li class="page-item" style="width: 100vw">
-                <a class="page-link py-2 nav-btn" href="#"
-                  ><i class="fas fa-cog"></i
-                ></a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </footer>
-    </div>
-</body>
+    </body>
 {{end}}
 
 
 {{block js()}}
+
+    const submitButton = document.getElementById("send-msg-btn");
+    const messageContainer = document.getElementById("msg-container");
+
+    const sendMessage = () => {
+        let yourMessage = document.getElementById("text-message").value;
+        let yourPostedMessage = document.createElement("div");
+        yourPostedMessage.classList.add("d-flex", "from-me");
+        if (yourMessage) {
+            yourPostedMessage.innerHTML = '<p class="txt-bbl">' + yourMessage + "</p>";
+            messageContainer.appendChild(yourPostedMessage);
+        } else {
+            return;
+        }
+    };
+
+    submitButton.addEventListener("click", sendMessage);
 
 {{end}}
