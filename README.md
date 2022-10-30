@@ -9,7 +9,7 @@ Capstone - Team E
   - [X] Matches Page
   - [ ] Messages Page
     - [ ] Message Threads
-  - [ ] Settings
+  - [X] Settings
     - [X] Logout Button
   - [X] Profiles
     - [X] Edit Profiles
