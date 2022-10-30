@@ -35,6 +35,7 @@ func (a *application) routes() *chi.Mux {
 
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
+		r.Put("/settings/{settingsID:[0-9]+}", a.Handlers.UpdateSettings)
 		r.Put("/update-profile/{profileID:[0-9]+}", a.Handlers.UpdateProfile)
 	})
 

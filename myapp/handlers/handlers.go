@@ -19,43 +19,83 @@ type Handlers struct {
 	Models data.Models
 }
 
-func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Println("Error parsing form:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	// if a session with a user does not exist, go to login page
+	lookingFor := r.Form.Get("lookingFor")
+	distance := r.Form.Get("distance")
+
+	if settingsID := chi.URLParam(r, "settingsID"); settingsID != "" {
+		sID, err := strconv.Atoi(settingsID)
+		if err != nil {
+			fmt.Println("Error converting settingsID to int:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		settings, err := h.Models.Settings.Get(sID)
+		if err != nil {
+			fmt.Println("Error getting settings:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		settings.LookingFor = lookingFor
+		settings.Distance, err = strconv.Atoi(distance)
+		if err != nil {
+			fmt.Println("Error converting distance to int:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = h.Models.Settings.Update(*settings)
+	}
+
+}
+
+func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 	if !h.App.Session.Exists(r.Context(), "userID") {
 		http.Redirect(w, r, "users/login", http.StatusSeeOther)
 		return
 	}
 
-	// get user ID from the session
-	if userID := h.App.Session.GetInt(r.Context(), "userID"); userID != 0 {
+	userID := h.App.Session.GetInt(r.Context(), "userID")
 
-		// get the user's profile data from the database
-		profile, err := h.Models.Profiles.GetByUserID(userID)
-		if err != nil {
-			fmt.Println("Error getting profile:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		// create variables from the grabbed data to send to our view
-		vars := make(jet.VarMap)
-		vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
-		vars.Set("profileID", profile.ID)
-		vars.Set("usersProfileID", profile.UserID)
-
-		err = h.App.Render.JetPage(w, r, "settings", vars, nil)
-		if err != nil {
-			h.App.ErrorLog.Println("error rendering:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		}
-
-	} else {
-		// if the user's id was unable to be grabbed (or missing) from app session data,
-		// go back to the login page
-		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+	// get the user's profile data from the database
+	profile, err := h.Models.Profiles.GetByUserID(userID)
+	if err != nil {
+		fmt.Println("Error getting profile:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	settings, err := h.Models.Settings.GetByUserID(userID)
+	if err != nil {
+		fmt.Println("Error getting settings:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// create variables from the grabbed data to send to our view
+	vars := make(jet.VarMap)
+	vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
+	vars.Set("profileID", profile.ID)
+	vars.Set("usersProfileID", profile.UserID)
+	vars.Set("distance", settings.Distance)
+	vars.Set("settingsID", settings.ID)
+	vars.Set("lookingFor", settings.LookingFor)
+
+	err = h.App.Render.JetPage(w, r, "settings", vars, nil)
+	if err != nil {
+		h.App.ErrorLog.Println("error rendering:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
 }
 
 func (h *Handlers) Messages(w http.ResponseWriter, r *http.Request) {
@@ -363,8 +403,21 @@ func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Create settings
+	s := &data.Settings{
+		UserID:   userID,
+		Distance: 50,
+	}
+
+	// insert the new settings into the database
+	_, err = s.Insert(*s)
+	if err != nil {
+		fmt.Println("Error inserting settings:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	// Record the profile-insert success message into the outgoing http response
-	fmt.Fprintf(w, "Profile created with id: %d", profileID)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(fmt.Sprintf("%d", profileID)))
 }
