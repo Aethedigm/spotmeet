@@ -30,6 +30,8 @@
 <script>
 
 window.onload = function() {
+    getLocation();
+
     // Fetch data from server
     fetch("/matches/myresults")
         .then(response => response.json())
@@ -91,6 +93,25 @@ const addMatch = (match) => {
 
     const matchContainer = document.getElementById("matches_container");
     matchContainer.innerHTML += matchTemplate;
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocationToServer);
+    }
+}
+
+async function sendLocationToServer(position) {
+    const coordinates = {lat: position.coords.latitude, long: position.coords.longitude};
+    const response = await fetch('matches/location', {
+        method: 'POST',
+        body: JSON.stringify(coordinates),
+        headers: {
+            'Content-type': 'application/json; charset=UTF-8'
+        }
+     });
+    const responseText = await response.text();
+    console.log(responseText); // logs 'OK'
 }
 
 </script>
