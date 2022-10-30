@@ -146,12 +146,32 @@ func (t *SpotifyToken) Upsert(spotifytoken SpotifyToken) (int, error) {
 	spotifytoken.CreatedAt = time.Now()
 	spotifytoken.UpdatedAt = time.Now()
 
-	res2, err2 := collection.Insert(spotifytoken)
-	if err2 != nil {
+	res2, err := collection.Insert(spotifytoken)
+
+	if err != nil {
 		return 0, err
 	}
 
 	id := getInsertID(res2.ID())
 
 	return id, nil
+}
+
+// UpdateAccessToken updates the access_token, updated_at, and access_expiry fields of
+// a user's spotifytoken record
+func (t *SpotifyToken) UpdateAccessToken(accessToken string, accessExpiry time.Time) error {
+	collection := upper.Collection(t.Table())
+
+	// update the calling struct's values
+	t.AccessToken = accessToken
+	t.UpdatedAt = time.Now()
+	t.AccessTokenExpiry = accessExpiry
+
+	// use UpdateReturning to automatically identify the record in the db our calling struct is referring to
+	err := collection.UpdateReturning(t)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

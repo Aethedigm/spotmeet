@@ -6,6 +6,7 @@ import (
 	"myapp/data"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -37,24 +38,16 @@ func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		//// get the user's user data from the database
-		//user, err := h.Models.Users.Get(profile.UserID)
-		//if err != nil {
-		//	fmt.Println("Error getting user:", err)
-		//	http.Error(w, err.Error(), http.StatusBadRequest)
-		//	return
-		//}
-
 		// create variables from the grabbed data to send to our view
 		vars := make(jet.VarMap)
 		vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
 		vars.Set("profileID", profile.ID)
 		vars.Set("usersProfileID", profile.UserID)
 
-		err2 := h.App.Render.JetPage(w, r, "settings", vars, nil)
-		if err2 != nil {
-			h.App.ErrorLog.Println("error rendering:", err2)
-			http.Error(w, err2.Error(), http.StatusBadRequest)
+		err = h.App.Render.JetPage(w, r, "settings", vars, nil)
+		if err != nil {
+			h.App.ErrorLog.Println("error rendering:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
 	} else {
@@ -262,6 +255,21 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	if !h.App.Session.Exists(r.Context(), "userID") {
 		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		return
+	}
+
+	// Check the user's spotify access token expiry. If it's within 5 minutes of its
+	// -- expiry, redirect to users/newspotaccesstoken to get a new one from spotify via the refresh token
+	// Get user ID from the session
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+	userSpotTokens, _ := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
+	// convert to east-coat time zone, that's used by time.Time (add 4 hrs)
+	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 14400
+	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
+	if expiry < fiveMinutesFromNow {
+		fmt.Println(fiveMinutesFromNow)
+		// go to users/newspotaccesstoken to get the new access token with the refresh token
+		http.Redirect(w, r, "users/newspotaccesstoken", http.StatusSeeOther)
 		return
 	}
 

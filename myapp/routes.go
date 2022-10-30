@@ -28,6 +28,7 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/logout", a.Handlers.Logout)
 		r.Get("/register", a.Handlers.UserRegister)
 		r.Get("/spotauth", a.Handlers.SpotifyAuthorization)
+		r.Get("/newspotaccesstoken", a.Handlers.NewAccessTokenRequest)
 		r.Get("/profile", a.Handlers.Profile)
 		r.Get("/profile/{profileID:[0-9]+}", a.Handlers.ProfileByID)
 		r.Get("/edit-profile/{profileID:[0-9]+}", a.Handlers.EditProfile)
