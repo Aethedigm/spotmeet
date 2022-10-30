@@ -3,23 +3,77 @@
 {{block browserTitle()}}Welcome{{end}}
 
 {{block css()}}
-<style>
-span.avoidwrap {
-    display:inline-block;
-}
-
-.welcome {
-    font-size: 70px;
-}
-
-@media only screen and (max-width: 768px) {
-    .break {
-        display: block;
-        margin-top: -10px;
-        margin-bottom: -10px;
+    <style>
+        
+    #chat-body {
+    min-height: 100vh;
+    min-width: 100vw;
+    max-height: 100vh;
+    position: fixed;
     }
-}
-</style>
+
+    #other-user-info {
+    background-color: rgb(233, 233, 233);
+    border-bottom: 1px solid rgba(106, 106, 106, 0.526);
+    }
+
+    #other-user-info img {
+    max-width: 15vw; 
+    max-height: 15vh;
+    position: static;
+    }
+
+    #msg-container {
+    border-bottom: 1px solid rgba(173, 227, 239, 0.354);
+    overflow: hidden;
+    overflow-y: scroll;
+    font-size: 0.80rem;
+    color: white;
+    max-height: 100%;
+    }
+
+    #send-msg-btn {
+    background-color: rgb(65, 236, 168); border: none;
+    }
+
+    #nav-btns {
+    background-color: rgba(173, 150, 150, 0.676);
+    font-size: 1.75rem;
+    }
+
+    .nav-btn {
+    color: rgba(27, 213, 255, 0.821);
+    border: none;
+    }
+
+    .active .nav-btn{
+    background-color: rgb(27, 213, 255) !important;
+    }
+
+    .from-me {
+    flex-direction: row-reverse;
+    
+    }
+
+    .from-me .txt-bbl {
+    
+    background-color: rgb(73, 172, 243);
+    margin-right: 2%;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    }
+
+    .from-them .txt-bbl {
+    background-color: rgb(107, 107, 107);
+    margin-left:2%;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    }
+
+    #msgs {
+    min-height: 100%;
+    }
+    </style>
 {{end}}
 
 {{block pageContent()}}
@@ -132,7 +186,7 @@ span.avoidwrap {
         </div>
       </footer>
     </div>
-
+</body>
 {{end}}
 
 
