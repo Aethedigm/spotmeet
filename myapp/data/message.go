@@ -36,6 +36,29 @@ func (m *Message) GetAll() ([]*Message, error) {
 	return all, nil
 }
 
+func (m *Message) GetAllForIDFromID(userID, matchID int) ([]*Message, error) {
+	var all []*Message
+	var all2 []*Message
+
+	collection := upper.Collection(m.Table())
+	res1 := collection.Find(up.Cond{"user_id": userID, "match_id": matchID})
+	res2 := collection.Find(up.Cond{"user_id": matchID, "match_id": userID})
+
+	err := res1.All(&all)
+	if err != nil {
+		return nil, err
+	}
+
+	err = res2.All(&all2)
+	if err != nil {
+		return nil, err
+	}
+
+	all = append(all, all2...)
+
+	return all, nil
+}
+
 // GetAllForOneMatch returns a slice of all messages for a match.
 func (m *Message) GetAllForOneMatch(matchID int) ([]*Message, error) {
 

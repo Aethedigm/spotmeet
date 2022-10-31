@@ -3,12 +3,13 @@ package handlers
 import (
 	"encoding/base32"
 	"fmt"
-	"golang.org/x/oauth2"
 	"log"
 	"math/rand"
 	"myapp/data"
 	"net/http"
 	"os"
+
+	"golang.org/x/oauth2"
 
 	"github.com/zmb3/spotify"
 )
@@ -28,8 +29,6 @@ func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
-	values := r.URL.Query()
-	values.Set("show_dialog", "true")
 	err := h.App.Render.Page(w, r, "login", nil, nil)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -39,6 +38,7 @@ func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
+		fmt.Println("Error parsing form", err)
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
@@ -48,32 +48,29 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Models.Users.GetByEmail(email)
 	if err != nil {
+		fmt.Println("Error getting user by email", err)
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	matches, err := user.PasswordMatches(password)
 	if err != nil {
+		fmt.Println("Error checking password", err)
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	if !matches {
+		fmt.Println("Password does not match")
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	h.App.Session.Put(r.Context(), "userID", user.ID)
 
-	// Need to get the specific Spotify redirect and access tokens for the user_id we just found.
-	// If we do not do this, then if the browser signs in as a new or other user, it keeps the tokens from the
-	// last user who was logged in.
-	// Also, we need to wipe these spotify tokens from the session data once the app user purposefully
-	// logs out of SpotMeet.
-
 	_, err = h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
-		// User does not have current token, so redirect to Spotify auth
+		fmt.Println("Error getting Spotify token for user", err)
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
