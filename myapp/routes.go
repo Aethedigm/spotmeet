@@ -21,8 +21,6 @@ func (a *application) routes() *chi.Mux {
 	a.App.Routes.Route("/matches", func(r chi.Router) {
 		r.Get("/", a.Handlers.Matches)
 		r.Get("/myresults", a.Handlers.MyMatchResults)
-
-		r.Post("/location", a.Handlers.Location)
 	})
 
 	a.App.Routes.Route("/users", func(r chi.Router) {
@@ -36,6 +34,7 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/edit-profile/{profileID:[0-9]+}", a.Handlers.EditProfile)
 
 		r.Post("/login", a.Handlers.PostUserLogin)
+		r.Post("/login/location", a.Handlers.Location)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
 
 		r.Put("/settings/{settingsID:[0-9]+}", a.Handlers.UpdateSettings)

@@ -2,6 +2,8 @@ package data
 
 import (
 	"errors"
+	"fmt"
+	"math"
 	"time"
 
 	up "github.com/upper/db/v4"
@@ -182,4 +184,42 @@ func (u *User) PasswordMatches(plainText string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// DistanceBetween finds the distance between two users, in miles,
+// rounded to the nearest whole number.
+func (u *User) DistanceBetween(user_A_id int, user_B_id int) (int, error) {
+	var userA User
+	var userB User
+	collection := upper.Collection(u.Table())
+
+	// Get userA
+	res := collection.Find(up.Cond{"id": user_A_id})
+	err := res.One(&userA)
+	if err != nil {
+		return -1, err
+	}
+
+	// Get userB
+	res = collection.Find(up.Cond{"id": user_B_id})
+	err = res.One(&userB)
+	if err != nil {
+		return -1, err
+	}
+
+	// Isolate  coordinates for use in formula
+	latA := userA.Latitude
+	longA := userA.Longitude
+	latB := userB.Latitude
+	longB := userB.Longitude
+
+	// Plug user coordinates into distance-in-miles formula
+	distanceAsFloat := 3963 * math.Acos((math.Sin(latA)*math.Sin(latB))+math.Cos(latA)*math.Cos(latB)*math.Cos(longB-longA))
+
+	// round the answer to the nearest whole number
+	distanceAsInt := int(math.Round(distanceAsFloat))
+
+	fmt.Println(distanceAsInt)
+
+	return distanceAsInt, nil
 }

@@ -3,7 +3,12 @@
 {{block browserTitle()}}Matches{{end}}
 
 {{block css()}}
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        .modal {
+            background: #4285F4;
+        }
+    </style>
 {{end}}
 
 {{block pageContent()}}
@@ -24,13 +29,35 @@
         <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
     </div>
 </div>
+
+<!-- Number of New Matches Popup (displays on page load)-->
+    <div class="modal fade" id="popup">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div style="text-align:center" class="modal-body">
+                    <b>{{userName}}</b>, you have
+                </div>
+                <div>
+                    <h4 style="text-align:center">{{numberOfNewMatches}} new matches!</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success w-100 mb-4" data-bs-dismiss="modal" onclick="submitRegisterForm()">Let's go!</button>
+                </div>
+            </div>
+        </div>
+    </div>
 {{end}}
 
 {{block js()}}
 <script>
 
 window.onload = function() {
+
     getLocation();
+
+    if ({{numberOfNewMatches}} !== 0) {
+        $('#popup').modal('show');
+    }
 
     // Fetch data from server
     fetch("/matches/myresults")

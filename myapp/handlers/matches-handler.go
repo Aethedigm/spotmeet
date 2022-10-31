@@ -3,10 +3,14 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/CloudyKit/jet/v6"
+	"myapp/data"
+	"myapp/middleware"
 	"net/http"
 	"time"
 )
 
+// MyMatchResults gets Matches that have already been created
 func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	matches, err := h.Models.Matches.GetAllForOneUser(h.App.Session.GetInt(r.Context(), "userID"))
 	if err != nil {
@@ -29,6 +33,8 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Matches calls for the rendering of the matches page, if a user exists for the browser session,
+// and, if the current user has an access token that will not expire within 5 minutes.
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	if !h.App.Session.Exists(r.Context(), "userID") {
 		http.Redirect(w, r, "users/login", http.StatusSeeOther)
@@ -50,7 +56,25 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.App.Render.Page(w, r, "matches", nil, nil)
+	// find new matches for the user
+	numberOfNewMatches, err := middleware.CreateMatches(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("Error creating matches for user_id ", userID, ":", err)
+	}
+
+	// get variables ready to pass into the matches view
+	u := data.User{}
+	user, err := u.Get(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("Error getting User struct for user_id ", userID, ":", err)
+	}
+	userName := user.FirstName
+	vars := make(jet.VarMap)
+	vars.Set("numberOfNewMatches", numberOfNewMatches)
+	vars.Set("userName", userName)
+
+	// render the page, and pass variables into it
+	err = h.App.Render.Page(w, r, "matches", vars, nil)
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}
