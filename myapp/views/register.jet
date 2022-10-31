@@ -3,82 +3,114 @@
 {{block browserTitle()}}Register{{end}}
 
 {{block css()}}
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <style>
+        .modal {
+            background: #4285F4;
+        }
+    </style>
 {{end}}
 
 {{block pageContent()}}
-<h2 class="mt-5 text-center">Register</h2>
+    <h2 class="mt-5 text-center">Sign Up for Spotmeet</h2>
 
-<hr>
+    <hr>
 
-<form method="post" action=""
-    name="register-form" id="register-form"
-    class="d-block needs-validation"
-    autocomplete="off" novalidate="">
+    <form method="post" action=""
+        name="register-form" id="register-form"
+        class="d-block needs-validation"
+        autocomplete="off" novalidate="">
 
-    <div class="mb-3">
-        <label for="first_name">First Name</label>
-        <input type="text" class="form-control" id="first_name" name="first_name"
-            required="" autocomplete="given-name" autofocus>
+        <div class="mb-3">
+            <label for="first_name">First Name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name"
+                required="" autocomplete="given-name" autofocus>
+        </div>
+
+        <div class="mb-3">
+            <label for="last_name">Last Name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name"
+                required="" autocomplete="family-name">
+        </div>
+
+        <div class="mb-3">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email"
+                required="" autocomplete="email">
+        </div>
+
+        <div class="mb-3">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password"
+                required="" autocomplete="new-password">
+        </div>
+
+        <br><br>
+
+        <a href="javascript:void(0)" class="btn btn-primary w-100 mb-4" onclick="evaluateRegisterForm()">Create Account</a>
+    </form>
+
+    <!-- Successful Registration Popup (hidden by default)-->
+    <div class="modal fade" id="popup">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div style="text-align:center" class="modal-body">
+                    Registration Successful
+                </div>
+                <div>
+                    <h4 style="text-align:center">Welcome to Spotmeet, <span id="newUser"></span>!</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success w-100 mb-4" data-bs-dismiss="modal" onclick="submitRegisterForm()">Ok</button>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label for="last_name">Last Name</label>
-        <input type="text" class="form-control" id="last_name" name="last_name"
-            required="" autocomplete="family-name">
-    </div>
-
-    <div class="mb-3">
-        <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" name="email"
-            required="" autocomplete="email">
-    </div>
-
-    <div class="mb-3">
-        <label for="password">Password</label>
-        <input type="password" class="form-control" id="password" name="password"
-            required="" autocomplete="new-password">
-    </div>
-
-    <a href="javascript:void(0)" class="btn btn-primary" onclick="evaluateRegisterForm()">Register</a>
-</form>
 
 {{end}}
 
-
 {{block js()}}
-<script>
-const evaluateRegisterForm = () => {
-    const form = document.getElementById('register-form');
-    if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
-        form.classList.add('was-validated');
-        return;
-    }
-    form.classList.add('was-validated');
 
-    var creds = new Object();
-    creds.first_name = document.getElementById('first_name').value;
-    creds.last_name = document.getElementById('last_name').value;
-    creds.email = document.getElementById('email').value;
-    creds.password = document.getElementById('password').value;
+    <script>
+        const evaluateRegisterForm = () => {
+            const form = document.getElementById('register-form');
+            if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
 
-    register(creds);
-}
+            $('#newUser').html(document.getElementById('first_name').value);
+            $('#popup').modal('show');
+        }
 
-const register = (creds) => {
-    fetch('/users/create', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(creds)
-    })
-        .then(response => console.log(response))
-        .then(() => {
-            window.location.href = "/";
-        });
-}
-</script>
+        const submitRegisterForm = () => {
+            const form = document.getElementById('register-form');
+
+            var creds = new Object();
+            creds.first_name = document.getElementById('first_name').value;
+            creds.last_name = document.getElementById('last_name').value;
+            creds.email = document.getElementById('email').value;
+            creds.password = document.getElementById('password').value;
+
+            register(creds);
+        }
+
+        const register = (creds) => {
+            fetch('/users/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(creds)
+            })
+                .then(response => console.log(response))
+                .then(() => {
+                    window.location.href = "/";
+                });
+        }
+
+    </script>
+
 {{end}}
