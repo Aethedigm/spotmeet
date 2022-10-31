@@ -6,9 +6,6 @@ import (
 	"myapp/data"
 	"net/http"
 	"strconv"
-	"time"
-
-	"github.com/go-chi/chi/v5"
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/aethedigm/celeritas"
@@ -19,283 +16,6 @@ type Handlers struct {
 	Models data.Models
 }
 
-func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		fmt.Println("Error parsing form:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	lookingFor := r.Form.Get("lookingFor")
-	distance := r.Form.Get("distance")
-
-	if settingsID := chi.URLParam(r, "settingsID"); settingsID != "" {
-		sID, err := strconv.Atoi(settingsID)
-		if err != nil {
-			fmt.Println("Error converting settingsID to int:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		settings, err := h.Models.Settings.Get(sID)
-		if err != nil {
-			fmt.Println("Error getting settings:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		settings.LookingFor = lookingFor
-		settings.Distance, err = strconv.Atoi(distance)
-		if err != nil {
-			fmt.Println("Error converting distance to int:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		err = h.Models.Settings.Update(*settings)
-	}
-
-}
-
-func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
-	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
-		return
-	}
-
-	userID := h.App.Session.GetInt(r.Context(), "userID")
-
-	// get the user's profile data from the database
-	profile, err := h.Models.Profiles.GetByUserID(userID)
-	if err != nil {
-		fmt.Println("Error getting profile:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	settings, err := h.Models.Settings.GetByUserID(userID)
-	if err != nil {
-		fmt.Println("Error getting settings:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// create variables from the grabbed data to send to our view
-	vars := make(jet.VarMap)
-	vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
-	vars.Set("profileID", profile.ID)
-	vars.Set("usersProfileID", profile.UserID)
-	vars.Set("distance", settings.Distance)
-	vars.Set("settingsID", settings.ID)
-	vars.Set("lookingFor", settings.LookingFor)
-
-	err = h.App.Render.JetPage(w, r, "settings", vars, nil)
-	if err != nil {
-		h.App.ErrorLog.Println("error rendering:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-
-}
-
-func (h *Handlers) Messages(w http.ResponseWriter, r *http.Request) {
-	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
-		return
-	}
-
-	err := h.App.Render.JetPage(w, r, "messages", nil, nil)
-	if err != nil {
-		h.App.ErrorLog.Println("error rendering:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-}
-
-func (h *Handlers) UpdateProfile(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		fmt.Println("Error parsing form:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	fmt.Println("body:" + r.Form.Encode())
-
-	desc := r.Form.Get("description")
-
-	fmt.Println("Description:", desc)
-
-	if profileID := chi.URLParam(r, "profileID"); profileID != "" {
-		pID, err := strconv.Atoi(profileID)
-		if err != nil {
-			fmt.Println("Error converting profileID to int:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		profile, err := h.Models.Profiles.Get(pID)
-		if err != nil {
-			fmt.Println("Error getting profile:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		profile.Description = desc
-
-		err = h.Models.Profiles.Update(*profile)
-		if err != nil {
-			fmt.Println("Error updating profile:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("success"))
-	}
-
-	http.Error(w, "Error updating profile", http.StatusBadRequest)
-}
-
-func (h *Handlers) EditProfile(w http.ResponseWriter, r *http.Request) {
-	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
-		return
-	}
-
-	if profileID := chi.URLParam(r, "profileID"); profileID != "" {
-		pID, err := strconv.Atoi(profileID)
-		if err != nil {
-			fmt.Println("Error converting profileID to int:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		profile, err := h.Models.Profiles.Get(pID)
-		if err != nil {
-			fmt.Println("Error getting profile:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		if profile.UserID != h.App.Session.GetInt(r.Context(), "userID") {
-			http.Error(w, "You are not authorized to edit this profile", http.StatusForbidden)
-			return
-		} else {
-
-			user, err := h.Models.Users.Get(profile.UserID)
-			if err != nil {
-				fmt.Println("Error getting user:", err)
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-
-			vars := make(jet.VarMap)
-			vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
-			vars.Set("profileID", profile.ID)
-			vars.Set("description", profile.Description)
-			vars.Set("FirstName", user.FirstName)
-
-			err = h.App.Render.JetPage(w, r, "editprofile", vars, nil)
-			if err != nil {
-				h.App.ErrorLog.Println("error rendering:", err)
-				http.Error(w, err.Error(), http.StatusBadRequest)
-			}
-		}
-	} else {
-		http.Redirect(w, r, "matches", http.StatusSeeOther)
-	}
-}
-
-func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
-	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
-		return
-	}
-
-	if profileID := chi.URLParam(r, "profileID"); profileID != "" {
-
-		pID, err := strconv.Atoi(profileID)
-		if err != nil {
-			fmt.Println("Error converting profileID to int:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		profile, err := h.Models.Profiles.Get(pID)
-		if err != nil {
-			fmt.Println("Error getting profile:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		user, err := h.Models.Users.Get(profile.UserID)
-		if err != nil {
-			fmt.Println("Error getting user:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		vars := make(jet.VarMap)
-		vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
-		vars.Set("profileID", profile.ID)
-		vars.Set("usersProfileID", profile.UserID)
-		vars.Set("FirstName", user.FirstName)
-		vars.Set("imgurl", profile.ImageURL)
-		vars.Set("description", profile.Description)
-
-		// GET TOP 3 ARTISTS
-		vars.Set("Artist1", "Artist#1")
-		vars.Set("Artist2", "Artist#2")
-		vars.Set("Artist3", "Artist#3")
-
-		err = h.App.Render.JetPage(w, r, "profile", vars, nil)
-		if err != nil {
-			h.App.ErrorLog.Println("error rendering:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-		}
-	} else {
-		http.Error(w, "No ID provided", http.StatusBadRequest)
-	}
-}
-
-func (h *Handlers) Profile(w http.ResponseWriter, r *http.Request) {
-	if userID := h.App.Session.GetInt(r.Context(), "userID"); userID != 0 {
-		profile, err := h.Models.Profiles.GetByUserID(userID)
-		if err != nil {
-			fmt.Println("Error getting profile:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		http.Redirect(w, r, "/users/profile/"+fmt.Sprint(profile.ID), http.StatusSeeOther)
-	} else {
-		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
-		return
-	}
-}
-
-func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
-	matches, err := h.Models.Matches.GetAllForOneUser(h.App.Session.GetInt(r.Context(), "userID"))
-	if err != nil {
-		fmt.Println("Error getting matches:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	matchesJSON, err := json.Marshal(matches)
-	if err != nil {
-		fmt.Println("Error marshalling matches:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(matchesJSON)
-	if err != nil {
-		h.App.ErrorLog.Println("error writing json")
-		return
-	}
-}
-
 func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 	if !h.App.Session.Exists(r.Context(), "userID") {
 		h.App.ErrorLog.Println("error retrieving user_id from session")
@@ -303,65 +23,37 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 	}
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 
+	err := r.ParseForm()
+	if err != nil {
+		h.App.ErrorLog.Println("error parsing form:", err)
+		return
+	}
+
 	// get the current User from the database as a struct
-	user := data.User{}
-	currentUser, err := user.Get(userID)
+	currentUser, err := h.Models.Users.Get(userID)
 	if err != nil {
 		h.App.ErrorLog.Println("error getting user object:", err)
 		return
 	}
 
-	// grab the body of the POST request, which was formatted as json
-	js := make([]byte, r.ContentLength)
-	_, err = r.Body.Read(js)
-	if err != nil {
-		fmt.Println("error while reading json from body", err)
-		// Not returning yet, here. There is an error happening, but the necessary data
-		// is still being read into the js variable.
-	}
+	lat := r.Form.Get("lat")
+	lng := r.Form.Get("long")
 
-	// unpack the json data into our current User object
-	err = json.Unmarshal(js, &currentUser)
+	// convert the lat and long to float64
+	latFloat, err := strconv.ParseFloat(lat, 64)
 	if err != nil {
-		h.App.ErrorLog.Println("error retrieving location data")
-		return
-	} else {
-		fmt.Println("User location: ", currentUser.Latitude, currentUser.Longitude)
-	}
-
-	// write the updated User to the database
-	err = user.Update(*currentUser)
-	if err != nil {
-		h.App.ErrorLog.Println("error updating user in database")
-		return
-	}
-}
-
-func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
-	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		h.App.ErrorLog.Println("error converting lat to float64:", err)
 		return
 	}
 
-	// Check the user's spotify access token expiry. If it's within 5 minutes of its
-	// -- expiry, redirect to users/newspotaccesstoken to get a new one from spotify via the refresh token
-	// Get user ID from the session
-	userID := h.App.Session.GetInt(r.Context(), "userID")
-	userSpotTokens, _ := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
-	// convert to east-coat time zone, that's used by time.Time (add 4 hrs)
-	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 14400
-	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
-	if expiry < fiveMinutesFromNow {
-		fmt.Println(fiveMinutesFromNow)
-		// go to users/newspotaccesstoken to get the new access token with the refresh token
-		http.Redirect(w, r, "users/newspotaccesstoken", http.StatusSeeOther)
+	lngFloat, err := strconv.ParseFloat(lng, 64)
+	if err != nil {
+		h.App.ErrorLog.Println("error converting long to float64:", err)
 		return
 	}
 
-	err := h.App.Render.Page(w, r, "matches", nil, nil)
-	if err != nil {
-		h.App.ErrorLog.Println("error rendering:", err)
-	}
+	currentUser.Latitude = latFloat
+	currentUser.Longitude = lngFloat
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {

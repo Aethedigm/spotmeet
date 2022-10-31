@@ -37,6 +37,7 @@ func (a *application) routes() *chi.Mux {
 
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
+
 		r.Put("/settings/{settingsID:[0-9]+}", a.Handlers.UpdateSettings)
 		r.Put("/update-profile/{profileID:[0-9]+}", a.Handlers.UpdateProfile)
 	})
@@ -45,6 +46,11 @@ func (a *application) routes() *chi.Mux {
 
 	a.App.Routes.Route("/messages", func(r chi.Router) {
 		r.Get("/", a.Handlers.Messages)
+		r.Get("/getThreads/{userID:[0-9]+}", a.Handlers.GetThreads)
+		r.Get("/getMessages/{fromUserID:[0-9]+}", a.Handlers.Thread)
+		r.Get("/between/{userID:[0-9]+}/{matchID:[0-9]+}", a.Handlers.GetMessages)
+
+		r.Post("/create", a.Handlers.CreateMessage)
 	})
 
 	a.App.Routes.Get("/settings", a.Handlers.Settings)

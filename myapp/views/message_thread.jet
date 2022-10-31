@@ -1,0 +1,124 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}Welcome{{end}}
+
+{{block css()}}
+    <style>
+        .message-input {
+            width: 80%;
+            display: inline;
+        }
+
+        .message-btn {
+            width: 15%;
+            display: inline;
+        }
+
+        .ml-5 {
+            margin-left: 5px;
+        }
+
+        .mr-5 {
+            margin-right: 5px;
+        }
+
+        .messageContainer {
+            margin-bottom: 200px;
+            padding-top: 35px;
+        }
+
+        .message {
+            margin-top: auto;
+            margin-bottom: auto;
+            margin-left: 10px;
+            border-radius: 25px;
+            background-color: #2090c5;
+            padding: 15px;
+            width: fit-content;
+            block-size: fit-content;
+        }
+
+        .sent {
+            margin-right: 10px;
+            background-color: #20c590;            
+        }
+
+        body {
+            padding-bottom: 50px;
+        }
+    </style>
+{{end}}
+
+{{block pageContent()}}
+<div id="header" class="navbar fixed-top bg-light">
+    <div class="container-fluid">
+        <div id="other-user-name">
+            {{ matchFirstName }}
+            <hr>
+        </div>
+    </div>
+</div>
+
+<div id="message_container" class="messageContainer mp-5 mt-5 flexbox mb-5">
+</div>
+
+<div id="footbar" class="navbar fixed-bottom bg-light">
+    <div class="container-fluid w-100 pull-left">
+        <input type="text" id="message-input" class="message-input mr-5 ml-5 mb-2">
+        <a href="#" class="btn btn-success message-btn" onclick="sendClick()">Send</button></a>
+    </div>
+    <br />
+    <div class="container-fluid">
+        <a href="#" class="btn btn-primary float-left w-25">Message</a>
+        <a href="/matches" class="btn rounded-pill w-25">Match</a>
+        <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
+    </div>
+</div>
+{{end}}
+
+
+{{block js()}}
+<script>
+    const userID = {{ userID }};
+    const messageContainer = document.getElementById('message_container');
+
+    const sendClick = () => {
+        const msgInput = document.getElementById('message-input').value;
+
+        let formData = new FormData();
+        formData.set('message', msgInput);
+        formData.set('senderID', userID);
+        formData.set('receiverID', {{ matchID }});
+
+        fetch("/messages/create", {
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => {
+                getMessages();
+            });
+    }
+
+    const getMessages = () => {
+        fetch("/messages/between/{{ userID }}/{{ matchID }}")
+            .then(response => response.json())
+            .then(data => {
+                data.sort((a, b) => a.ID - b.ID);
+
+                messageContainer.innerHTML = "";
+
+                for (let i = 0; i < data.length; i++) {
+                    let message = data[i];
+                    if (message.user_id == userID) {
+                        messageContainer.innerHTML += `<div class="message sent float-left ms-auto mt-2">${message.content}</div>`;
+                    } else {
+                        messageContainer.innerHTML += `<div class="message float-right me-auto mt-2">${message.content}</div>`;
+                    }
+                }
+            });
+    }
+
+    setInterval(getMessages, 2000);
+    window.onload = getMessages;
+</script>
+{{end}}

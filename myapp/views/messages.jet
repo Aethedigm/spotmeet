@@ -3,18 +3,61 @@
 {{block browserTitle()}}Messages{{end}}
 
 {{block css()}}
+    <style>
+        .messageContainer {
+            margin-bottom: 200px;
+        }
 
+        .message-thread {
+            margin-top: auto;
+            margin-bottom: auto;
+            margin-left: 10px;
+            border-radius: 25px;
+            background-color: #2090c5;
+            padding: 15px;
+            width: fit-content;
+            block-size: fit-content;
+        }
+
+        body {
+            padding-bottom: 50px;
+        }
+    </style>
 {{end}}
 
 {{block pageContent()}}
+<div id="message_container" class="messageContainer mt-5 flexbox mb-5 justify-content-center text-center">
+</div>
+
 <div id="footbar" class="navbar fixed-bottom bg-light">
     <div class="container-fluid">
-        <a href="/#" class="btn btn-primary float-left w-25">Messages</a>
-        <a href="/matches" class="btn rounded-pill w-25">Matches</a>
+        <a href="#" class="btn btn-primary float-left w-25">Message</a>
+        <a href="/matches" class="btn rounded-pill w-25">Match</a>
         <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
     </div>
 </div>
 {{end}}
 
+
 {{block js()}}
+<script>
+    window.onload = function() {
+        getMessageThreads();
+    }
+
+    const getMessageThreads = () => {
+        const msgContainer = document.getElementById("message_container");
+
+        fetch('/messages/getThreads/{{ userID }}')
+            .then(response => response.json())
+            .then(data => { 
+                for (i = 0; i < data.length; i++) {
+                    const thread = data[i];
+                    const threadTemplate = `<a href="/messages/getMessages/${thread.MatchID}" class="btn btn-secondary w-50">${thread.MatchFirstName}</a>`;
+
+                    msgContainer.innerHTML += threadTemplate;
+                }
+            });
+    }
+</script>
 {{end}}

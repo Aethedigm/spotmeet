@@ -21,6 +21,8 @@ type Models struct {
 	Profiles      Profile
 	SpotifyTokens SpotifyToken
 	Settings      Settings
+	Messages      Message
+	Links         Link
 }
 
 // New initializes the models package for use
