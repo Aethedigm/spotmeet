@@ -7,8 +7,8 @@ Capstone - Team E
   - [X] Login Page
   - [X] Register Page
   - [X] Matches Page
-  - [ ] Messages Page
-    - [ ] Message Threads
+  - [X] Messages Page
+    - [X] Message Threads
   - [X] Settings
     - [X] Logout Button
   - [X] Profiles
