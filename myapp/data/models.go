@@ -23,6 +23,7 @@ type Models struct {
 	Settings      Settings
 	Messages      Message
 	Links         Link
+	RQ            RawQuery
 }
 
 // New initializes the models package for use

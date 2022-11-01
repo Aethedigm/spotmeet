@@ -1,0 +1,6 @@
+ALTER TABLE settings
+
+ADD COLUMN lat_max float NOT NULL DEFAULT 0,
+ADD COLUMN lat_min float NOT NULL DEFAULT 0,
+ADD COLUMN long_max float NOT NULL DEFAULT 0,
+ADD COLUMN long_min float NOT NULL DEFAULT 0;

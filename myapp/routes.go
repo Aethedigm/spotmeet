@@ -21,6 +21,8 @@ func (a *application) routes() *chi.Mux {
 	a.App.Routes.Route("/matches", func(r chi.Router) {
 		r.Get("/", a.Handlers.Matches)
 		r.Get("/myresults", a.Handlers.MyMatchResults)
+		r.Get("/accept/{matchID:[0-9]+}", a.Handlers.AcceptMatch)
+		r.Get("/reject/{matchID:[0-9]+}", a.Handlers.RejectMatch)
 
 		r.Post("/location", a.Handlers.Location)
 	})

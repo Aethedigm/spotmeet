@@ -5,12 +5,16 @@ import (
 )
 
 type Settings struct {
-	ID                     int    `db:"id,omitempty"`
-	UserID                 int    `db:"user_id" json:"user_id"`
-	Distance               int    `db:"distance" json:"distance"`
-	LookingFor             string `db:"looking_for" json:"looking_for"`
-	MatchSensitivity       int    `db:"match_sensitivity" json:"match_sensitivity"`
-	LikedArtistSensitivity int    `db:"liked_artist_sensitivity" json:"liked_artist_sensitivity"`
+	ID                     int     `db:"id,omitempty"`
+	UserID                 int     `db:"user_id" json:"user_id"`
+	Distance               int     `db:"distance" json:"distance"`
+	LookingFor             string  `db:"looking_for" json:"looking_for"`
+	MatchSensitivity       int     `db:"match_sensitivity" json:"match_sensitivity"`
+	LikedArtistSensitivity int     `db:"liked_artist_sensitivity" json:"liked_artist_sensitivity"`
+	LatMin                 float64 `db:"lat_min" json:"lat_min"`
+	LatMax                 float64 `db:"lat_max" json:"lat_max"`
+	LongMin                float64 `db:"long_min" json:"long_min"`
+	LongMax                float64 `db:"long_max" json:"long_max"`
 }
 
 func (s *Settings) Table() string {

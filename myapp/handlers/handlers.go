@@ -17,15 +17,17 @@ type Handlers struct {
 }
 
 func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
-	if !h.App.Session.Exists(r.Context(), "userID") {
-		h.App.ErrorLog.Println("error retrieving user_id from session")
-		return
-	}
-	userID := h.App.Session.GetInt(r.Context(), "userID")
 
 	err := r.ParseForm()
 	if err != nil {
 		h.App.ErrorLog.Println("error parsing form:", err)
+		return
+	}
+
+	userIDstr := r.Form.Get("userID")
+	userID, err := strconv.Atoi(userIDstr)
+	if err != nil {
+		h.App.ErrorLog.Println("error converting userID to int:", err)
 		return
 	}
 
@@ -38,6 +40,9 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 
 	lat := r.Form.Get("lat")
 	lng := r.Form.Get("long")
+
+	fmt.Println("lat:", lat)
+	fmt.Println("lng:", lng)
 
 	// convert the lat and long to float64
 	latFloat, err := strconv.ParseFloat(lat, 64)
@@ -54,6 +59,8 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 
 	currentUser.Latitude = latFloat
 	currentUser.Longitude = lngFloat
+
+	currentUser.Update(*currentUser)
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {

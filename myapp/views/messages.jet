@@ -53,7 +53,7 @@
             .then(data => { 
                 for (i = 0; i < data.length; i++) {
                     const thread = data[i];
-                    const threadTemplate = `<a href="/messages/getMessages/${thread.MatchID}" class="btn btn-secondary w-50">${thread.MatchFirstName}</a>`;
+                    const threadTemplate = `<br /><a href="/messages/getMessages/${thread.MatchID}" class="btn btn-secondary w-50 mb-2">${thread.MatchFirstName}</a>`;
 
                     msgContainer.innerHTML += threadTemplate;
                 }
