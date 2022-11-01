@@ -43,6 +43,22 @@ func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		u, err := h.Models.Users.Get(settings.UserID)
+		if err != nil {
+			fmt.Println("Error getting user:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Get u lat and long, save to settings with distance
+		latMod := float64(settings.Distance) * 0.01492753623
+		longMod := float64(settings.Distance) * 0.018315018315
+
+		settings.LatMin = u.Latitude - latMod
+		settings.LatMax = u.Latitude + latMod
+		settings.LongMin = u.Longitude - longMod
+		settings.LongMax = u.Longitude + longMod
+
 		err = h.Models.Settings.Update(*settings)
 	}
 

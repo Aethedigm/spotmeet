@@ -82,10 +82,10 @@ const addMatch = (match) => {
         </div>
         <div id="bottom_row-${match.ID}" class="row">
             <div class="col">
-                <a href="/matches/accept?id=${match.ID}" class="btn btn-success rounded w-100">Link</a>
+                <a href="#" onclick="acceptMatch(${match.ID})" class="btn btn-success rounded w-100">Link</a>
             </div>
             <div class="col">
-                <a href="/matches/decline?id=${match.ID}" class="btn btn-danger rounded w-100">Pass</a>
+                <a href="#" onclick="declineMatch(${match.ID})" class="btn btn-danger rounded w-100">Pass</a>
             </div>
         </div>
     </div>
@@ -93,6 +93,26 @@ const addMatch = (match) => {
 
     const matchContainer = document.getElementById("matches_container");
     matchContainer.innerHTML += matchTemplate;
+}
+
+const acceptMatch = (matchID) => {
+    fetch("/matches/accept/" + matchID)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("match_container-" + matchID).remove();
+            }
+        });
+}
+
+const declineMatch = (matchID) => {
+    fetch("/matches/reject/" + matchID)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("match_container-" + matchID).remove();
+            }
+        });
 }
 
 function getLocation() {
@@ -105,6 +125,7 @@ async function sendLocationToServer(position) {
     const data = new URLSearchParams();
     const coordinates = {lat: position.coords.latitude, long: position.coords.longitude};
 
+    data.append("userID", {{userID}});
     data.append("lat", coordinates.lat);
     data.append("long", coordinates.long);
 

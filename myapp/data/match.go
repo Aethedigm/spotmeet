@@ -19,11 +19,22 @@ type Match struct {
 	ArtistID     int       `db:"artist_id" json:"artist_id"`
 	CreatedAt    time.Time `db:"created_at"`
 	Expires      time.Time `db:"expiry" json:"expiry"`
+	Complete     bool      `db:"complete" json:"complete"`
 }
 
 // Table returns the table name associated with this model in the database
 func (m *Match) Table() string {
 	return "matches"
+}
+
+func (m *Match) Update(match Match) error {
+	collection := upper.Collection(match.Table())
+	res := collection.Find(match.ID)
+	err := res.Update(match)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetAll returns a slice of all matches.
@@ -50,8 +61,8 @@ func (m *Match) GetAllForOneUser(userID int) ([]Match, error) {
 	var a2 []Match
 
 	collection := upper.Collection(m.Table())
-	res1 := collection.Find(up.Cond{"user_a_id =": userID})
-	res2 := collection.Find(up.Cond{"user_b_id =": userID})
+	res1 := collection.Find(up.Cond{"user_a_id": userID, "complete": false})
+	res2 := collection.Find(up.Cond{"user_b_id": userID, "complete": false})
 
 	err := res1.All(&a1)
 	if err != nil {
@@ -72,7 +83,7 @@ func (m *Match) GetAllForOneUser(userID int) ([]Match, error) {
 func (m *Match) Get(id int) (*Match, error) {
 	var thematch Match
 	collection := upper.Collection(m.Table())
-	res := collection.Find(up.Cond{"id =": id})
+	res := collection.Find(up.Cond{"id": id})
 
 	err := res.One(&thematch)
 	if err != nil {
