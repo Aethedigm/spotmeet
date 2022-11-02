@@ -30,7 +30,8 @@
 <script>
 
 window.onload = function() {
-    getLocation()
+    showLoadingAnimation();
+    getLocationAndMatches();
 }
 
 const noMatches = () => {
@@ -96,7 +97,7 @@ const declineMatch = (matchID) => {
         });
 }
 
-function getLocation() {
+function getLocationAndMatches() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(sendLocationToServer)
     }
@@ -119,7 +120,8 @@ async function sendLocationToServer(position) {
      })
         .then(response => response.json())
         .then(data => console.log(data))
-        .then(fetchMatches());
+        .then(fetchMatches())
+        .then(removeLoading());
 }
 
 // Fetch data from server
@@ -142,6 +144,95 @@ async function fetchMatches() {
             }
         });
 }
+
+function showLoadingAnimation() {
+    if (document.getElementById("divWheelFrame") != null) {
+        return;
+    }
+    var style = document.createElement("style");
+    style.id = "styleLoading";
+    style.innerHTML = `
+        .message {
+            font-size: 4em;
+            color: white;
+            text-align: center;
+        }
+        .wheel-frame {
+            position: fixed;
+            background-color: #4285F4;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 4;
+        }
+        .wheel-track {
+            height: 100px;
+            display: inline-block;
+            position: absolute;
+            top: calc(50% - 50px);
+            left: 50%;
+        }
+        .wheel-dot {
+            height: 15px;
+            width: 15px;
+            background-color: white;
+            border-radius: 100%;
+        }
+        .wheel-animated {
+            animation-name: wheel-animated;
+            animation-direction: alternate;
+            animation-duration: .50s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+        @keyframes wheel-animated {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    `
+    document.body.appendChild(style);
+
+    var message = document.createElement("div");
+    message.id = "divMessage";
+    message.classList.add("message");
+    message.innerHTML = `Loading your matches...`
+
+    var frame = document.createElement("div");
+    frame.id = "divWheelFrame";
+    frame.classList.add("wheel-frame");
+
+    for (var i = 0; i < 10; i++) {
+        var track = document.createElement("div");
+        track.classList.add("wheel-track");
+        var dot = document.createElement("div");
+        dot.classList.add("wheel-dot");
+        track.style.transform = "rotate(" + String(i * 40) + "deg)";
+        track.appendChild(dot);
+        frame.appendChild(track);
+    }
+
+    document.body.appendChild(frame);
+    document.body.appendChild(message);
+
+    var wait = 0;
+    var dots = document.getElementsByClassName("wheel-dot");
+    for (var i = 0; i < dots.length; i++) {
+        window.setTimeout(function(dot) {
+            dot.classList.add("wheel-animated");
+        }, wait, dots[i]);
+        wait += 200;
+    }
+};
+
+async function removeLoading() {
+  document.body.removeChild(document.getElementById("divWheelFrame"));
+  document.body.removeChild(document.getElementById("styleLoading"));
+};
 
 </script>
 {{end}}
