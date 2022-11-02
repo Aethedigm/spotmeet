@@ -95,6 +95,12 @@ func (a *Artist) DeleteByName(artistName string) error {
 func (a *Artist) Insert(theArtist Artist) (int, error) {
 	collection := upper.Collection(a.Table())
 
+	// Make sure this artist doesn't already exist
+	_, err := a.GetByName(theArtist.Name)
+	if err == nil {
+		return 0, nil
+	}
+
 	res, err := collection.Insert(&theArtist)
 	if err != nil {
 		return 0, err

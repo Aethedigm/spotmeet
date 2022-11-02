@@ -24,6 +24,8 @@ type Models struct {
 	Messages      Message
 	Links         Link
 	RQ            RawQuery
+	LikedArtists  LikedArtist
+	Artists       Artist
 }
 
 // New initializes the models package for use
