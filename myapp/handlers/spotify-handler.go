@@ -17,11 +17,11 @@ import (
 var auth = spotify.Authenticator{}
 var state string
 
-var spotScopes = [2]string{spotify.ScopeUserTopRead, spotify.ScopeUserReadRecentlyPlayed}
+var spotScopes = []string{spotify.ScopeUserTopRead, spotify.ScopeUserReadRecentlyPlayed, spotify.ScopeUserFollowRead}
 
 func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) {
 	callback := os.Getenv("URL") + "/spotauth/callback"
-	auth = spotify.NewAuthenticator(callback, spotScopes[0], spotScopes[1])
+	auth = spotify.NewAuthenticator(callback, spotScopes...)
 	randomBytes := make([]byte, 16)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
@@ -108,11 +108,13 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
+		fmt.Printf("State mismatch: %s != %s\n", st, state)
+		return
 	}
 
 	spotclient := auth.NewClient(tok)
@@ -120,12 +122,13 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 
 	_, err = spotclient.CurrentUser()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	if userID == 0 || userID == -1 {
-		log.Fatal("The user_id of the current user could not be found in the session data.")
+		fmt.Println("The user_id of the current user could not be found in the session data.")
+		return
 	}
 
 	spottoken := data.SpotifyToken{
@@ -141,31 +144,46 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
-	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
+	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
 		return
 	}
-	oauth2SpotToken := oauth2.Token{
-		AccessToken:  userSpotTokens.AccessToken,
-		TokenType:    "bearer",
-		RefreshToken: userSpotTokens.RefreshToken,
-		Expiry:       userSpotTokens.AccessTokenExpiry,
+
+	spotifyToken := &oauth2.Token{
+		AccessToken:  SpotTok.AccessToken,
+		RefreshToken: SpotTok.RefreshToken,
 	}
 
-	client := auth.NewClient(&oauth2SpotToken)
-	artists, err := client.CurrentUsersFollowedArtists()
+	client := auth.NewClient(spotifyToken)
+	_, err = client.CurrentUser()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Current user is nil")
 		return
 	}
 
-	for _, artist := range artists.Artists {
-		spotArtist := data.Artist{
-			SpotifyID: artist.ID.String(),
-			Name:      artist.Name,
+	artists, err := client.CurrentUsersFollowedArtistsOpt(50, "0")
+	if err != nil {
+		fmt.Println("Error getting artists", err)
+		return
+	}
+
+	if len(artists.Artists) < 1 {
+		fmt.Println("No artists returned")
+		return
+	}
+
+	for i := range artists.Artists {
+		temp := data.Artist{
+			SpotifyID: artists.Artists[i].ID.String(),
+			Name:      artists.Artists[i].Name,
 		}
-		spotArtist.Insert(spotArtist)
+
+		tID, err := temp.Insert(temp)
+		if err != nil {
+			fmt.Println("Error inserting artist ID", tID)
+			return
+		}
 	}
 }
 
