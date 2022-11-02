@@ -143,7 +143,7 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
 	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
-		fmt.Println("No Spotify token found for user")
+		fmt.Println("No spotify token found for user")
 		return
 	}
 	oauth2SpotToken := oauth2.Token{
@@ -153,33 +153,20 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
 		Expiry:       userSpotTokens.AccessTokenExpiry,
 	}
 
-	auth = spotify.NewAuthenticator(os.Getenv("URL")+"/newspotaccesstoken/callback", spotScopes[0], spotScopes[1])
 	client := auth.NewClient(&oauth2SpotToken)
-
-	limit := 30
-	timeRange := "long"
-
-	artists, err := client.CurrentUsersTopArtistsOpt(&spotify.Options{
-		Limit:     &limit,
-		Timerange: &timeRange,
-	})
+	artists, err := client.CurrentUsersFollowedArtists()
 	if err != nil {
-		fmt.Println("Error getting top artists for user", err)
+		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("Artists added: ", artists.Artists)
-	fmt.Println("Limit:", limit)
-
 	for _, artist := range artists.Artists {
-		artistData := data.Artist{
+		spotArtist := data.Artist{
 			SpotifyID: artist.ID.String(),
 			Name:      artist.Name,
 		}
-
-		artistData.Insert(artistData)
+		spotArtist.Insert(spotArtist)
 	}
-
 }
 
 func min(a, b int) int {
