@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User is the type for a user
 type User struct {
 	ID        int       `db:"id,omitempty"`
 	FirstName string    `db:"first_name" json:"first_name"`
@@ -23,12 +22,10 @@ type User struct {
 	Longitude float64   `db:"long" json:"long"`
 }
 
-// Table returns the table name associated with this model in the database
 func (u *User) Table() string {
 	return "users"
 }
 
-// GetAll returns a slice of all users
 func (u *User) GetAll() ([]*User, error) {
 	collection := upper.Collection(u.Table())
 
@@ -43,7 +40,6 @@ func (u *User) GetAll() ([]*User, error) {
 	return all, nil
 }
 
-// GetByEmail gets one user, by email
 func (u *User) GetByEmail(email string) (*User, error) {
 	var theUser User
 	collection := upper.Collection(u.Table())
@@ -68,7 +64,6 @@ func (u *User) GetByEmail(email string) (*User, error) {
 	return &theUser, nil
 }
 
-// Get gets one user by id
 func (u *User) Get(id int) (*User, error) {
 	var theUser User
 	collection := upper.Collection(u.Table())
@@ -94,7 +89,6 @@ func (u *User) Get(id int) (*User, error) {
 	return &theUser, nil
 }
 
-// Update updates a user record in the database
 func (u *User) Update(theUser User) error {
 	theUser.UpdatedAt = time.Now()
 	collection := upper.Collection(u.Table())
@@ -106,7 +100,6 @@ func (u *User) Update(theUser User) error {
 	return nil
 }
 
-// Delete deletes a user by id
 func (u *User) Delete(id int) error {
 	collection := upper.Collection(u.Table())
 	res := collection.Find(id)
@@ -118,7 +111,6 @@ func (u *User) Delete(id int) error {
 
 }
 
-// Insert inserts a new user, and returns the newly inserted id
 func (u *User) Insert(theUser User) (int, error) {
 	collection := upper.Collection(u.Table())
 
@@ -142,7 +134,6 @@ func (u *User) Insert(theUser User) (int, error) {
 	return uID, nil
 }
 
-// ResetPassword resets a users's password, by id, using supplied password
 func (u *User) ResetPassword(id int, password string) error {
 	newHash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
 	if err != nil {
@@ -164,10 +155,6 @@ func (u *User) ResetPassword(id int, password string) error {
 	return nil
 }
 
-// PasswordMatches verifies a supplied password against the hash stored in the database.
-// It returns true if valid, and false if the password does not match, or if there is an
-// error. Note that an error is only returned if something goes wrong (since an invalid password
-// is not an error -- it's just the wrong password))
 func (u *User) PasswordMatches(plainText string) (bool, error) {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
 	if err != nil {

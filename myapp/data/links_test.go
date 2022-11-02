@@ -3,7 +3,10 @@
 // run tests with this command: go test . --tags integration --count=1
 package data
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
 
 func TestLink_Table(t *testing.T) {
 	s := Link{}
@@ -39,19 +42,26 @@ func TestLink_Insert(t *testing.T) {
 	}
 
 	a := Artist{
-		SpotifyID: "test",
-		Name:      "test",
+		SpotifyID: "test1333",
+		Name:      "test2333",
 	}
 
 	aID, err := a.Insert(a)
+	if err != nil || aID == 0 {
+		t.Error(err)
+	}
+
+	artist, err := a.Get(aID)
 	if err != nil {
 		t.Error(err)
 	}
 
 	l := Link{
-		User_A_ID: uID,
-		User_B_ID: uID2,
-		ArtistID:  aID,
+		User_A_ID:   uID,
+		User_B_ID:   uID2,
+		ArtistID:    artist.ID,
+		PercentLink: 100,
+		CreatedAt:   time.Now(),
 	}
 
 	lID, err := l.Insert(l)

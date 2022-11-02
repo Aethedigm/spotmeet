@@ -17,7 +17,6 @@ type Handlers struct {
 }
 
 func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
-
 	err := r.ParseForm()
 	if err != nil {
 		h.App.ErrorLog.Println("error parsing form:", err)
@@ -40,9 +39,6 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 
 	lat := r.Form.Get("lat")
 	lng := r.Form.Get("long")
-
-	fmt.Println("lat:", lat)
-	fmt.Println("lng:", lng)
 
 	// convert the lat and long to float64
 	latFloat, err := strconv.ParseFloat(lat, 64)

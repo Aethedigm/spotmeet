@@ -1,25 +1,9 @@
 package handlers
 
 import (
-	"encoding/base32"
 	"fmt"
-	"log"
-	"math/rand"
-	"myapp/data"
 	"net/http"
-	"os"
-
-	"golang.org/x/oauth2"
-
-	"github.com/zmb3/spotify"
 )
-
-var auth = spotify.Authenticator{}
-var state string
-
-// if length of spotScopes changes, be sure to update functions that call this array
-// within this .go file
-var spotScopes = [2]string{spotify.ScopeUserTopRead, spotify.ScopeUserReadRecentlyPlayed}
 
 func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 	err := h.App.Render.Page(w, r, "register", nil, nil)
@@ -75,165 +59,13 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// User has current token, so redirect to matches page
+	h.SetSpotifyArtistsForUser(user.ID)
+
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
 func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
-	// log out the user from the SpotMeet app
-	h.App.Session.RenewToken(r.Context())
+	// h.App.Session.RenewToken(r.Context())
 	h.App.Session.Remove(r.Context(), "userID")
 	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
-}
-
-func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) {
-	callback := os.Getenv("LOCALHOST_URL") + "/spotauth/callback"
-	auth = spotify.NewAuthenticator(callback, spotScopes[0], spotScopes[1])
-	randomBytes := make([]byte, 16)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// state is defined outside this function, so it can be used in other functions.
-	// It is created here, and sent with the request to Spotify to get an access and refresh token.
-	// Upon returning, it is checked in SpotifyAuthorizationCallback, ensure someone else
-	// besides Spotify has not initiated the request.
-	state = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
-
-	// use state, along with the Spotify client ID (inside of auth) to get a unique url from Spotify
-	// so that we can send the user to it, in order for them to log in with Spotify directly,
-	// and initiate a callback from Spotify containing our access and refresh tokens.
-	url := auth.AuthURL(state)
-
-	// If the browser is already logged in to a Spotify account, use Spotify
-	// to ask them if they want to continue with that Spotify account.
-	url = url + "&show_dialog=true"
-
-	// redirecting to Spotify login!
-	http.Redirect(w, r, url, http.StatusSeeOther)
-}
-
-func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.Request) {
-	tok, err := auth.Token(state, r)
-	if err != nil {
-		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
-	}
-	if st := r.FormValue("state"); st != state {
-		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
-	}
-
-	spotclient := auth.NewClient(tok)
-	fmt.Fprintf(w, "Login Completed!")
-
-	_, err = spotclient.CurrentUser()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	userID := h.App.Session.GetInt(r.Context(), "userID")
-	if userID == 0 || userID == -1 {
-		log.Fatal("The user_id of the current user could not be found in the session data.")
-	}
-
-	// Write the new refresh token and new access token to a new
-	// spotifytoken struct, and assign that to the current User's SpotifyToken variable.
-	spottoken := data.SpotifyToken{
-		UserID:            userID,
-		AccessToken:       tok.AccessToken,
-		RefreshToken:      tok.RefreshToken,
-		AccessTokenExpiry: tok.Expiry,
-	}
-
-	spottoken.Upsert(spottoken)
-
-	http.Redirect(w, r, "/matches", http.StatusSeeOther)
-}
-
-func (h *Handlers) NewAccessTokenRequest(w http.ResponseWriter, r *http.Request) {
-	callback := os.Getenv("LOCALHOST_URL") + "/newspotaccesstoken/callback"
-	auth = spotify.NewAuthenticator(callback, spotScopes[0], spotScopes[1])
-	randomBytes := make([]byte, 16)
-	_, err := rand.Read(randomBytes)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// get the user's spotifytoken, put that info into a new oauth2.Token struct
-	userID := h.App.Session.GetInt(r.Context(), "userID")
-	userSpotTokens, _ := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
-	oauth2SpotToken := oauth2.Token{
-		AccessToken:  userSpotTokens.AccessToken,
-		TokenType:    "bearer",
-		RefreshToken: userSpotTokens.RefreshToken,
-		Expiry:       userSpotTokens.AccessTokenExpiry,
-	}
-
-	// pass the oauth2 token into NewClient, to set the stage
-	client := auth.NewClient(&oauth2SpotToken)
-
-	// get the new access token, and save it to the user's spotifytoken record in the db
-	newtoken, _ := client.Token()
-	userSpotTokens.AccessToken = newtoken.AccessToken
-	err = userSpotTokens.UpdateAccessToken(newtoken.AccessToken, newtoken.Expiry)
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		fmt.Print("Spotify access token updated successfully!")
-	}
-	//
-	//// redefine state for the refresh-to-access token process
-	//state = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
-	//
-	//// use state to create the url to access Spotify
-	//url := auth.AuthURL(state)
-	//
-	//// If the browser is already logged in to a Spotify account, use Spotify
-	//// to ask them if they want to continue with that Spotify account.
-	//url = url + "&show_dialog=true"
-	//
-	//// redirecting to Spotify login!
-	//http.Redirect(w, r, url, http.StatusSeeOther)
-
-	http.Redirect(w, r, "/matches", http.StatusSeeOther)
-}
-
-func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) {
-	tok, err := auth.Token(state, r)
-	if err != nil {
-		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
-	}
-	if st := r.FormValue("state"); st != state {
-		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
-	}
-
-	spotclient := auth.NewClient(tok)
-	fmt.Fprintf(w, "Login Completed!")
-
-	_, err = spotclient.CurrentUser()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	userID := h.App.Session.GetInt(r.Context(), "userID")
-	if userID == 0 || userID == -1 {
-		log.Fatal("The user_id of the current user could not be found in the session data.")
-	}
-
-	// Write the new refresh token and new access token to a new
-	// spotifytoken struct, and assign that to the current User's SpotifyToken variable.
-	spottoken := data.SpotifyToken{
-		UserID:            userID,
-		AccessToken:       tok.AccessToken,
-		RefreshToken:      tok.RefreshToken,
-		AccessTokenExpiry: tok.Expiry,
-	}
-
-	spottoken.Upsert(spottoken)
-
-	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
