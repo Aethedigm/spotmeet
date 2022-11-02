@@ -123,7 +123,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	matches, err := h.Models.Matches.GetAllForOneUser(h.App.Session.GetInt(r.Context(), "userID"))
+	matches, err := h.Models.Matches.GetAllForOneUser(userID)
 	if err != nil {
 		fmt.Println("Error getting matches:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)

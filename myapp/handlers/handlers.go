@@ -37,6 +37,12 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	currentUserSettings, err := h.Models.Settings.GetByUserID(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("error getting settings object:", err)
+		return
+	}
+
 	lat := r.Form.Get("lat")
 	lng := r.Form.Get("long")
 
@@ -53,10 +59,32 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// update user's max/min coordinates in settings if their current lat/long are zero
+	if currentUser.Latitude == 0 && currentUser.Longitude == 0 {
+		defaultDistance := 50 // 50 miles is the default distance for new users' settings
+		latMod := float64(defaultDistance) * 0.01492753623
+		longMod := float64(defaultDistance) * 0.018315018315
+
+		currentUserSettings.LatMin = latFloat - latMod
+		currentUserSettings.LatMax = latFloat + latMod
+		currentUserSettings.LongMin = lngFloat - longMod
+		currentUserSettings.LongMax = lngFloat + longMod
+
+		err = currentUserSettings.Update(*currentUserSettings)
+		if err != nil {
+			h.App.ErrorLog.Println("error updating user ", userID, " settings", err)
+			return
+		}
+	}
+
 	currentUser.Latitude = latFloat
 	currentUser.Longitude = lngFloat
 
-	currentUser.Update(*currentUser)
+	err = currentUser.Update(*currentUser)
+	if err != nil {
+		h.App.ErrorLog.Println("error updating user ", userID, err)
+		return
+	}
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
