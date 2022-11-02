@@ -22,6 +22,7 @@ Capstone - Team E
 - [ ] Middleware
   - [X] Spotify Auth
   - [ ] Spotify Music Capture
+  - [X] Spotify Artist Capture
   - [ ] Trigger Matches
 
 # Setup
