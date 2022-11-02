@@ -31,25 +31,6 @@
 
 window.onload = function() {
     getLocation()
-
-    // Fetch data from server
-    fetch("/matches/myresults")
-        .then(response => response.json())
-        .then(data => {
-            if (data.length !== 0) {
-                // Sort matches
-                data.sort(function(a, b) {
-                    return a.match_percentage - b.match_percentage;
-                });
-
-                // Display matches
-                for (let i = 0; i < data.length; i++) {
-                    addMatch(data[i]);
-                }
-            } else {
-                noMatches();
-            }
-        });
 }
 
 const noMatches = () => {
@@ -137,7 +118,29 @@ async function sendLocationToServer(position) {
         body: data
      })
         .then(response => response.json())
-        .then(data => console.log(data));
+        .then(data => console.log(data))
+        .then(fetchMatches());
+}
+
+// Fetch data from server
+async function fetchMatches() {
+    fetch("/matches/myresults")
+        .then(response => response.json())
+        .then(data => {
+            if (data.length !== 0) {
+                // Sort matches
+                data.sort(function(a, b) {
+                    return a.match_percentage - b.match_percentage;
+                });
+
+                // Display matches
+                for (let i = 0; i < data.length; i++) {
+                    addMatch(data[i]);
+                }
+            } else {
+                noMatches();
+            }
+        });
 }
 
 </script>
