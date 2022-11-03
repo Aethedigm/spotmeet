@@ -35,7 +35,7 @@ func (a *Artist) GetAll() ([]*Artist, error) {
 func (a *Artist) GetByName(name string) (*Artist, error) {
 	var theArtist Artist
 	collection := upper.Collection(a.Table())
-	res := collection.Find(up.Cond{"artist_name =": name})
+	res := collection.Find(up.Cond{"artist_name": name})
 	err := res.One(&theArtist)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (a *Artist) GetByName(name string) (*Artist, error) {
 func (a *Artist) Get(id int) (*Artist, error) {
 	var theArtist Artist
 	collection := upper.Collection(a.Table())
-	res := collection.Find(up.Cond{"id =": id})
+	res := collection.Find(up.Cond{"id": id})
 
 	err := res.One(&theArtist)
 	if err != nil {

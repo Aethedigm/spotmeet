@@ -184,5 +184,16 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
 			fmt.Println("Error inserting artist ID", tID)
 			return
 		}
+
+		tempLart := data.LikedArtist{
+			UserID:     userID,
+			ArtistID:   tID,
+			LikedLevel: 100,
+		}
+
+		_, err = h.Models.LikedArtists.Insert(tempLart)
+		if err != nil {
+			fmt.Println("Error inserting liked artist", tID, temp.Name)
+		}
 	}
 }

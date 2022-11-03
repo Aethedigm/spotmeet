@@ -35,7 +35,6 @@ func (l *LikedArtist) GetAll() ([]*LikedArtist, error) {
 	return all, nil
 }
 
-// GetAllByOneUser returns a slice of all liked artists by a single user
 func (l *LikedArtist) GetAllByOneUser(userID int) ([]*LikedArtist, error) {
 	collection := upper.Collection(l.Table())
 
@@ -50,7 +49,6 @@ func (l *LikedArtist) GetAllByOneUser(userID int) ([]*LikedArtist, error) {
 	return all, nil
 }
 
-// Get gets one liked artist by id
 func (l *LikedArtist) Get(id int) (*LikedArtist, error) {
 	var theLikedArtist LikedArtist
 	collection := upper.Collection(l.Table())
