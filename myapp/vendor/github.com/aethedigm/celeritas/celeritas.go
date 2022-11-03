@@ -159,7 +159,7 @@ func (c *Celeritas) ListenAndServe() {
 	defer c.DB.Pool.Close()
 
 	c.InfoLog.Printf("Listening on port %s", os.Getenv("PORT"))
-	err := srv.ListenAndServeTLS("spotmeet.crt", "spotmeet.key")
+	err := srv.ListenAndServeTLS(os.Getenv("SECURE_CERT"), os.Getenv("SECURE_KEY"))
 	c.ErrorLog.Fatal(err)
 }
 
