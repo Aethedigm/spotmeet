@@ -151,7 +151,12 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userID := h.App.Session.GetInt(r.Context(), "userID")
-	userSpotTokens, _ := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
+	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
+	if err != nil {
+		fmt.Println("Error getting spotify token", err)
+	} else {
+		h.SetSpotifyArtistsForUser(userID)
+	}
 
 	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 14400
 	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
@@ -165,7 +170,7 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	vars := make(jet.VarMap)
 	vars.Set("userID", userID)
 
-	err := h.App.Render.Page(w, r, "matches", vars, nil)
+	err = h.App.Render.Page(w, r, "matches", vars, nil)
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}
