@@ -153,9 +153,12 @@ function showLoadingAnimation() {
     style.id = "styleLoading";
     style.innerHTML = `
         .message {
-            font-size: 4em;
+            font-size: 1.5em;
             color: white;
             text-align: center;
+            position: absolute;
+            top: calc(50% - 5em);
+            left: 40%;
         }
         .wheel-frame {
             position: fixed;
@@ -174,15 +177,15 @@ function showLoadingAnimation() {
             left: 50%;
         }
         .wheel-dot {
-            height: 15px;
-            width: 15px;
+            height: 12px;
+            width: 12px;
             background-color: white;
             border-radius: 100%;
         }
         .wheel-animated {
             animation-name: wheel-animated;
             animation-direction: alternate;
-            animation-duration: .50s;
+            animation-duration: 1s;
             animation-iteration-count: infinite;
             animation-timing-function: ease-in-out;
         }
@@ -191,7 +194,7 @@ function showLoadingAnimation() {
                 opacity: 0;
             }
             to {
-                opacity: 1;
+                opacity: 3;
             }
         }
     `
@@ -200,11 +203,12 @@ function showLoadingAnimation() {
     var message = document.createElement("div");
     message.id = "divMessage";
     message.classList.add("message");
-    message.innerHTML = `Loading your matches...`
+    message.innerHTML = `We're finding you matches`
 
     var frame = document.createElement("div");
     frame.id = "divWheelFrame";
     frame.classList.add("wheel-frame");
+    frame.appendChild(message);
 
     for (var i = 0; i < 10; i++) {
         var track = document.createElement("div");
@@ -217,7 +221,6 @@ function showLoadingAnimation() {
     }
 
     document.body.appendChild(frame);
-    document.body.appendChild(message);
 
     var wait = 0;
     var dots = document.getElementsByClassName("wheel-dot");
@@ -225,13 +228,13 @@ function showLoadingAnimation() {
         window.setTimeout(function(dot) {
             dot.classList.add("wheel-animated");
         }, wait, dots[i]);
-        wait += 200;
+        wait += 50;
     }
 };
 
 async function removeLoading() {
-  document.body.removeChild(document.getElementById("divWheelFrame"));
-  document.body.removeChild(document.getElementById("styleLoading"));
+    document.body.removeChild(document.getElementById("divWheelFrame"));
+    document.body.removeChild(document.getElementById("styleLoading"));
 };
 
 </script>
