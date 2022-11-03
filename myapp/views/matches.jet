@@ -30,26 +30,8 @@
 <script>
 
 window.onload = function() {
-    getLocation();
-
-    // Fetch data from server
-    fetch("/matches/myresults")
-        .then(response => response.json())
-        .then(data => {
-            if (data.length !== 0) {
-                // Sort matches
-                data.sort(function(a, b) {
-                    return a.match_percentage - b.match_percentage;
-                });
-
-                // Display matches
-                for (let i = 0; i < data.length; i++) {
-                    addMatch(data[i]);
-                }
-            } else {
-                noMatches();
-            }
-        });
+    showLoadingAnimation();
+    getLocationAndMatches();
 }
 
 const noMatches = () => {
@@ -115,9 +97,9 @@ const declineMatch = (matchID) => {
         });
 }
 
-function getLocation() {
+function getLocationAndMatches() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(sendLocationToServer);
+        navigator.geolocation.getCurrentPosition(sendLocationToServer)
     }
 }
 
@@ -137,8 +119,123 @@ async function sendLocationToServer(position) {
         body: data
      })
         .then(response => response.json())
-        .then(data => console.log(data));
+        .then(data => console.log(data))
+        .then(fetchMatches())
+        .then(removeLoading());
 }
+
+// Fetch data from server
+async function fetchMatches() {
+    fetch("/matches/myresults")
+        .then(response => response.json())
+        .then(data => {
+            if (data.length !== 0) {
+                // Sort matches
+                data.sort(function(a, b) {
+                    return a.match_percentage - b.match_percentage;
+                });
+
+                // Display matches
+                for (let i = 0; i < data.length; i++) {
+                    addMatch(data[i]);
+                }
+            } else {
+                noMatches();
+            }
+        });
+}
+
+function showLoadingAnimation() {
+    if (document.getElementById("divWheelFrame") != null) {
+        return;
+    }
+    var style = document.createElement("style");
+    style.id = "styleLoading";
+    style.innerHTML = `
+        .message {
+            font-size: 1.5em;
+            color: white;
+            text-align: center;
+            position: absolute;
+            top: calc(50% - 5em);
+            left: 40%;
+        }
+        .wheel-frame {
+            position: fixed;
+            background-color: #4285F4;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 4;
+        }
+        .wheel-track {
+            height: 100px;
+            display: inline-block;
+            position: absolute;
+            top: calc(50% - 50px);
+            left: 50%;
+        }
+        .wheel-dot {
+            height: 12px;
+            width: 12px;
+            background-color: white;
+            border-radius: 100%;
+        }
+        .wheel-animated {
+            animation-name: wheel-animated;
+            animation-direction: alternate;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+        @keyframes wheel-animated {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 3;
+            }
+        }
+    `
+    document.body.appendChild(style);
+
+    var message = document.createElement("div");
+    message.id = "divMessage";
+    message.classList.add("message");
+    message.innerHTML = `We're finding you matches`
+
+    var frame = document.createElement("div");
+    frame.id = "divWheelFrame";
+    frame.classList.add("wheel-frame");
+    frame.appendChild(message);
+
+    for (var i = 0; i < 10; i++) {
+        var track = document.createElement("div");
+        track.classList.add("wheel-track");
+        var dot = document.createElement("div");
+        dot.classList.add("wheel-dot");
+        track.style.transform = "rotate(" + String(i * 40) + "deg)";
+        track.appendChild(dot);
+        frame.appendChild(track);
+    }
+
+    document.body.appendChild(frame);
+
+    var wait = 0;
+    var dots = document.getElementsByClassName("wheel-dot");
+    for (var i = 0; i < dots.length; i++) {
+        window.setTimeout(function(dot) {
+            dot.classList.add("wheel-animated");
+        }, wait, dots[i]);
+        wait += 50;
+    }
+};
+
+async function removeLoading() {
+    document.body.removeChild(document.getElementById("divWheelFrame"));
+    document.body.removeChild(document.getElementById("styleLoading"));
+};
 
 </script>
 {{end}}
