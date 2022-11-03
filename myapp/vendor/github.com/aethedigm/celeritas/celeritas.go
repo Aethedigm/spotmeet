@@ -1,6 +1,7 @@
 package celeritas
 
 import (
+	_ "embed"
 	"fmt"
 	"log"
 	"net/http"
@@ -158,7 +159,7 @@ func (c *Celeritas) ListenAndServe() {
 	defer c.DB.Pool.Close()
 
 	c.InfoLog.Printf("Listening on port %s", os.Getenv("PORT"))
-	err := srv.ListenAndServe()
+	err := srv.ListenAndServeTLS("spotmeet.crt", "spotmeet.key")
 	c.ErrorLog.Fatal(err)
 }
 
