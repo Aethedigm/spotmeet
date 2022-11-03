@@ -53,7 +53,7 @@ const addMatch = (match) => {
     <div id="match_container-${match.ID}" class="container-fluid mt-3">
         <div id="top_row-${match.ID}" class="row mb-2">
             <div class="col-3">
-                <i class="fa-solid fa-user fa-2xl"></i>
+                <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></i>
             </div>
             <div class="col-4 mt-2">
                 ${match.percent_match}% Match
