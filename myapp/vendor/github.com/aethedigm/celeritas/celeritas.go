@@ -145,6 +145,10 @@ func (c *Celeritas) Init(p initPaths) error {
 	return nil
 }
 
+func redirectToHttps(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, os.Getenv("URL")+r.RequestURI, http.StatusMovedPermanently)
+}
+
 // ListenAndServe starts the web server
 func (c *Celeritas) ListenAndServe() {
 	srv := &http.Server{
@@ -159,7 +163,28 @@ func (c *Celeritas) ListenAndServe() {
 	defer c.DB.Pool.Close()
 
 	c.InfoLog.Printf("Listening on port %s", os.Getenv("PORT"))
-	err := srv.ListenAndServeTLS(os.Getenv("SECURE_CERT"), os.Getenv("SECURE_KEY"))
+	var err error
+	if os.Getenv("SECURE") == "true" {
+		// Start HTTP server to redirect to HTTPS one
+		httpSrv := &http.Server{
+			Addr:         ":80",
+			ErrorLog:     c.ErrorLog,
+			Handler:      http.HandlerFunc(redirectToHttps),
+			IdleTimeout:  30 * time.Second,
+			ReadTimeout:  30 * time.Second,
+			WriteTimeout: 600 * time.Second,
+		}
+
+		go func() {
+			httpSrv.ListenAndServe()
+		}()
+
+		err = srv.ListenAndServeTLS(os.Getenv("SECURE_CERT"), os.Getenv("SECURE_KEY"))
+
+	} else {
+		err = srv.ListenAndServe()
+	}
+
 	c.ErrorLog.Fatal(err)
 }
 
