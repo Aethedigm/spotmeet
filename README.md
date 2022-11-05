@@ -17,7 +17,7 @@ Capstone - Team E
 - [ ] Backend
   - [X] Models
   - [X] Migrations
-  - [X] 80%+ Testing
+  - [ ] 80%+ Testing
   - [ ] Matching Algorithm
 - [ ] Middleware
   - [X] Spotify Auth

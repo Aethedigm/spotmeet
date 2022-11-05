@@ -46,10 +46,11 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		fmt.Println(err)
 		return
 	}
+
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
 		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
-		fmt.Println("State mismatch: %s != %s\n", st, state)
+		fmt.Printf("State mismatch: %s != %s\n", st, state)
 		return
 	}
 
