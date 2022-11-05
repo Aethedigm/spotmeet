@@ -153,9 +153,14 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
-		fmt.Println("Error getting spotify token", err)
+		fmt.Println("Error getting spotify token.", err)
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		return
 	} else {
-		h.SetSpotifyArtistsForUser(userID)
+		err = h.SetSpotifyArtistsForUser(userID)
+		if err != nil {
+			fmt.Println("Error setting spotify artists for user.", err)
+		}
 	}
 
 	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 14400

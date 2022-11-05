@@ -80,7 +80,9 @@ func (t *SpotifyToken) GetUserForAccessToken(accesstoken string) (*User, error) 
 func (t *SpotifyToken) GetSpotifyTokenForUser(id int) (*SpotifyToken, error) {
 	var spotifytoken *SpotifyToken
 	collection := upper.Collection(t.Table())
-	res := collection.Find(up.Cond{"user_id": id, "access_expiry >": time.Now()})
+	res := collection.Find(up.Cond{"user_id": id}) // removed "access_expiry >": time.Now() because SpotifyToken struct
+	// contains both access and refresh tokens. Need to be able to access this struct even when the access token expiry
+	// is before the current time.
 	err := res.One(&spotifytoken)
 	if err != nil {
 		return nil, err

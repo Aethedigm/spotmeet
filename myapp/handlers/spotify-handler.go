@@ -25,7 +25,9 @@ func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) 
 	randomBytes := make([]byte, 16)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		return
 	}
 
 	state = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
@@ -40,11 +42,15 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		fmt.Println(err)
+		return
 	}
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		fmt.Println("State mismatch: %s != %s\n", st, state)
+		return
 	}
 
 	spotclient := auth.NewClient(tok)
@@ -52,12 +58,16 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 
 	_, err = spotclient.CurrentUser()
 	if err != nil {
-		log.Fatal(err)
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		fmt.Println(err)
+		return
 	}
 
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	if userID == 0 || userID == -1 {
-		log.Fatal("The user_id of the current user could not be found in the session data.")
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		fmt.Println("The user_id of the current user could not be found in the session data.")
+		return
 	}
 
 	spottoken := data.SpotifyToken{
@@ -67,7 +77,11 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		AccessTokenExpiry: tok.Expiry,
 	}
 
-	spottoken.Upsert(spottoken)
+	_, err = spottoken.Upsert(spottoken)
+	if err != nil {
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		fmt.Println(err)
+	}
 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
@@ -143,11 +157,11 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
-func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
+func (h *Handlers) SetSpotifyArtistsForUser(userID int) error {
 	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
-		return
+		return err
 	}
 
 	spotifyToken := &oauth2.Token{
@@ -159,18 +173,18 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
 	_, err = client.CurrentUser()
 	if err != nil {
 		fmt.Println("Current user is nil")
-		return
+		return err
 	}
 
 	artists, err := client.CurrentUsersFollowedArtistsOpt(50, "0")
 	if err != nil {
 		fmt.Println("Error getting artists", err)
-		return
+		return err
 	}
 
 	if len(artists.Artists) < 1 {
 		fmt.Println("No artists returned")
-		return
+		return err
 	}
 
 	for i := range artists.Artists {
@@ -182,7 +196,7 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
 		tID, err := temp.Insert(temp)
 		if err != nil {
 			fmt.Println("Error inserting artist ID", tID)
-			return
+			return err
 		}
 
 		tempLart := data.LikedArtist{
@@ -194,6 +208,8 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) {
 		_, err = h.Models.LikedArtists.Insert(tempLart)
 		if err != nil {
 			fmt.Println("Error inserting liked artist", tID, temp.Name)
+			return err
 		}
 	}
+	return nil
 }

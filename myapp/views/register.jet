@@ -12,9 +12,16 @@
 {{end}}
 
 {{block pageContent()}}
-    <h2 class="mt-5 text-center">Sign Up for Spotmeet</h2>
+<div class="col">
+    <div class="d-flex align-items-center justify-content-center mt-5 mb-2">
+        <div>
+            <h3 class="font-weight-bold">sp<span style="color:#1DB954">o</span>tmeet</h3>
+        </div>
+    </div>
 
     <hr>
+
+    <div class="mb-3"><span style="font-size:1.5em; color:#1DB954;">Sign Up</span></div>
 
     <form method="post" action=""
         name="register-form" id="register-form"
@@ -44,10 +51,10 @@
             <input type="password" class="form-control" id="password" name="password"
                 required="" autocomplete="new-password">
         </div>
-
+        <hr>
         <br><br>
-
-        <a href="javascript:void(0)" class="btn btn-primary w-100 mb-4" onclick="evaluateRegisterForm()">Create Account</a>
+        <a href="javascript:void(0)" class="btn btn-primary w-100 mb-5" onclick="evaluateRegisterForm()">Create Account</a>
+        <a href="/" class="btn btn-secondary w-100 mb-5">Back</a>
     </form>
 
     <!-- Successful Registration Popup (hidden by default)-->
@@ -66,7 +73,7 @@
             </div>
         </div>
     </div>
-
+</div>
 {{end}}
 
 {{block js()}}

@@ -54,12 +54,16 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
-		fmt.Println("Error getting Spotify token for user", err)
+		fmt.Println("Spotify token for user does not exist. Going to /users/spotauth to get one.", err)
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
 
 	h.SetSpotifyArtistsForUser(user.ID)
+	if err != nil {
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		return
+	}
 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
