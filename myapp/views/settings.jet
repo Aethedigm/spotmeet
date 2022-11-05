@@ -7,10 +7,23 @@
 {{end}}
 
 {{block pageContent()}}
-<div class="mt-5 text-center justify-content-center">
-    <h1>Settings</h1>
+    <div id="topbar"
+        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
+        class="navbar fixed-top bg-light">
+            <div class="btn" onclick="location.href = '/'">
+                <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
+            </div>
+            <div
+                onclick="location.href = '/users/profile'"
+                style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                class="btn float-right">
+                    View my profile&nbsp;&nbsp;
+            </div>
+    </div>
 
-    <hr>
+<div style="margin-top:5em; margin-bottom:3.6em;" class="justify-content-center">
+
+    <div class="text-center mb-3"><span style="font-size:1.5em; color:#1DB954;">Settings</span></div>
 
     <div style="text-align:left"><label for="looking-for" class="form-label">Looking for...</label></div>
     <div style="margin-bottom:2em; flex-wrap: wrap;" id="looking-for" class="btn-group" role="group" aria-label="Basic radio toggle button group">
@@ -39,16 +52,16 @@
     </div>
 
     <div class="container">
-        <a href="#" class="btn btn-primary w-50 mb-4" onclick="setUserSettings()">Save Changes</a>
-        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary w-50 mb-4">Edit Profile</a>
-        <a href="/users/logout" class="btn btn-primary w-50 mb-4">Log Out</a>
+        <a href="#" class="btn btn-primary w-100 mb-4" onclick="setUserSettings()">Save Changes</a>
+        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary w-100 mb-4">Edit Profile</a>
+        <a href="/users/logout" class="btn btn-primary w-100 mb-4">Log Out</a>
     </div>
 
-    <div id="footbar" class="navbar fixed-bottom bg-light">
-        <div class="container-fluid">
-            <a href="/messages" class="btn float-left rounded-pill w-25">Message</a>
+    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+        <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <a href="/messages" class="btn rounded-pill float-left w-25">Message</a>
             <a href="/matches" class="btn rounded-pill w-25">Match</a>
-            <a href="/#" class="btn btn-primary float-right w-25">Settings</a>
+            <a href="#" class="btn float-right btn-primary w-25">Settings</a>
         </div>
     </div>
 </div>

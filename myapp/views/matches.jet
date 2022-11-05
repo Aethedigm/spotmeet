@@ -3,27 +3,231 @@
 {{block browserTitle()}}Matches{{end}}
 
 {{block css()}}
+    <style id="styleLoading">
+        .container-fluid {
+            background: white
+        }
+        .message {
+            font-size: 1.5em;
+            color: white;
+            text-align: center;
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            top: calc(50% - 100px);
+            left: calc(50% - 90px);
+        }
+        .noMatches {
+            font-size: 1em;
+            color: white;
+            text-align: center;
+            font-family: 'Fredoka One', cursive;
+            position: relative;
+            padding-top: 50%;
+        }
+        .wheel-frame {
+            position: fixed;
+            background-color: #4285F4;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 4;
+        }
+        .wheel-track {
+            height: 100px;
+            display: inline-block;
+            position: absolute;
+            top: calc(50% - 50px);
+            left: calc(50% - 5px);
+        }
+        .wheel-dot {
+            height: 12px;
+            width: 12px;
+            background-color: white;
+            border-radius: 100%;
+        }
+        .wheel-animated {
+            animation-name: wheel-animated;
+            animation-direction: alternate;
+            animation-duration: 1s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+        }
+        @keyframes wheel-animated {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 3;
+            }
+        }
+        .messageContainer {
+            margin-bottom: 200px;
+        }
+        body {
+            padding-bottom: 50px;
+            margin-top: 20px;
+            background: #4285F4
+        }
+        .badge {
+            border-radius: 8px;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            font-size: .7142em;
+            line-height: 12px;
+            background-color: transparent;
+            border: 1px solid;
+            margin-bottom: 5px;
+            border-radius: .875rem;
+        }
+        .bg-green {
+            background-color: #50d38a !important;
+            color: #fff;
+        }
+        .bg-blush {
+            background-color: #ff758e !important;
+            color: #fff;
+        }
+        .bg-amber {
+            background-color: #FFC107 !important;
+            color: #fff;
+        }
+        .bg-red {
+            background-color: #ec3b57 !important;
+            color: #fff;
+        }
+        .bg-blue {
+            background-color: #4285F4 !important;
+            color: #4285F4;
+        }
+        .card {
+            background: #fff;
+            margin-bottom: 30px;
+            transition: .5s;
+            border: 0;
+            border-radius: .1875rem;
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            box-shadow: none;
+        }
+        .matchlist .action_bar .delete_all {
+            margin-bottom: 0;
+            margin-top: 8px
+        }
+        .matchlist .action_bar .btn,
+        .matchlist .action_bar .search {
+            margin: 0
+        }
+        .matchlist .mail_list .list-group-item {
+            border: 0;
+            padding: 15px;
+            margin-bottom: 1px
+        }
+        .matchlist .mail_list .list-group-item:hover {
+            background: #eceeef
+        }
 
+        .matchlist .mail_list .list-group-item .media {
+            margin: 0;
+            width: 100%
+        }
+
+        .matchlist .mail_list .list-group-item .controls {
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: top;
+            text-align: center;
+            margin-top: 11px
+        }
+        .matchlist .mail_list .list-group-item .controls .checkbox {
+            display: inline-block
+        }
+        .matchlist .mail_list .list-group-item .controls .checkbox label {
+            margin: 0;
+            padding: 10px
+        }
+        .matchlist .mail_list .list-group-item .controls .favourite {
+            margin-left: 10px
+        }
+        .matchlist .mail_list .list-group-item .thumb {
+            display: inline-block
+        }
+        .matchlist .mail_list .list-group-item .thumb img {
+            width: 40px
+        }
+        .matchlist .mail_list .list-group-item .media-heading a {
+            color: #555;
+            font-weight: normal
+        }
+        .matchlist .mail_list .list-group-item .media-heading a:hover,
+        .matchlist .mail_list .list-group-item .media-heading a:focus {
+            text-decoration: none
+        }
+        .matchlist .mail_list .list-group-item .media-heading time {
+            font-size: 13px;
+            margin-right: 10px
+        }
+        .matchlist .mail_list .list-group-item .media-heading .badge {
+            margin-bottom: 0;
+            border-radius: 50px;
+            font-weight: normal
+        }
+        .matchlist .mail_list .list-group-item .msg {
+            margin-bottom: 0px
+        }
+        .matchlist .mail_list .unread {
+            border-left: 2px solid
+        }
+        .matchlist .mail_list .unread .media-heading a {
+            color: #333;
+            font-weight: 700
+        }
+        .matchlist .btn-group {
+            box-shadow: none
+        }
+        .matchlist .bg-gray {
+            background: #e6e6e6
+        }
+        @media only screen and (max-width: 767px) {
+            .matchlist .mail_list .list-group-item .controls {
+                margin-top: 3px
+            }
+        }
+    </style>
 {{end}}
 
 {{block pageContent()}}
-<div id="navbar" class="navbar fixed-top mb-5">
-    <div class="container-fluid">
-        <div></div>
-        <a href="/users/profile" class="btn btn-primary float-right rounded-pill">View Profile</a>
+    <div id="topbar"
+        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
+        class="navbar fixed-top bg-light">
+            <div class="btn" onclick="location.href = '/'">
+                <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
+            </div>
+            <div
+                onclick="location.href = '/users/profile'"
+                style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                class="btn float-right">
+                    View my profile&nbsp;&nbsp;
+            </div>
     </div>
-</div>
 
-<div id="matches_container" class="mt-5">
-</div>
+    <section style="margin-top:2.6em; margin-bottom:3.6em;" class="content matchlist">
+            <div class="row clearfix">
+                <div class="col-md-12 col-lg-12 col-xl-12">
+                    <ul id="matches_container" class="mail_list list-group list-unstyled"></ul>
+                </div>
+            </div>
+    </section>
 
-<div id="footbar" class="navbar fixed-bottom bg-light">
-    <div class="container-fluid">
-        <a href="/messages" class="btn float-left rounded-pill w-25">Message</a>
-        <a href="#" class="btn btn-primary w-25">Match</a>
-        <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
+    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+        <div class="container">
+            <a href="/messages" class="btn float-left rounded-pill w-25">Message</a>
+            <a href="#" class="btn btn-primary w-25">Match</a>
+            <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
+        </div>
     </div>
-</div>
+
 {{end}}
 
 {{block js()}}
@@ -34,13 +238,48 @@ window.onload = function() {
     getLocationAndMatches();
 }
 
+function showLoadingAnimation() {
+    if (document.getElementById("divWheelFrame") != null) {
+        return;
+    }
+
+    var message = document.createElement("div");
+    message.id = "divMessage";
+    message.classList.add("message");
+    message.innerHTML = `Finding matches`
+
+    var frame = document.createElement("div");
+    frame.id = "divWheelFrame";
+    frame.classList.add("wheel-frame");
+    frame.appendChild(message);
+
+    for (var i = 0; i < 10; i++) {
+        var track = document.createElement("div");
+        track.classList.add("wheel-track");
+        var dot = document.createElement("div");
+        dot.classList.add("wheel-dot");
+        track.style.transform = "rotate(" + String(i * 40) + "deg)";
+        track.appendChild(dot);
+        frame.appendChild(track);
+    }
+
+    document.body.appendChild(frame);
+
+    var wait = 0;
+    var dots = document.getElementsByClassName("wheel-dot");
+    for (var i = 0; i < dots.length; i++) {
+        window.setTimeout(function(dot) {
+            dot.classList.add("wheel-animated");
+        }, wait, dots[i]);
+        wait += 150;
+    }
+};
+
 const noMatches = () => {
     const noMatchTemplate = `
         <div class="container">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <h1>No Matches</h1>
-                </div>
+            <div class="noMatches">
+                <h1>No matches...for now.<br>Keep listening to music on Spotify!</h1>
             </div>
         </div>
     `;
@@ -50,27 +289,27 @@ const noMatches = () => {
 
 const addMatch = (match) => {
     const matchTemplate = `
-    <div id="match_container-${match.ID}" class="container-fluid mt-3">
-        <div id="top_row-${match.ID}" class="row mb-2">
-            <div class="col-3">
-                <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></i>
-            </div>
-            <div class="col-4 mt-2">
-                ${match.percent_match}% Match
-            </div>
-            <div class="col-5  mt-2">
-                ${match.artist_id}
-            </div>
-        </div>
-        <div id="bottom_row-${match.ID}" class="row">
-            <div class="col">
-                <a href="#" onclick="acceptMatch(${match.ID})" class="btn btn-success rounded w-100">Link</a>
-            </div>
-            <div class="col">
-                <a href="#" onclick="declineMatch(${match.ID})" class="btn btn-danger rounded w-100">Pass</a>
-            </div>
-        </div>
-    </div>
+       <li id="match_container-${match.ID}" class="media media-body container-fluid mt-3 list-group-item">
+           <div id="top_row-${match.ID}" class="row mb-2">
+               <div class="col-3">
+                   <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></i>
+               </div>
+               <div class="col-4 mt-2">
+                   ${match.percent_match}% Match
+               </div>
+               <div class="col-5  mt-2">
+                   ${match.artist_id}
+               </div>
+           </div>
+           <div id="bottom_row-${match.ID}" class="row">
+               <div class="col">
+                   <a href="#" onclick="acceptMatch(${match.ID})" class="btn btn-success rounded w-100">Link</a>
+               </div>
+               <div class="col">
+                   <a href="#" onclick="declineMatch(${match.ID})" class="btn btn-danger rounded w-100">Pass</a>
+               </div>
+           </div>
+       </li>
     `
 
     const matchContainer = document.getElementById("matches_container");
@@ -99,11 +338,11 @@ const declineMatch = (matchID) => {
 
 function getLocationAndMatches() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(sendLocationToServer)
+        navigator.geolocation.getCurrentPosition(sendLocationToServerAndGetMatches)
     }
 }
 
-async function sendLocationToServer(position) {
+async function sendLocationToServerAndGetMatches(position) {
     const data = new URLSearchParams();
     const coordinates = {lat: position.coords.latitude, long: position.coords.longitude};
 
@@ -144,93 +383,6 @@ async function fetchMatches() {
             }
         });
 }
-
-function showLoadingAnimation() {
-    if (document.getElementById("divWheelFrame") != null) {
-        return;
-    }
-    var style = document.createElement("style");
-    style.id = "styleLoading";
-    style.innerHTML = `
-        .message {
-            font-size: 1.5em;
-            color: white;
-            text-align: center;
-            position: absolute;
-            top: calc(50% - 5em);
-            left: 40%;
-        }
-        .wheel-frame {
-            position: fixed;
-            background-color: #4285F4;
-            left: 0;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 4;
-        }
-        .wheel-track {
-            height: 100px;
-            display: inline-block;
-            position: absolute;
-            top: calc(50% - 50px);
-            left: 50%;
-        }
-        .wheel-dot {
-            height: 12px;
-            width: 12px;
-            background-color: white;
-            border-radius: 100%;
-        }
-        .wheel-animated {
-            animation-name: wheel-animated;
-            animation-direction: alternate;
-            animation-duration: 1s;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-        }
-        @keyframes wheel-animated {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 3;
-            }
-        }
-    `
-    document.body.appendChild(style);
-
-    var message = document.createElement("div");
-    message.id = "divMessage";
-    message.classList.add("message");
-    message.innerHTML = `We're finding you matches`
-
-    var frame = document.createElement("div");
-    frame.id = "divWheelFrame";
-    frame.classList.add("wheel-frame");
-    frame.appendChild(message);
-
-    for (var i = 0; i < 10; i++) {
-        var track = document.createElement("div");
-        track.classList.add("wheel-track");
-        var dot = document.createElement("div");
-        dot.classList.add("wheel-dot");
-        track.style.transform = "rotate(" + String(i * 40) + "deg)";
-        track.appendChild(dot);
-        frame.appendChild(track);
-    }
-
-    document.body.appendChild(frame);
-
-    var wait = 0;
-    var dots = document.getElementsByClassName("wheel-dot");
-    for (var i = 0; i < dots.length; i++) {
-        window.setTimeout(function(dot) {
-            dot.classList.add("wheel-animated");
-        }, wait, dots[i]);
-        wait += 50;
-    }
-};
 
 async function removeLoading() {
     document.body.removeChild(document.getElementById("divWheelFrame"));

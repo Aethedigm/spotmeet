@@ -3,39 +3,183 @@
 {{block browserTitle()}}Messages{{end}}
 
 {{block css()}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <style>
         .messageContainer {
             margin-bottom: 200px;
         }
-
-        .message-thread {
-            margin-top: auto;
-            margin-bottom: auto;
-            margin-left: 10px;
-            border-radius: 25px;
-            background-color: #2090c5;
-            padding: 15px;
-            width: fit-content;
-            block-size: fit-content;
+        .noMessages {
+            font-size: 1em;
+            color: white;
+            text-align: center;
+            font-family: 'Fredoka One', cursive;
+            position: relative;
+            padding-top: 50%;
         }
-
         body {
             padding-bottom: 50px;
+            margin-top: 20px;
+            background: #4285F4
+        }
+        .badge {
+            border-radius: 8px;
+            padding: 4px 8px;
+            text-transform: uppercase;
+            font-size: .7142em;
+            line-height: 12px;
+            background-color: transparent;
+            border: 1px solid;
+            margin-bottom: 5px;
+            border-radius: .875rem;
+        }
+        .bg-green {
+            background-color: #50d38a !important;
+            color: #fff;
+        }
+        .bg-blush {
+            background-color: #ff758e !important;
+            color: #fff;
+        }
+        .bg-amber {
+            background-color: #FFC107 !important;
+            color: #fff;
+        }
+        .bg-red {
+            background-color: #ec3b57 !important;
+            color: #fff;
+        }
+        .bg-blue {
+            background-color: #60bafd !important;
+            color: #fff;
+        }
+        .card {
+            background: #fff;
+            margin-bottom: 30px;
+            transition: .5s;
+            border: 0;
+            border-radius: .1875rem;
+            display: inline-block;
+            position: relative;
+            width: 100%;
+            box-shadow: none;
+        }
+        .inbox .action_bar .delete_all {
+            margin-bottom: 0;
+            margin-top: 8px
+        }
+        .inbox .action_bar .btn,
+        .inbox .action_bar .search {
+            margin: 0
+        }
+        .inbox .mail_list .list-group-item {
+            border: 0;
+            padding: 15px;
+            margin-bottom: 1px
+        }
+        .inbox .mail_list .list-group-item:hover {
+            background: #eceeef
+        }
+
+        .inbox .mail_list .list-group-item .media {
+            margin: 0;
+            width: 100%
+        }
+
+        .inbox .mail_list .list-group-item .controls {
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: top;
+            text-align: center;
+            margin-top: 11px
+        }
+        .inbox .mail_list .list-group-item .controls .checkbox {
+            display: inline-block
+        }
+        .inbox .mail_list .list-group-item .controls .checkbox label {
+            margin: 0;
+            padding: 10px
+        }
+        .inbox .mail_list .list-group-item .controls .favourite {
+            margin-left: 10px
+        }
+        .inbox .mail_list .list-group-item .thumb {
+            display: inline-block
+        }
+        .inbox .mail_list .list-group-item .thumb img {
+            width: 40px
+        }
+        .inbox .mail_list .list-group-item .media-heading a {
+            color: #555;
+            font-weight: normal
+        }
+        .inbox .mail_list .list-group-item .media-heading a:hover,
+        .inbox .mail_list .list-group-item .media-heading a:focus {
+            text-decoration: none
+        }
+        .inbox .mail_list .list-group-item .media-heading time {
+            font-size: 13px;
+            margin-right: 10px
+        }
+        .inbox .mail_list .list-group-item .media-heading .badge {
+            margin-bottom: 0;
+            border-radius: 50px;
+            font-weight: normal
+        }
+        .inbox .mail_list .list-group-item .msg {
+            margin-bottom: 0px
+        }
+        .inbox .mail_list .unread {
+            border-left: 2px solid
+        }
+        .inbox .mail_list .unread .media-heading a {
+            color: #333;
+            font-weight: 700
+        }
+        .inbox .btn-group {
+            box-shadow: none
+        }
+        .inbox .bg-gray {
+            background: #e6e6e6
+        }
+        @media only screen and (max-width: 767px) {
+            .inbox .mail_list .list-group-item .controls {
+                margin-top: 3px
+            }
         }
     </style>
 {{end}}
 
 {{block pageContent()}}
-<div id="message_container" class="messageContainer mt-5 flexbox mb-5 justify-content-center text-center">
-</div>
-
-<div id="footbar" class="navbar fixed-bottom bg-light">
-    <div class="container-fluid">
-        <a href="#" class="btn btn-primary float-left w-25">Message</a>
-        <a href="/matches" class="btn rounded-pill w-25">Match</a>
-        <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
+    <div id="topbar"
+        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
+        class="navbar fixed-top bg-light">
+            <div class="btn" onclick="location.href = '/'">
+                <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
+            </div>
+            <div
+                onclick="location.href = '/users/profile'"
+                style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                class="btn float-right">
+                    View my profile&nbsp;&nbsp;
+            </div>
     </div>
-</div>
+
+    <section style="margin-top:3.6em; margin-bottom:3.6em;" class="content inbox">
+            <div class="row clearfix">
+                <div class="col-md-12 col-lg-12 col-xl-12">
+                    <ul id="message_container" class="mail_list list-group list-unstyled"></ul>
+                </div>
+            </div>
+    </section>
+
+    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+        <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <a href="#" class="btn btn-primary float-left w-25">Message</a>
+            <a href="/matches" class="btn rounded-pill w-25">Match</a>
+            <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
+        </div>
+    </div>
+
 {{end}}
 
 
@@ -45,17 +189,44 @@
         getMessageThreads();
     }
 
+    const noMessages = () => {
+        const noMessageTemplate = `
+            <div class="container">
+                <div class="noMessages">
+                    <h1>Your message box is empty :(<br><br>Tap "link" on matches to see them here!</h1>
+                </div>
+            </div>
+        `;
+
+        document.getElementById("message_container").innerHTML = noMessageTemplate;
+    }
+
     const getMessageThreads = () => {
         const msgContainer = document.getElementById("message_container");
 
-        fetch('/messages/getThreads/{{ userID }}')
-            .then(response => response.json())
-            .then(data => { 
-                for (i = 0; i < data.length; i++) {
-                    const thread = data[i];
-                    const threadTemplate = `<br /><a href="/messages/getMessages/${thread.MatchID}" class="btn btn-secondary w-50 mb-2">${thread.MatchFirstName}</a>`;
-
-                    msgContainer.innerHTML += threadTemplate;
+            fetch('/messages/getThreads/{{ userID }}')
+                .then(response => response.json())
+                .then(data => {
+                if (data.length !== 0) {
+                    for (i = 0; i < data.length; i++) {
+                        const thread = data[i];
+                        const threadTemplate = `
+                            <li onclick="location.href = '/messages/getMessages/${thread.MatchID}';" class="list-group-item">
+                                <div class="media">
+                                    <div class="media-body">
+                                        <div style="display:flex; flex-direction:row; justify-content: space-between;" class="media-heading">
+                                            <div style="font-size:1.2em" class="m-r-10">${thread.MatchFirstName}</div>
+                                            <div style="text-align:right" class="float-right text-muted"><time style="text-align:right" class="hidden-sm-down" datetime="2017">12:00pm</time></div>
+                                        </div>
+                                        <p class="msg">Latest-message text goes here...</p>
+                                    </div>
+                                </div>
+                            </li>
+                        `
+                        msgContainer.innerHTML += threadTemplate;
+                        }
+                } else {
+                    noMessages();
                 }
             });
     }

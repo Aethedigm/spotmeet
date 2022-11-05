@@ -7,73 +7,81 @@
 {{end}}
 
 {{block pageContent()}}
-<div class="mt-5 text-center justify-content-center">
-    <h1>Profile</h1>
-    
-    <!-- IF USER ONLY -->
-    {{ if userID == usersProfileID }}
-    <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary rounded-pill">Edit Profile</a>
-    {{ end }}
-    <!-- END IF -->
-
-    <hr>
-
-    <div id="profile-picture">
-        <img src="{{ imgurl }}" class="w-25 rounded-circle">
+    <div id="topbar"
+        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
+        class="navbar fixed-top bg-light">
+            <div class="btn" onclick="location.href = '/'">
+                <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
+            </div>
     </div>
 
-    <div id="name" class="mt-3">
-        <h2>{{ FirstName }}</h2>
-    </div>
+    <div style="margin-top:5em; margin-bottom:3.6em; text-align:center;" class="justify-content-center">
+        <div class="text-center mb-3"><span style="font-size:1.5em; color:#1DB954;">Profile</span></div>
 
-    <div id="about-container" class="container">
-        <div class="row justify-content-center">
-            <div class="col-sm w-50">
-                <div id="about-header" class="fw-bold">
-                    About {{ FirstName }}:
+        <!-- IF USER ONLY -->
+        {{ if userID == usersProfileID }}
+        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary rounded-pill">Edit Profile</a>
+        {{ end }}
+        <!-- END IF -->
+
+        <hr>
+
+        <div id="profile-picture">
+            <img src="{{ imgurl }}" class="w-25 rounded-circle">
+        </div>
+
+        <div id="name" class="mt-3">
+            <h2>{{ FirstName }}</h2>
+        </div>
+
+        <div id="about-container" class="container">
+            <div class="row justify-content-center">
+                <div class="col-sm w-50">
+                    <div id="about-header" class="fw-bold">
+                        About {{ FirstName }}:
+                    </div>
+                    <div id="about" class="mt-5">
+                        {{ description }}
+                    </div>
                 </div>
-                <div id="about" class="mt-5">
-                    {{ description }}
+            </div>
+        </div>
+
+        <div id="top-artists" class="mt-5 container w-50">
+            <div class="row">
+                <div class="fw-bold">
+                    {{ FirstName }}'s Top Artists:
                 </div>
+            </div>
+            <div class="row">
+                <table class="table table-striped">
+                    <tr>
+                        <td>
+                            {{ Artist1 }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ Artist2 }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ Artist3 }}
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
 
-    <div id="top-artists" class="mt-5 container w-50">
-        <div class="row">
-            <div class="fw-bold">
-                {{ FirstName }}'s Top Artists:
-            </div>
-        </div>
-        <div class="row">
-            <table class="table table-striped">
-                <tr>
-                    <td>
-                        {{ Artist1 }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ Artist2 }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ Artist3 }}
-                    </td>
-                </tr>
-            </table>
+    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+        <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <a href="/messages" class="btn float-left w-25">Message</a>
+            <a href="/matches" class="btn rounded-pill w-25">Match</a>
+            <a href="/settings" class="btn float-right rounded-pill w-25">Settings</a>
         </div>
     </div>
-</div>
-
-<div id="footbar" class="navbar fixed-bottom bg-light">
-    <div class="container-fluid">
-        <a href="/messages" class="btn float-left w-25">Messages</a>
-        <a href="/matches" class="btn float-left rounded-pill w-25">Matches</a>
-        <a href="/settings" class="btn float-left rounded-pill w-25">Settings</a>
-    </div>
-</div>
 {{end}}
 
 {{block js()}}
