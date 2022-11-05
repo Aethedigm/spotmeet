@@ -14,7 +14,7 @@
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
             </div>
             <a 
-                    href="/" 
+                    href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
             >

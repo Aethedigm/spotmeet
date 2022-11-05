@@ -165,7 +165,7 @@
                     View my profile&nbsp;&nbsp;
                 </a>
                 <a 
-                    href="/" 
+                    href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
