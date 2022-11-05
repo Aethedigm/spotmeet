@@ -154,7 +154,7 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		fmt.Println("Error getting spotify token.", err)
-		http.Redirect(w, r, "/users/login/?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
 		return
 	} else {
 		err = h.SetSpotifyArtistsForUser(userID)

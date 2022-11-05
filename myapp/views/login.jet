@@ -46,7 +46,7 @@ Login
             Login Failed
         </div>
 
-        <div id="spotify-conn-failed" class="container">
+        <div id="spotify-conn-failed" class="container hidden">
             <div id="spotify-conn-failed">
                 <span>Spotify authentication failed. Please try again.<span>
             </div>
@@ -81,9 +81,7 @@ window.onload = function() {
         .get('spotConnFailed');
 
     if (spotConnFailed) {
-        spotConnFailed()
-    } else {
-        document.getElementById("spotify-conn-failed").classList.add("hidden");
+        document.getElementById("spotify-conn-failed").classList.remove("hidden");
     }
 
     const loginFailed = new URLSearchParams(window.location.search)
@@ -93,16 +91,6 @@ window.onload = function() {
         document.getElementById("login-status").classList.remove("hidden");
         document.getElementById("login-status").classList.add("login-failed");
     }
-}
-
-const spotConnFailed = () => {
-    const spotConnFailTemplate = `
-        <div>
-            <span>Connection to Spotify failed.<br>Please check your internet connection and login credentials.</span>
-        </div>
-    `;
-    document.getElementById("spotify-conn-failed").classList.remove("hidden");
-    document.getElementById("spotify-conn-failed").innerHTML = spotConnFailTemplate;
 }
 
 const val = () => {
