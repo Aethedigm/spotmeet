@@ -13,11 +13,21 @@
             <div class="btn" onclick="location.href = '/'">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
             </div>
-            <div
-                onclick="location.href = '/users/profile'"
-                style="text-align:right; font-family: 'Fredoka', sans-serif;"
-                class="btn float-right">
+            <div class="btn float-right">
+                <a 
+                    href="/users/profile" 
+                    style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                    class="btn float-right"
+                >
                     View my profile&nbsp;&nbsp;
+                </a>
+                <a 
+                    href="/users/profile" 
+                    style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                    class="btn float-right"
+                >
+                    Log Out&nbsp;&nbsp;
+                </a>
             </div>
     </div>
 
