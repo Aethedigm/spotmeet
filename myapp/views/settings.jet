@@ -22,9 +22,10 @@
                     View my profile&nbsp;&nbsp;
                 </a>
                 <a 
-                    href="/users/profile" 
+                    href="/" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
+                    id="btnLogout"
                 >
                     Log Out&nbsp;&nbsp;
                 </a>
@@ -133,5 +134,6 @@ const matchRangeChange = () => {
     const matchPercentLabel = document.getElementById("matchPercentLabel");
     matchPercentLabel.textContent = matchRange.value;
 }
+
 </script>
 {{end}}
