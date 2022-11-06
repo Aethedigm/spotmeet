@@ -211,6 +211,9 @@
                 .then(response => response.json())
                 .then(data => {
                 if (data.length !== 0) {
+
+                    msgContainer.innerHTML = "";
+
                     for (i = 0; i < data.length; i++) {
                         const thread = data[i];
                         const threadTemplate = `
@@ -218,10 +221,13 @@
                                 <div class="media">
                                     <div class="media-body">
                                         <div style="display:flex; flex-direction:row; justify-content: space-between;" class="media-heading">
-                                            <div style="font-size:1.2em" class="m-r-10">${thread.MatchFirstName}</div>
-                                            <div style="text-align:right" class="float-right text-muted"><time style="text-align:right" class="hidden-sm-down" datetime="2017">12:00pm</time></div>
+                                            <div style="font-size:1.2em" class="m-r-10">
+                                                <img src="${thread.OtherUsersImage}" class="rounded-circle" style="width: 32px;"></img>
+                                                <span style="font-size:1.2em" class="m-r-10">${thread.MatchFirstName}</span>
+                                            </div>
+                                            <time style="text-align:right" class="hidden-sm-down" datetime="2017">${thread.LatestMessageTimeSent}</time>
                                         </div>
-                                        <p class="msg">Latest-message text goes here...</p>
+                                        <p class="msg">${thread.LatestMessagePreview}</p>
                                     </div>
                                 </div>
                             </li>
@@ -233,5 +239,7 @@
                 }
             });
     }
+
+    // setInterval(getMessageThreads, 10000);
 </script>
 {{end}}
