@@ -19,7 +19,7 @@
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
-                    View my profile&nbsp;&nbsp;
+                    <i class="fa-solid fa-user"></i>
                 </a>
                 <a 
                     href="/users/logout" 
@@ -27,7 +27,7 @@
                     class="btn float-right"
                     id="btnLogout"
                 >
-                    Log Out&nbsp;&nbsp;
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </a>
             </div>
     </div>

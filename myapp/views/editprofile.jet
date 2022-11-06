@@ -19,14 +19,14 @@
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
-                    View my profile&nbsp;&nbsp;
+                    <i class="fa-solid fa-user"></i>
                 </a>
                 <a 
                     href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
-                    Log Out&nbsp;&nbsp;
+                    <i class="fa-solid fa-right-from-bracket"></i>
                 </a>
             </div>
     </div>
