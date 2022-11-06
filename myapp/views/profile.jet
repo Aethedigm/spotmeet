@@ -13,6 +13,13 @@
             <div class="btn" onclick="location.href = '/'">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span style="color:#1DB954">o</span>tmeet</h3>
             </div>
+            <a 
+                    href="/users/logout" 
+                    style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                    class="btn float-right"
+            >
+                <i class="fa-solid fa-right-from-bracket" style="font-size:1.5rem" ></i>
+            </a>
     </div>
 
     <div style="margin-top:5em; margin-bottom:3.6em; text-align:center;" class="justify-content-center">

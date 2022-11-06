@@ -158,6 +158,7 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
 	err = h.SetSpotifyArtistsForUser(userID)
 	if err != nil {
 		fmt.Println("Error setting spotify artists for user.", err)

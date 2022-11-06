@@ -71,5 +71,5 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) Logout(w http.ResponseWriter, r *http.Request) {
 	// h.App.Session.RenewToken(r.Context())
 	h.App.Session.Remove(r.Context(), "userID")
-	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
