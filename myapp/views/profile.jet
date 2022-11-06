@@ -18,7 +18,7 @@
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
             >
-                <i class="fa-solid fa-right-from-bracket"></i>
+                <i class="fa-solid fa-right-from-bracket" style="font-size:1.5rem" ></i>
             </a>
     </div>
 
