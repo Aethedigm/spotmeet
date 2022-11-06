@@ -27,13 +27,13 @@ Login
 <div class="col">
     <div class="d-flex align-items-center justify-content-center mt-5 mb-2">
         <div>
-            <h3 class="font-weight-bold">sp<span style="color:#1DB954">o</span>tmeet</h3>
+            <h3 class="font-weight-bold">sp<span class="green-font">o</span>tmeet</h3>
         </div>
     </div>
 
     <hr>
 
-    <div class="mb-3"><span style="font-size:1.5em; color:#1DB954;">Login</span></div>
+    <div class="mb-3"><span class="green-font" style="font-size:1.5em;">Login</span></div>
 
     <form method="post" action="/users/login"
         name="login-form" id="login-form"

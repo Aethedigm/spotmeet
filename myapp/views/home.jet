@@ -27,9 +27,9 @@ span.avoidwrap {
 <div class="col text-center">
     <div class="d-flex align-items-center justify-content-center mt-5 mb-2">
         <div>
-            <h3 class="font-weight-bold">sp<span style="color:#1DB954">o</span>tmeet</h3>
+            <h3 class="font-weight-bold">sp<span class="green-font">o</span>tmeet</h3>
             <div class="text-muted mt-5 welcome">
-                <span class="break">Welcome</span> <span class="break">to</span> <span style="color:#1DB954" class="break">spotmeet!</span>
+                <span class="break">Welcome</span> <span class="break">to</span> <span class="break green-font">spotmeet!</span>
             </div>
         </div>
     </div>

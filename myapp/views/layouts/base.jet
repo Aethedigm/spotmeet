@@ -29,6 +29,9 @@
         .nav-icons {
             font-size: 1.5rem;
         }
+        .green-font {
+            color:#1DB954;
+        }
     </style>
 
     {{yield css()}}
