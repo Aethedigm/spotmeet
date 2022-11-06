@@ -101,6 +101,9 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 		LatestMessagePreview = LatestMessagePreview[:35] + " . . ."
 	}
 	strLatestMessageTimeSent := LatestMessageTimeSent.Format(time.Kitchen)
+	if LatestMessagePreview == "" {
+		strLatestMessageTimeSent = "No messages sent yet"
+	}
 
 	q2rows.Next()
 	q2rows.Scan(&OtherUsersImage)

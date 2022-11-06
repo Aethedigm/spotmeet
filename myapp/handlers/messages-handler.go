@@ -47,17 +47,6 @@ func (h *Handlers) GetMessages(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 
-	// Redefining Thread struct here, with more info to pass to messages.jet.
-	// More-easily editable, and defining here since not used in db.
-	type threadPreview struct {
-		UserID                int
-		MatchID               int
-		MatchFirstName        string
-		LatestMessagePreview  string
-		LatestMessageTimeSent string
-		OtherUsersImage       string
-	}
-
 	userIDstr := chi.URLParam(r, "userID")
 	userID, err := strconv.Atoi(userIDstr)
 	if err != nil {
@@ -73,7 +62,7 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	threads := []threadPreview{}
+	threads := []data.Thread{}
 	for _, links := range links {
 		var user *data.User
 		if links.User_A_ID == userID {
@@ -109,7 +98,7 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tmp := threadPreview{
+		tmp := data.Thread{
 			UserID:                user.ID,
 			MatchID:               matchID,
 			MatchFirstName:        user.FirstName,

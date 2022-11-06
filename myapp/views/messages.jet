@@ -237,6 +237,6 @@
             });
     }
 
-    setInterval(getMessageThreads, 2000);
+    // setInterval(getMessageThreads, 10000);
 </script>
 {{end}}
