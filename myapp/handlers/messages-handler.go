@@ -140,10 +140,18 @@ func (h *Handlers) Thread(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	profile, err := h.Models.Profiles.GetByUserID(matchID)
+	if err != nil {
+		fmt.Println("Error getting profile ID", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	vars := make(jet.VarMap)
 	vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
 	vars.Set("matchID", matchID)
 	vars.Set("matchFirstName", match.FirstName)
+	vars.Set("matchProfileID", profile.ID)
 
 	err = h.App.Render.JetPage(w, r, "message_thread", vars, nil)
 	if err != nil {
