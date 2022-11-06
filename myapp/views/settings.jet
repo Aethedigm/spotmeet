@@ -3,11 +3,7 @@
 {{block browserTitle()}}Settings{{end}}
 
 {{block css()}}
-<style>
-    .nav-icons {
-        font-size: 1.5rem;
-    }
-</style>
+
 {{end}}
 
 {{block pageContent()}}

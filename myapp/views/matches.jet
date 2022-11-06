@@ -194,9 +194,6 @@
                 margin-top: 3px
             }
         }
-        .nav-icons {
-            font-size: 1.5rem;
-        }
     </style>
 {{end}}
 
