@@ -163,7 +163,8 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Error setting spotify artists for user.", err)
 	}
 
-	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 14400
+	// still need to change this logic to utilize UTC
+	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 18000
 	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
 	if expiry < fiveMinutesFromNow {
 		fmt.Println(fiveMinutesFromNow)

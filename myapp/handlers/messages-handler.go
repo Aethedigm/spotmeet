@@ -46,6 +46,18 @@ func (h *Handlers) GetMessages(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
+
+	// Redefining Thread struct here, with more info to pass to messages.jet.
+	// More-easily editable, and defining here since not used in db.
+	type threadPreview struct {
+		UserID                int
+		MatchID               int
+		MatchFirstName        string
+		LatestMessagePreview  string
+		LatestMessageTimeSent string
+		OtherUsersImage       string
+	}
+
 	userIDstr := chi.URLParam(r, "userID")
 	userID, err := strconv.Atoi(userIDstr)
 	if err != nil {
@@ -61,7 +73,7 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	threads := []data.Thread{}
+	threads := []threadPreview{}
 	for _, links := range links {
 		var user *data.User
 		if links.User_A_ID == userID {
@@ -86,10 +98,24 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		tmp := data.Thread{
-			UserID:         user.ID,
-			MatchID:        matchID,
-			MatchFirstName: user.FirstName,
+
+		latestMessagePreview,
+			latestMessageTimeSent,
+			otherUsersImage,
+			err := h.Models.RQ.ThreadPreviewQuery(userID, matchID)
+		if err != nil {
+			fmt.Println("Error in func ThreadPreviewQuery(), called in messages-handler.go.", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		tmp := threadPreview{
+			UserID:                user.ID,
+			MatchID:               matchID,
+			MatchFirstName:        user.FirstName,
+			LatestMessagePreview:  latestMessagePreview,
+			LatestMessageTimeSent: latestMessageTimeSent,
+			OtherUsersImage:       otherUsersImage,
 		}
 
 		threads = append(threads, tmp)
