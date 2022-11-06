@@ -61,7 +61,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	err = h.SetSpotifyArtistsForUser(user.ID)
 	if err != nil {
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
 

@@ -26,7 +26,7 @@ func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) 
 	_, err := rand.Read(randomBytes)
 	if err != nil {
 		fmt.Println(err)
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
 
@@ -42,14 +42,15 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		fmt.Println(err)
 		return
 	}
+
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
-		fmt.Println("State mismatch: %s != %s\n", st, state)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
+		fmt.Printf("State mismatch: %s != %s\n", st, state)
 		return
 	}
 
@@ -58,14 +59,14 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 
 	_, err = spotclient.CurrentUser()
 	if err != nil {
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		fmt.Println(err)
 		return
 	}
 
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	if userID == 0 || userID == -1 {
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		fmt.Println("The user_id of the current user could not be found in the session data.")
 		return
 	}
@@ -79,7 +80,7 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 
 	_, err = spottoken.Upsert(spottoken)
 	if err != nil {
-		http.Redirect(w, r, "/users/login?spotConnFailed=true", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		fmt.Println(err)
 	}
 
