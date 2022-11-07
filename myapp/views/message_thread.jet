@@ -53,7 +53,7 @@
 <div id="header" class="navbar fixed-top bg-light">
     <div class="container-fluid">
         <div id="other-user-name">
-            <a href="/users/profile/{{ matchProfileID }}">{{ matchFirstName }}</a>
+            <a href="/users/profile/{{ matchProfileID }}"><i class="fa-regular fa-circle-user nav-icons"></i></a>
         </div>
     </div>
 </div>
