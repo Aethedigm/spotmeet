@@ -52,9 +52,9 @@
 {{block pageContent()}}
 <div id="header" class="navbar fixed-top bg-light">
     <div class="container-fluid">
-        <div id="other-user-name">
+        <div id="navbar-top">
+            <a href=".." class="me-3"><i class="fa-solid fa-arrow-left-long nav-icons green-font"></i></a>
             {{ matchFirstName }}
-            <hr>
         </div>
     </div>
 </div>
