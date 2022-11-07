@@ -229,7 +229,7 @@
                                     <div class="media-body">
                                         <div style="display:flex; flex-direction:row; justify-content: space-between;" class="media-heading">
                                             <div style="font-size:1.2em" class="m-r-10">
-                                                <img src="${thread.OtherUsersImage}" class="rounded-circle" style="width: 32px;"></img>
+                                                <a href="/users/profile/${thread.MatchID}"><img src="${thread.OtherUsersImage}" class="rounded-circle" style="width: 32px;"></img></a>
                                                 <span style="font-size:1.2em" class="m-r-10">${thread.MatchFirstName}</span>
                                             </div>
                                             <time style="text-align:right" class="hidden-sm-down" datetime="2017">${thread.LatestMessageTimeSent}</time>
