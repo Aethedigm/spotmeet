@@ -123,16 +123,18 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	matches, err := h.Models.Matches.GetAllForOneUser(userID)
-	if err != nil {
-		fmt.Println("Error getting matches:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	//matches, err := h.Models.Matches.GetAllForOneUser(userID)
+	//if err != nil {
+	//	fmt.Println("Error getting matches:", err)
+	//	http.Error(w, err.Error(), http.StatusBadRequest)
+	//	return
+	//}
 
-	matchesJSON, err := json.Marshal(matches)
+	matchesForDisplay, err := h.Models.RQ.MatchesDisplayQuery(userID)
+
+	matchesJSON, err := json.Marshal(matchesForDisplay)
 	if err != nil {
-		fmt.Println("Error marshalling matches:", err)
+		fmt.Println("Error marshalling matchesForDisplay:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -157,7 +159,6 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
-
 
 	err = h.SetSpotifyArtistsForUser(userID)
 	if err != nil {
