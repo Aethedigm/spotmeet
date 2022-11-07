@@ -129,8 +129,10 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		thisUser := h.App.Session.GetInt(r.Context(), "userID")
+
 		vars := make(jet.VarMap)
-		vars.Set("userID", profile.UserID)
+		vars.Set("userID", thisUser)
 		vars.Set("profileID", profile.ID)
 		vars.Set("usersProfileID", profile.UserID)
 		vars.Set("FirstName", user.FirstName)
