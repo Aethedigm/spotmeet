@@ -244,8 +244,8 @@
 <script>
 
 window.onload = function() {
-    showLoadingAnimation();
-    getLocationAndMatches();
+        showLoadingAnimation();
+        getLocationAndMatches();
 }
 
 function showLoadingAnimation() {
@@ -285,6 +285,67 @@ function showLoadingAnimation() {
     }
 };
 
+function getLocationAndMatches() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocationToServer, geolocationDenied);
+    } else {
+        noGeolocation();
+    }
+}
+
+function sendLocationToServer(position) {
+    const data = new URLSearchParams();
+    const coordinates = {lat: position.coords.latitude, long: position.coords.longitude};
+
+    data.append("userID", {{userID}});
+    data.append("lat", coordinates.lat);
+    data.append("long", coordinates.long);
+
+    fetch('matches/location', {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/x-www-form-urlencoded'
+        },
+        body: data
+    })
+        .then(response => response.json())
+        .then(data => console.log(data));
+
+    // give the server some time to write the location
+    delay(500).then(() => fetchMatches())
+        .then(() => removeLoading());
+}
+
+function delay(time) {
+    return new Promise(resolve => setTimeout(resolve, time));
+}
+
+// Fetch data from server
+function fetchMatches() {
+    fetch("/matches/myresults")
+        .then(response => response.json())
+        .then(data => {
+            if (data.length !== 0) {
+                // Sort matches
+                data.sort(function(a, b) {
+                    return a.match_percentage - b.match_percentage;
+                });
+
+                // Display matches
+                for (let i = 0; i < data.length; i++) {
+                    addMatch(data[i]);
+                }
+            } else {
+                noMatches();
+            }
+        });
+}
+
+function removeLoading() {
+    document.body.removeChild(document.getElementById("divWheelFrame"));
+    document.body.removeChild(document.getElementById("styleLoading"));
+};
+
 const noMatches = () => {
     const noMatchTemplate = `
         <div class="container">
@@ -295,6 +356,43 @@ const noMatches = () => {
     `;
 
     document.getElementById("matches_container").innerHTML = noMatchTemplate;
+}
+
+function geolocationDenied(error) {
+    var message = "";
+    if (error.code == error.PERMISSION_DENIED) {
+        message = "<h1>Spotmeet only works if you allow us to use your location! <br><br>Try again by refreshing this page, or changing your browser settings.</h1>";
+    }
+    else if (error.code == POSITION_UNAVAILABLE) {
+        message = "<h1>Unfortunately your location is unable to be seen.<br><br>Please try again later.</h1>";
+    } else {
+        message = "<h1>Your location request timed out.<br><br>Try again by refreshing this page.</h1>";
+    }
+
+    let noGeoTemplate = `
+        <div class="container">
+            <div class="noMatches">
+                ` + message + `
+            </div>
+        </div>
+    `;
+
+    document.getElementById("matches_container").innerHTML = noGeoTemplate;
+    removeLoading();
+
+}
+
+const noGeolocation = () => {
+    const noGeoTemplate = `
+        <div class="container">
+            <div class="noMatches">
+                <h1>Unable to ask for your location. Please enable location on your device, or check your browser settings.</h1>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("matches_container").innerHTML = noGeoTemplate;
+    removeLoading();
 }
 
 const addMatch = (match) => {
@@ -345,59 +443,6 @@ const declineMatch = (matchID) => {
             }
         });
 }
-
-function getLocationAndMatches() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(sendLocationToServerAndGetMatches)
-    }
-}
-
-async function sendLocationToServerAndGetMatches(position) {
-    const data = new URLSearchParams();
-    const coordinates = {lat: position.coords.latitude, long: position.coords.longitude};
-
-    data.append("userID", {{userID}});
-    data.append("lat", coordinates.lat);
-    data.append("long", coordinates.long);
-
-    fetch('matches/location', {
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/x-www-form-urlencoded'
-        },
-        body: data
-     })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .then(fetchMatches())
-        .then(removeLoading());
-}
-
-// Fetch data from server
-async function fetchMatches() {
-    fetch("/matches/myresults")
-        .then(response => response.json())
-        .then(data => {
-            if (data.length !== 0) {
-                // Sort matches
-                data.sort(function(a, b) {
-                    return a.match_percentage - b.match_percentage;
-                });
-
-                // Display matches
-                for (let i = 0; i < data.length; i++) {
-                    addMatch(data[i]);
-                }
-            } else {
-                noMatches();
-            }
-        });
-}
-
-async function removeLoading() {
-    document.body.removeChild(document.getElementById("divWheelFrame"));
-    document.body.removeChild(document.getElementById("styleLoading"));
-};
 
 </script>
 {{end}}
