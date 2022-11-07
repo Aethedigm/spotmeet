@@ -19,7 +19,11 @@
         body {
             padding-bottom: 50px;
             margin-top: 20px;
-            background: #4285F4
+            background-image: linear-gradient(to bottom right, #f3f6f4, #91ed69, #f3f6f4);
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
         }
         .badge {
             border-radius: 8px;
