@@ -53,8 +53,7 @@
 <div id="header" class="navbar fixed-top bg-light">
     <div class="container-fluid">
         <div id="other-user-name">
-            {{ matchFirstName }}
-            <hr>
+            <a href="/users/profile/{{ matchProfileID }}">{{ matchFirstName }}</a>
         </div>
     </div>
 </div>
