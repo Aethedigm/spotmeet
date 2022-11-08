@@ -30,7 +30,6 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// get the current User from the database as a struct
 	currentUser, err := h.Models.Users.Get(userID)
 	if err != nil {
 		h.App.ErrorLog.Println("error getting user object:", err)
@@ -46,7 +45,6 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 	lat := r.Form.Get("lat")
 	lng := r.Form.Get("long")
 
-	// convert the lat and long to float64
 	latFloat, err := strconv.ParseFloat(lat, 64)
 	if err != nil {
 		h.App.ErrorLog.Println("error converting lat to float64:", err)
@@ -59,9 +57,8 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// update user's max/min coordinates in settings if their current lat/long are zero
 	if currentUser.Latitude == 0 && currentUser.Longitude == 0 {
-		defaultDistance := 50 // 50 miles is the default distance for new users' settings
+		defaultDistance := 50
 		latMod := float64(defaultDistance) * 0.01492753623
 		longMod := float64(defaultDistance) * 0.018315018315
 
@@ -132,10 +129,8 @@ func (h *Handlers) SessionTest(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) {
 
-	// create empty user struct
 	u := &data.User{}
 
-	// convert the body of the http request to json, and decode it into the empty user struct
 	err := json.NewDecoder(r.Body).Decode(u)
 	if err != nil {
 		fmt.Println("Error decoding json:", err)
@@ -143,7 +138,6 @@ func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// insert the new user information into the users table
 	userID, err := u.Insert(*u)
 	if err != nil {
 		fmt.Println("Error inserting user:", err)
@@ -151,19 +145,16 @@ func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Record the user-insert success message into the outgoing http response
 	fmt.Fprintf(w, "User created with id: %d", userID)
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(fmt.Sprintf("%d", userID)))
 
-	// create profile struct with the new user id, and default information
 	p := &data.Profile{
 		UserID:      userID,
 		Description: "Hello, I'm new to SpotMeet! This is a default message.",
 		ImageURL:    "/public/images/default-profile-pic.png",
 	}
 
-	// insert the new profile into the database
 	profileID, err := p.Insert(*p)
 	if err != nil {
 		fmt.Println("Error inserting profile:", err)
@@ -171,13 +162,11 @@ func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Create settings
 	s := &data.Settings{
 		UserID:   userID,
 		Distance: 50,
 	}
 
-	// insert the new settings into the database
 	_, err = s.Insert(*s)
 	if err != nil {
 		fmt.Println("Error inserting settings:", err)
@@ -185,7 +174,6 @@ func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	// Record the profile-insert success message into the outgoing http response
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(fmt.Sprintf("%d", profileID)))
 }

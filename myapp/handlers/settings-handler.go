@@ -72,7 +72,6 @@ func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 
-	// get the user's profile data from the database
 	profile, err := h.Models.Profiles.GetByUserID(userID)
 	if err != nil {
 		fmt.Println("Error getting profile:", err)
@@ -87,7 +86,6 @@ func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// create variables from the grabbed data to send to our view
 	vars := make(jet.VarMap)
 	vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
 	vars.Set("profileID", profile.ID)
