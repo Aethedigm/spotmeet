@@ -131,6 +131,10 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	matchesForDisplay, err := h.Models.RQ.MatchesDisplayQuery(userID)
+	if err != nil {
+		fmt.Println("Error with MatchesDisplayQuery(), called in matches-handler.go:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 	matchesJSON, err := json.Marshal(matchesForDisplay)
 	if err != nil {
