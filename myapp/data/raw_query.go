@@ -110,3 +110,47 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 
 	return LatestMessagePreview, strLatestMessageTimeSent, OtherUsersImage, nil
 }
+
+func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
+	q := `select *
+		  from (select u.id, u.first_name, mm.id as match_id, mm.percent_match, mm.artist_id
+				from users u
+				inner join (select *
+							from matches m
+							where m.user_a_id = ` + strconv.Itoa(userID) + ` or m.user_b_id = ` + strconv.Itoa(userID) + `) as mm
+				on u.id = mm.user_b_id or u.id = mm.user_a_id) as r
+		  where r.id <> ` + strconv.Itoa(userID) + `;`
+
+	rows, err := upper.SQL().Query(q)
+	if err != nil {
+		fmt.Println("problem with query", rows, err)
+		return []MatchForDisplay{}, err
+	}
+
+	var otherUserID int
+	var otherUserName string
+	var matchID int
+	var percentMatch int
+	var artistID int
+
+	var matchesForDisplay []MatchForDisplay
+	for rows.Next() {
+		err := rows.Scan(&otherUserID, &otherUserName, &matchID, &percentMatch, &artistID)
+		if err != nil {
+			fmt.Println("problem with filling variables from sql query called in MatchesDisplayQuery().", err)
+			return []MatchForDisplay{}, err
+		}
+
+		strct := MatchForDisplay{
+			OtherUserID:   otherUserID,
+			OtherUserName: otherUserName,
+			MatchID:       matchID,
+			PercentMatch:  percentMatch,
+			ArtistID:      artistID,
+		}
+
+		matchesForDisplay = append(matchesForDisplay, strct)
+	}
+
+	return matchesForDisplay, nil
+}
