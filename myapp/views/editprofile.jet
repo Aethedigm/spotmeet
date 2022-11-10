@@ -19,7 +19,7 @@
                     class="me-3"
                     style="text-decoration:none;"
                 >
-                    <i class="fa-solid fa-arrow-left-long nav-icons green-font"></i>
+                    <i class="fa-solid fa-arrow-left-long nav-icons"></i>
                 </a>
                 <a 
                     href="/users/logout" 

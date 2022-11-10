@@ -19,7 +19,7 @@
         body {
             padding-bottom: 50px;
             margin-top: 20px;
-            background-image: linear-gradient(to bottom right, #f3f6f4, #91ed69, #f3f6f4);
+            background-image: linear-gradient(to bottom right, #f3f6f4, #d9ead3, #f3f6f4);
             background-position: center center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -155,8 +155,7 @@
 
 {{block pageContent()}}
     <div id="topbar"
-        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
-        class="navbar fixed-top bg-light">
+        class="navbar fixed-top bg-light topbar">
             <div class="btn" onclick="location.href = '/'">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
             </div>
@@ -166,7 +165,7 @@
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
-                    <i class="fa-solid fa-user nav-icons green-font"></i>
+                    <i class="fa-solid fa-user nav-icons"></i>
                 </a>
                 <a 
                     href="/users/logout" 
@@ -186,11 +185,11 @@
             </div>
     </section>
 
-    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+    <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
-            <a href="#" class="btn btn-primary float-left w-25"><i class="fa-solid fa-message nav-icons"></i></a>
-            <a href="/matches" class="btn rounded-pill w-25"><i class="fa-solid fa-user-group nav-icons"></i></a>
-            <a href="/settings" class="btn float-right rounded-pill w-25"><i class="fa-solid fa-gear nav-icons"></i></a>
+            <a href="#" class="btn btn-primary float-left w-25 green-font button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
 
