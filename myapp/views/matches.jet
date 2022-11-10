@@ -401,24 +401,27 @@ const noGeolocation = () => {
 
 const addMatch = (match) => {
     const matchTemplate = `
-       <li id="match_container-${match.ID}" class="media media-body container-fluid mt-3 list-group-item">
-           <div id="top_row-${match.ID}" class="row mb-2">
-               <div class="col-3">
-                   <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></img>
+       <li id="match_container-${match.match_id}" class="media media-body container-fluid mt-3 list-group-item">
+           <div id="top_row-${match.match_id}" class="row mb-2" style="display:flex; flex-direction:row; justify-content: space-between;">
+               <div style="display:flex; flex-direction:row; justify-content: space-between;">
+                   <div>
+                       <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></img>
+                       &nbsp;&nbsp;<span style="font-size:1.2em; font-family: 'Fredoka', sans-serif;">${match.other_user_name}</span>
+                   </div>
+                   <div class="mt-2">
+                       ${match.percent_match}% Match
+                   </div>
                </div>
-               <div class="col-4 mt-2">
-                   ${match.percent_match}% Match
-               </div>
-               <div class="col-5  mt-2">
-                   ${match.artist_id}
+               <div class="mt-2">
+                   matched most on: artist ID ${match.artist_id}
                </div>
            </div>
-           <div id="bottom_row-${match.ID}" class="row">
+           <div id="bottom_row-${match.match_id}" class="row">
                <div class="col">
-                   <a href="#" onclick="acceptMatch(${match.ID})" class="btn btn-success rounded w-100">Link</a>
+                   <a href="#" onclick="acceptMatch(${match.match_id})" class="btn btn-success rounded w-100">Link</a>
                </div>
                <div class="col">
-                   <a href="#" onclick="declineMatch(${match.ID})" class="btn btn-danger rounded w-100">Pass</a>
+                   <a href="#" onclick="declineMatch(${match.match_id})" class="btn btn-danger rounded w-100">Pass</a>
                </div>
            </div>
        </li>

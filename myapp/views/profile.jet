@@ -26,7 +26,7 @@
         <div class="text-center mb-3"><span class="green-font" style="font-size:1.5em;">Profile</span></div>
 
         <!-- IF USER ONLY -->
-        {{ if userID == usersProfileID }}
+        {{ if usersProfileID == userID }}
         <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary rounded-pill">Edit Profile</a>
         {{ end }}
         <!-- END IF -->

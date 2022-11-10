@@ -123,16 +123,15 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	matches, err := h.Models.Matches.GetAllForOneUser(userID)
+	matchesForDisplay, err := h.Models.RQ.MatchesDisplayQuery(userID)
 	if err != nil {
-		fmt.Println("Error getting matches:", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		fmt.Println("Error with MatchesDisplayQuery(), called in matches-handler.go:", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	matchesJSON, err := json.Marshal(matches)
+	matchesJSON, err := json.Marshal(matchesForDisplay)
 	if err != nil {
-		fmt.Println("Error marshalling matches:", err)
+		fmt.Println("Error marshalling matchesForDisplay:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -158,7 +157,6 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 	err = h.SetSpotifyArtistsForUser(userID)
 	if err != nil {
 		fmt.Println("Error setting spotify artists for user.", err)
@@ -168,7 +166,6 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
 	if expiry < fiveMinutesFromNow {
 		fmt.Println(fiveMinutesFromNow)
-		// go to users/newspotaccesstoken to get the new access token with the refresh token
 		http.Redirect(w, r, "users/newspotaccesstoken", http.StatusSeeOther)
 		return
 	}
