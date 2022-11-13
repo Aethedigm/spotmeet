@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/base32"
+	"errors"
 	"fmt"
 	"log"
 	"math/rand"
@@ -213,4 +214,103 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) error {
 		}
 	}
 	return nil
+}
+
+func (h *Handlers) Tracks(w http.ResponseWriter, r *http.Request) {
+	userID := h.App.Session.Get(r.Context(), "userID")
+
+	user, err := h.Models.Users.Get(userID.(int))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	if err := h.GetUserTopSongs(*user); err != nil {
+		fmt.Println("Errors", err)
+	}
+
+	w.Write([]byte("Success"))
+}
+
+func (h *Handlers) GetUserTopSongs(user data.User) error {
+	// By default will only collect the top 20 songs for this user
+	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
+	if err != nil {
+		fmt.Println("No spotify token found for user")
+		return err
+	}
+
+	spotifyToken := &oauth2.Token{
+		AccessToken:  SpotTok.AccessToken,
+		RefreshToken: SpotTok.RefreshToken,
+	}
+
+	client := auth.NewClient(spotifyToken)
+	_, err = client.CurrentUser()
+	if err != nil {
+		fmt.Println("Current user is nil")
+		return err
+	}
+
+	songs, err := client.CurrentUsersTopTracks()
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	var (
+		loudnessAvg float64
+		tempoAvg    float64
+		timesigAvg  int
+		total       int
+	)
+
+	for x := range songs.Tracks {
+		trackAnalysis, err := client.GetAudioAnalysis(songs.Tracks[x].ID)
+		if err != nil {
+			fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
+		} else {
+			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
+			loud, temp, time, err := BuildSectionAggregate(trackAnalysis.Sections)
+			if err != nil {
+				fmt.Println("Error building section aggregate")
+				continue
+			}
+
+			loudnessAvg += loud
+			tempoAvg += temp
+			timesigAvg += time
+			total++
+		}
+	}
+
+	loudnessAvg = loudnessAvg / float64(total)
+	tempoAvg = tempoAvg / float64(total)
+	timesigAvg = timesigAvg / total
+
+	return nil
+}
+
+func BuildSectionAggregate(sections []spotify.Section) (float64, float64, int, error) {
+	var (
+		loudness float64
+		tempo    float64
+		timesig  int
+	)
+
+	if len(sections) < 1 {
+		return 0, 0, 0, errors.New("No sections provided")
+	}
+
+	for x := range sections {
+		loudness += sections[x].Loudness
+		tempo += sections[x].Tempo
+		timesig += sections[x].TimeSignature
+	}
+
+	loudness = loudness / float64(len(sections))
+	tempo = tempo / float64(len(sections))
+	timesig = timesig / len(sections)
+
+	return loudness, tempo, timesig, nil
 }
