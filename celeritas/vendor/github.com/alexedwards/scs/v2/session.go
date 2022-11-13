@@ -3,6 +3,7 @@ package scs
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"log"
 	"net"
 	"net/http"
@@ -78,7 +79,10 @@ type SessionCookie struct {
 	// (i.e. whether it should be retained after a user closes their browser).
 	// The default value is true, which means that the session cookie will not
 	// be destroyed when the user closes their browser and the appropriate
-	// 'Expires' and 'MaxAge' values will be added to the session cookie.
+	// 'Expires' and 'MaxAge' values will be added to the session cookie. If you
+	// want to only persist some sessions (rather than all of them), then set this
+	// to false and call the RememberMe() method for the specific sessions that you
+	// want to persist.
 	Persist bool
 
 	// SameSite controls the value of the 'SameSite' attribute on the session
@@ -154,10 +158,13 @@ func (s *SessionManager) LoadAndSave(next http.Handler) http.Handler {
 				s.ErrorFunc(w, r, err)
 				return
 			}
-			s.writeSessionCookie(w, token, expiry)
+
+			s.WriteSessionCookie(ctx, w, token, expiry)
 		case Destroyed:
-			s.writeSessionCookie(w, "", time.Time{})
+			s.WriteSessionCookie(ctx, w, "", time.Time{})
 		}
+
+		w.Header().Add("Vary", "Cookie")
 
 		if bw.code != 0 {
 			w.WriteHeader(bw.code)
@@ -166,7 +173,17 @@ func (s *SessionManager) LoadAndSave(next http.Handler) http.Handler {
 	})
 }
 
-func (s *SessionManager) writeSessionCookie(w http.ResponseWriter, token string, expiry time.Time) {
+// WriteSessionCookie writes a cookie to the HTTP response with the provided
+// token as the cookie value and expiry as the cookie expiry time. The expiry
+// time will be included in the cookie only if the session is set to persist
+// or has had RememberMe(true) called on it. If expiry is an empty time.Time
+// struct (so that it's IsZero() method returns true) the cookie will be
+// marked with a historical expiry time and negative max-age (so the browser
+// deletes it).
+//
+// Most applications will use the LoadAndSave() middleware and will not need to
+// use this method.
+func (s *SessionManager) WriteSessionCookie(ctx context.Context, w http.ResponseWriter, token string, expiry time.Time) {
 	cookie := &http.Cookie{
 		Name:     s.Cookie.Name,
 		Value:    token,
@@ -180,24 +197,13 @@ func (s *SessionManager) writeSessionCookie(w http.ResponseWriter, token string,
 	if expiry.IsZero() {
 		cookie.Expires = time.Unix(1, 0)
 		cookie.MaxAge = -1
-	} else if s.Cookie.Persist {
+	} else if s.Cookie.Persist || s.GetBool(ctx, "__rememberMe") {
 		cookie.Expires = time.Unix(expiry.Unix()+1, 0)        // Round up to the nearest second.
 		cookie.MaxAge = int(time.Until(expiry).Seconds() + 1) // Round up to the nearest second.
 	}
 
 	w.Header().Add("Set-Cookie", cookie.String())
-	addHeaderIfMissing(w, "Cache-Control", `no-cache="Set-Cookie"`)
-	addHeaderIfMissing(w, "Vary", "Cookie")
-
-}
-
-func addHeaderIfMissing(w http.ResponseWriter, key, value string) {
-	for _, h := range w.Header()[key] {
-		if h == value {
-			return
-		}
-	}
-	w.Header().Add(key, value)
+	w.Header().Add("Cache-Control", `no-cache="Set-Cookie"`)
 }
 
 func defaultErrorFunc(w http.ResponseWriter, r *http.Request, err error) {
