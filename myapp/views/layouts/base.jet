@@ -30,7 +30,7 @@
             font-size: 1.5rem;
         }
         .green-font {
-            color:#1DB954;
+            color:#1DB954 !important; 
         }
         #topbar {
             display: flex; 
