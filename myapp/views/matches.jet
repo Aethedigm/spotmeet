@@ -5,7 +5,13 @@
 {{block css()}}
     <style id="styleLoading">
         .container-fluid {
-            background: white
+            background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            box-shadow: 2px 2px 2px 1px rgba(147, 147, 147, 0.71);
+            border-radius: 10px;
         }
         .message {
             font-size: 1.5em;
@@ -26,7 +32,7 @@
         }
         .wheel-frame {
             position: fixed;
-            background-color: #4285F4;
+            background-color: #000000;
             left: 0;
             top: 0;
             right: 0;
@@ -67,7 +73,7 @@
         body {
             padding-bottom: 50px;
             margin-top: 20px;
-            background: #4285F4
+            background-color: rgba(255, 255, 255, 1);
         }
         .badge {
             border-radius: 8px;
@@ -194,12 +200,18 @@
                 margin-top: 3px
             }
         }
+        .thumb-button {
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            margin-right: 5px;
+        }
     </style>
 {{end}}
 
 {{block pageContent()}}
     <div id="topbar"
-        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
+        style="display:flex; flex-direction:row; justify-content: space-between;"
         class="navbar fixed-top bg-light">
             <div class="btn" onclick="location.href = '/'">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
@@ -210,7 +222,7 @@
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
-                    <i class="fa-solid fa-user nav-icons green-font"></i>
+                    <i class="fa-solid fa-user nav-icons"></i>
                 </a>
                 <a 
                     href="/users/logout" 
@@ -230,11 +242,11 @@
             </div>
     </section>
 
-    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+    <div id="footbar" style="" class="navbar fixed-bottom">
         <div class="container">
-            <a href="/messages" class="btn rounded-pill float-left w-25"><i class="fa-solid fa-message nav-icons"></i></a>
-            <a href="#" class="btn btn-primary w-25"><i class="fa-solid fa-user-group nav-icons"></i></a>
-            <a href="/settings" class="btn float-right rounded-pill w-25"><i class="fa-solid fa-gear nav-icons"></i></a>
+            <a href="/messages" class="btn rounded-pill float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="#" class="btn btn-primary w-25 green-font button-active no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
 
@@ -397,28 +409,31 @@ const noGeolocation = () => {
 
 const addMatch = (match) => {
     const matchTemplate = `
-       <li id="match_container-${match.match_id}" class="media media-body container-fluid mt-3 list-group-item">
-           <div id="top_row-${match.match_id}" class="row mb-2" style="display:flex; flex-direction:row; justify-content: space-between;">
-               <div style="display:flex; flex-direction:row; justify-content: space-between;">
+       <li id="match_container-${match.match_id}" class="media media-body container-fluid mt-3 list-group-item align-items-center p-2">
+           <div id="top_row-${match.match_id}" class="row mb-2 align-items-center" style="display:flex; flex-direction:row;">
+               <div style="display:flex; flex-direction:row; justify-content: space-between; align-items: center;">
                    <div>
                        <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></img>
                        &nbsp;&nbsp;<span style="font-size:1.2em; font-family: 'Fredoka', sans-serif;">${match.other_user_name}</span>
                    </div>
-                   <div class="mt-2">
-                       ${match.percent_match}% Match
+                   <div class="d-flex">
+                    <p class="mb-0 pb-0 me-2" style="height: 100%; padding: auto;">${match.percent_match}% Match</p>
+                    <a href="#" onclick="acceptMatch(${match.match_id})" class="btn btn-success thumb-button"><i class="fa-regular fa-thumbs-up"></i></a>
+                    <a href="#" onclick="declineMatch(${match.match_id})" class="btn btn-danger thumb-button"><i class="fa-regular fa-thumbs-down"></i></a>
                    </div>
                </div>
                <div class="mt-2">
                    matched most on: artist ID ${match.artist_id}
                </div>
+               <div class="col">
+                   
+               </div>
+               <div class="col">
+                   
+               </div>
            </div>
            <div id="bottom_row-${match.match_id}" class="row">
-               <div class="col">
-                   <a href="#" onclick="acceptMatch(${match.match_id})" class="btn btn-success rounded w-100">Link</a>
-               </div>
-               <div class="col">
-                   <a href="#" onclick="declineMatch(${match.match_id})" class="btn btn-danger rounded w-100">Pass</a>
-               </div>
+               
            </div>
        </li>
     `
