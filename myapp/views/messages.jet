@@ -19,7 +19,6 @@
         body {
             padding-bottom: 50px;
             margin-top: 20px;
-            background-image: linear-gradient(to bottom right, #f3f6f4, #d9ead3, #f3f6f4);
             background-position: center center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -150,6 +149,9 @@
                 margin-top: 3px
             }
         }
+        .message-container {
+            background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
+        }
     </style>
 {{end}}
 
@@ -227,7 +229,7 @@
                     for (i = 0; i < data.length; i++) {
                         const thread = data[i];
                         const threadTemplate = `
-                            <li onclick="location.href = '/messages/getMessages/${thread.MatchID}';" class="list-group-item">
+                            <li onclick="location.href = '/messages/getMessages/${thread.MatchID}';" class="list-group-item message-container">
                                 <div class="media">
                                     <div class="media-body">
                                         <div style="display:flex; flex-direction:row; justify-content: space-between;" class="media-heading">

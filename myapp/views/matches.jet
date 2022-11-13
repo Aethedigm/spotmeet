@@ -5,7 +5,7 @@
 {{block css()}}
     <style id="styleLoading">
         .container-fluid {
-            background-image: linear-gradient(to bottom right, #f3f6f4, #91ed69, #f3f6f4);
+            background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
             background-position: center center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -199,6 +199,12 @@
             .matchlist .mail_list .list-group-item .controls {
                 margin-top: 3px
             }
+        }
+        .thumb-button {
+            border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            margin-right: 5px;
         }
     </style>
 {{end}}
@@ -403,28 +409,31 @@ const noGeolocation = () => {
 
 const addMatch = (match) => {
     const matchTemplate = `
-       <li id="match_container-${match.match_id}" class="media media-body container-fluid mt-3 list-group-item">
-           <div id="top_row-${match.match_id}" class="row mb-2" style="display:flex; flex-direction:row; justify-content: space-between;">
-               <div style="display:flex; flex-direction:row; justify-content: space-between;">
+       <li id="match_container-${match.match_id}" class="media media-body container-fluid mt-3 list-group-item align-items-center p-2">
+           <div id="top_row-${match.match_id}" class="row mb-2 align-items-center" style="display:flex; flex-direction:row;">
+               <div style="display:flex; flex-direction:row; justify-content: space-between; align-items: center;">
                    <div>
                        <img src="/public/images/default-profile-pic.png" class="rounded-circle" style="width: 32px;"></img>
                        &nbsp;&nbsp;<span style="font-size:1.2em; font-family: 'Fredoka', sans-serif;">${match.other_user_name}</span>
                    </div>
-                   <div class="mt-2">
-                       ${match.percent_match}% Match
+                   <div class="d-flex">
+                    <p class="mb-0 pb-0 me-2" style="height: 100%; padding: auto;">${match.percent_match}% Match</p>
+                    <a href="#" onclick="acceptMatch(${match.match_id})" class="btn btn-success thumb-button"><i class="fa-regular fa-thumbs-up"></i></a>
+                    <a href="#" onclick="declineMatch(${match.match_id})" class="btn btn-danger thumb-button"><i class="fa-regular fa-thumbs-down"></i></a>
                    </div>
                </div>
                <div class="mt-2">
                    matched most on: artist ID ${match.artist_id}
                </div>
+               <div class="col">
+                   
+               </div>
+               <div class="col">
+                   
+               </div>
            </div>
            <div id="bottom_row-${match.match_id}" class="row">
-               <div class="col">
-                   <a href="#" onclick="acceptMatch(${match.match_id})" class="btn btn-success rounded w-100">Link</a>
-               </div>
-               <div class="col">
-                   <a href="#" onclick="declineMatch(${match.match_id})" class="btn btn-danger rounded w-100">Pass</a>
-               </div>
+               
            </div>
        </li>
     `
