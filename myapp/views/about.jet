@@ -1,0 +1,22 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}About{{end}}
+
+{{block css()}}
+
+{{end}}
+
+{{block pageContent()}}
+<div class="col text-center">
+    <h1 class="mb-5 mt-5">About Spotmeet</h1>
+    <p class="mb-5">
+        Spotmeet is a capstone project of 4 Cincinnati State students. 
+        Spotmeet is a place for users to meet with others who share a similar taste in music in their area!
+    </p>
+    <a href="/home" class="btn btn-primary">Return Home</a>
+</div>
+{{end}}
+
+{{block js()}}
+
+{{end}}

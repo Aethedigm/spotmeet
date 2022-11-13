@@ -16,6 +16,13 @@ type Handlers struct {
 	Models data.Models
 }
 
+func (h *Handlers) About(w http.ResponseWriter, r *http.Request) {
+	err := h.App.Render.Page(w, r, "about", nil, nil)
+	if err != nil {
+		h.App.ErrorLog.Println("error rendering:", err)
+	}
+}
+
 func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
