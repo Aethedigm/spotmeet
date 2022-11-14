@@ -5,8 +5,17 @@
 {{block css()}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <style>
+        .container-fluid {
+            background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
+            background-position: center center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            box-shadow: 2px 2px 2px 1px rgba(147, 147, 147, 0.71);
+            border-radius: 20px;
+        }
         .messageContainer {
-            margin-bottom: 200px;
+            margin-bottom: 200px !important;
         }
         .noMessages {
             font-size: 1em;
@@ -74,10 +83,17 @@
         .inbox .action_bar .search {
             margin: 0
         }
+        .list-group {
+            display: flex;
+            flex-direction: column;
+            padding-left: 0;
+            margin-bottom: 0;
+            border-radius: 20px
+        }
         .inbox .mail_list .list-group-item {
             border: 0;
             padding: 15px;
-            margin-bottom: 1px
+            margin-bottom: 20px;
         }
         .inbox .mail_list .list-group-item:hover {
             background: #eceeef
@@ -229,7 +245,7 @@
                     for (i = 0; i < data.length; i++) {
                         const thread = data[i];
                         const threadTemplate = `
-                            <li onclick="location.href = '/messages/getMessages/${thread.MatchID}';" class="list-group-item message-container">
+                            <li onclick="location.href = '/messages/getMessages/${thread.MatchID}';" class="list-group-item message-container container-fluid">
                                 <div class="media">
                                     <div class="media-body">
                                         <div style="display:flex; flex-direction:row; justify-content: space-between;" class="media-heading">
