@@ -11,7 +11,7 @@
             background-repeat: no-repeat;
             background-attachment: fixed;
             box-shadow: 2px 2px 2px 1px rgba(147, 147, 147, 0.71);
-            border-radius: 10px;
+            border-radius: 20px;
         }
         .message {
             font-size: 1.5em;
@@ -116,6 +116,13 @@
             position: relative;
             width: 100%;
             box-shadow: none;
+        }
+        .list-group {
+            display: flex;
+            flex-direction: column;
+            padding-left: 0;
+            margin-bottom: 0;
+            border-radius: 20px
         }
         .matchlist .action_bar .delete_all {
             margin-bottom: 0;
