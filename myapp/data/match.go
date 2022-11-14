@@ -52,6 +52,20 @@ func (m *Match) GetAll() ([]*Match, error) {
 	return all, nil
 }
 
+func (m *Match) GetAllActive() ([]*Match, error) {
+	collection := upper.Collection(m.Table())
+
+	var all []*Match
+
+	res := collection.Find(up.Cond{"complete": false}).OrderBy("id")
+	err := res.All(&all)
+	if err != nil {
+		return nil, err
+	}
+
+	return all, nil
+}
+
 // GetAllForOneUser returns a slice of all matches for a user.
 func (m *Match) GetAllForOneUser(userID int) ([]Match, error) {
 

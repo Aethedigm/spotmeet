@@ -113,11 +113,20 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 
 func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 	q := `select *
-		  from (select u.id, u.first_name, mm.id as match_id, mm.percent_match, mm.artist_id
-				from users u
-				inner join (select *
-							from matches m
-							where m.user_a_id = ` + strconv.Itoa(userID) + ` or m.user_b_id = ` + strconv.Itoa(userID) + `) as mm
+		  from (
+			select u.id, 
+			u.first_name, 
+			mm.id as match_id, 
+			mm.percent_match, 
+			mm.artist_id
+			from users u
+			inner join (
+				select *
+				from matches m
+				where m.user_a_id = ` + strconv.Itoa(userID) + `
+				or m.user_b_id = ` + strconv.Itoa(userID) + `
+				and m.complete = false
+				) as mm
 				on u.id = mm.user_b_id or u.id = mm.user_a_id) as r
 		  where r.id <> ` + strconv.Itoa(userID) + `;`
 
