@@ -123,9 +123,8 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 			inner join (
 				select *
 				from matches m
-				where m.user_a_id = ` + strconv.Itoa(userID) + `
-				or m.user_b_id = ` + strconv.Itoa(userID) + `
-				and m.complete = false
+				where m.user_a_id = ` + strconv.Itoa(userID) + ` and m.complete = false
+				or m.user_b_id = ` + strconv.Itoa(userID) + ` and m.complete = false
 				) as mm
 				on u.id = mm.user_b_id or u.id = mm.user_a_id) as r
 		  where r.id <> ` + strconv.Itoa(userID) + `;`
