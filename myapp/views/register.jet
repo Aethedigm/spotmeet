@@ -80,8 +80,13 @@
 
     <script>
         document.onkeydown = function(e){
+            var popup = document.getElementById('popup');
             if(e.keyCode == 13){
-                evaluateRegisterForm();
+                if(popup.style.display == 'block') {
+                    submitRegisterForm();
+                } else {
+                    evaluateRegisterForm();
+                }
             }
         };
 

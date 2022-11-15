@@ -24,7 +24,7 @@
         }
         .noMatches {
             font-size: 1em;
-            color: white;
+            color: green;
             text-align: center;
             font-family: 'Fredoka One', cursive;
             position: relative;
@@ -355,6 +355,7 @@ function fetchMatches() {
                     addMatch(data[i]);
                 }
             } else {
+                console.log("Hello World!");
                 noMatches();
             }
         });
@@ -367,7 +368,7 @@ function removeLoading() {
 
 const noMatches = () => {
     const noMatchTemplate = `
-        <div class="container">
+        <div class="container-fluid">
             <div class="noMatches">
                 <h1>No matches...for now.<br>Keep listening to music on Spotify!</h1>
             </div>
@@ -389,7 +390,7 @@ function geolocationDenied(error) {
     }
 
     let noGeoTemplate = `
-        <div class="container">
+        <div class="container-fluid">
             <div class="noMatches">
                 ` + message + `
             </div>
