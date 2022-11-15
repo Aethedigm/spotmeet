@@ -355,7 +355,6 @@ function fetchMatches() {
                     addMatch(data[i]);
                 }
             } else {
-                console.log("Hello World!");
                 noMatches();
             }
         });
