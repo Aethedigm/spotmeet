@@ -142,17 +142,28 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	matchesJSON, err := json.Marshal(matchesForDisplay)
-	if err != nil {
-		h.App.ErrorLog.Println("Error marshalling matchesForDisplay:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	emptyJSON, err := json.Marshal("")
 
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(matchesJSON)
-	if err != nil {
-		h.App.ErrorLog.Println("error writing json")
-		return
+	if matchesForDisplay == nil {
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(emptyJSON)
+		if err != nil {
+			h.App.ErrorLog.Println("error writing json")
+			return
+		}
+	} else {
+		matchesJSON, err := json.Marshal(matchesForDisplay)
+		if err != nil {
+			h.App.ErrorLog.Println("Error marshalling matchesForDisplay:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(matchesJSON)
+		if err != nil {
+			h.App.ErrorLog.Println("error writing json")
+			return
+		}
 	}
 }
 
