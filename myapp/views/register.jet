@@ -79,6 +79,12 @@
 {{block js()}}
 
     <script>
+        document.onkeydown = function(e){
+            if(e.keyCode == 13){
+                evaluateRegisterForm();
+            }
+        };
+
         const evaluateRegisterForm = () => {
             const form = document.getElementById('register-form');
             if (form.checkValidity() === false) {
