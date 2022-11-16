@@ -3,6 +3,7 @@
 {{block browserTitle()}}Welcome{{end}}
 
 {{block css()}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
     <style>
         .message-input {
             width: 80%;
@@ -81,6 +82,7 @@
 <script>
     const userID = {{ userID }};
     const messageContainer = document.getElementById('message_container');
+    document.getElementById("message-input").focus();
 
     document.onkeydown = function(e){
         if(e.keyCode == 13){
@@ -122,10 +124,26 @@
 
                 for (let i = 0; i < data.length; i++) {
                     let message = data[i];
+
+                    var iso8601format = message.created_at;
+                    var currentTime = moment().toISOString();
+                    var fromNow_OneDay = moment().add(1, 'd');
+
+                    var momentTime = moment(iso8601format);
+                    var date = momentTime.utc().format('MMM D, YYYY');
+                    var time = momentTime.utc().format('h:mm A');
+                    var dateAndTime = time + "&nbsp;&nbsp;&nbsp;" + date;
+
                     if (message.user_id == userID) {
-                        messageContainer.innerHTML += `<div class="message sent float-left ms-auto mt-2">${message.content}</div>`;
+                        messageContainer.innerHTML +=
+                            `<div class="message sent float-left ms-auto mt-2">
+                                ${message.content}<br><span style="font-size:.8em">${dateAndTime}</span>
+                            </div>`;
                     } else {
-                        messageContainer.innerHTML += `<div class="message float-right me-auto mt-2">${message.content}</div>`;
+                        messageContainer.innerHTML +=
+                            `<div class="message float-right me-auto mt-2">
+                                ${message.content}<br><span style="font-size:.8em">${dateAndTime}</span>
+                            </div>`;
                     }
                 }
             });

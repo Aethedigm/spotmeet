@@ -28,7 +28,7 @@
             text-align: center;
             font-family: 'Fredoka One', cursive;
             position: relative;
-            padding-top: 50%;
+            padding-top: 20%;
         }
         .wheel-frame {
             position: fixed;
