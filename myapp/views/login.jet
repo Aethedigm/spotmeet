@@ -93,6 +93,12 @@ window.onload = function() {
     }
 }
 
+document.onkeydown = function(e){
+    if(e.keyCode == 13){
+        val();
+    }
+};
+
 const val = () => {
     document.getElementById("spotify-conn-failed").classList.add("hidden");
     let form = document.getElementById("login-form");

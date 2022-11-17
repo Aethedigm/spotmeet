@@ -82,6 +82,12 @@
     const userID = {{ userID }};
     const messageContainer = document.getElementById('message_container');
 
+    document.onkeydown = function(e){
+        if(e.keyCode == 13){
+            sendClick();
+        }
+    };
+
     const sendClick = () => {
         const msgInput = document.getElementById('message-input').value;
 
@@ -97,7 +103,13 @@
             .then(response => {
                 msgInput.value = "";                
                 getMessages();
-            });
+            })
+            .then(document.getElementById('message-input').value = "")
+        delay(50).then(() => window.scrollTo(0, document.body.scrollHeight));
+    }
+
+    function delay(time) {
+        return new Promise(resolve => setTimeout(resolve, time));
     }
 
     const getMessages = () => {
@@ -117,6 +129,8 @@
                     }
                 }
             });
+
+            delay(200).then(() => window.scrollTo(0, document.body.scrollHeight));
     }
 
     setInterval(getMessages, 2000);
