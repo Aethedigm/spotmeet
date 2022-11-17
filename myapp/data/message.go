@@ -13,7 +13,7 @@ type Message struct {
 	UserID    int       `db:"user_id" json:"user_id"`
 	MatchID   int       `db:"match_id" json:"match_id"`
 	Content   string    `db:"content" json:"content"`
-	CreatedAt time.Time `db:"created_at"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
 // Table returns the table name associated with this model in the database

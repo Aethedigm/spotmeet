@@ -1,5 +1,7 @@
 package data
 
+import "time"
+
 type Thread struct {
 	UserID                int
 	MatchID               int
@@ -7,4 +9,5 @@ type Thread struct {
 	LatestMessagePreview  string
 	LatestMessageTimeSent string
 	OtherUsersImage       string
+	TimeSentISO           time.Time
 }

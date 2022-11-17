@@ -19,11 +19,11 @@
         }
         .noMessages {
             font-size: 1em;
-            color: white;
+            color: green;
             text-align: center;
             font-family: 'Fredoka One', cursive;
             position: relative;
-            padding-top: 50%;
+            padding-top: 5%;
         }
         body {
             padding-bottom: 50px;
@@ -222,7 +222,7 @@
 
     const noMessages = () => {
         const noMessageTemplate = `
-            <div class="container">
+            <div class="container-fluid">
                 <div class="noMessages">
                     <h1>Your message box is empty :(<br><br>Tap "link" on matches to see them here!</h1>
                 </div>

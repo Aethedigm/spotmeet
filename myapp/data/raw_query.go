@@ -61,7 +61,7 @@ func (r *RawQuery) MatchQuery(user User, settings Settings) ([]int, error) {
 	return userIDs, nil
 }
 
-func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, string, string, error) {
+func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, string, string, time.Time, error) {
 
 	// query to find content of latest message, and the time for that message
 	q1 := `select m.content, m.created_at
@@ -73,7 +73,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	q1rows, err := upper.SQL().Query(q1)
 	if err != nil {
 		fmt.Println("problem with query within func ThreadPreviewQuery", q1rows, err)
-		return "", "", "", err
+		return "", "", "", time.Time{}, err
 	}
 
 	// query to get other-user's profile image url
@@ -84,7 +84,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	q2rows, err := upper.SQL().Query(q2)
 	if err != nil {
 		fmt.Println("problem with query within func ThreadPreviewQuery", q2rows, err)
-		return "", "", "", err
+		return "", "", "", time.Time{}, err
 	}
 
 	// create containers to return
@@ -100,7 +100,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	if len(LatestMessagePreview) > 35 {
 		LatestMessagePreview = LatestMessagePreview[:35] + " . . ."
 	}
-	strLatestMessageTimeSent := LatestMessageTimeSent.Format(time.Kitchen)
+	strLatestMessageTimeSent := LatestMessageTimeSent.Format("Jan 2 3:04PM")
 	if LatestMessagePreview == "" {
 		strLatestMessageTimeSent = "No messages sent yet"
 	}
@@ -108,7 +108,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	q2rows.Next()
 	q2rows.Scan(&OtherUsersImage)
 
-	return LatestMessagePreview, strLatestMessageTimeSent, OtherUsersImage, nil
+	return LatestMessagePreview, strLatestMessageTimeSent, OtherUsersImage, LatestMessageTimeSent, nil
 }
 
 func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
