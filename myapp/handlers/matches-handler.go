@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"myapp/data"
 	"net/http"
 	"strconv"
@@ -48,14 +47,14 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 
 	matchID, err := strconv.Atoi(matchIDstr)
 	if err != nil {
-		fmt.Println("Error converting matchID to int:", err)
+		h.App.ErrorLog.Println("Error converting matchID to int:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	match, err := h.Models.Matches.Get(matchID)
 	if err != nil {
-		fmt.Println("Error getting match:", err)
+		h.App.ErrorLog.Println("Error getting match:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -64,7 +63,7 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 
 	err = h.Models.Matches.Update(*match)
 	if err != nil {
-		fmt.Println("Error updating match:", err)
+		h.App.ErrorLog.Println("Error updating match:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -73,12 +72,20 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 	link.User_A_ID = match.User_A_ID
 	link.User_B_ID = match.User_B_ID
 	link.PercentLink = 100
-	link.ArtistID = 1
+	link.ArtistID = match.ArtistID
+	if link.ArtistID == 0 {
+		link.ArtistID, err = h.Models.Artists.GetOneID()
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 	link.CreatedAt = time.Now()
 
 	_, err = h.Models.Links.Insert(link)
 	if err != nil {
-		fmt.Println("Error inserting link:", err)
+		h.App.ErrorLog.Println("Error inserting link:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -114,6 +121,12 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		match.User_B_ID = users[i]
 		match.PercentMatch = 100
 		match.CreatedAt = time.Now()
+		match.ArtistID, err = h.Models.Artists.GetOneID()
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		_, err := h.Models.Matches.Insert(match)
 		if err != nil {
@@ -125,21 +138,32 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 
 	matchesForDisplay, err := h.Models.RQ.MatchesDisplayQuery(userID)
 	if err != nil {
-		fmt.Println("Error with MatchesDisplayQuery(), called in matches-handler.go:", err)
+		h.App.ErrorLog.Println("Error with MatchesDisplayQuery(), called in matches-handler.go:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	matchesJSON, err := json.Marshal(matchesForDisplay)
-	if err != nil {
-		fmt.Println("Error marshalling matchesForDisplay:", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
+	emptyJSON, err := json.Marshal("")
 
-	w.Header().Set("Content-Type", "application/json")
-	_, err = w.Write(matchesJSON)
-	if err != nil {
-		h.App.ErrorLog.Println("error writing json")
-		return
+	if matchesForDisplay == nil {
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(emptyJSON)
+		if err != nil {
+			h.App.ErrorLog.Println("error writing json")
+			return
+		}
+	} else {
+		matchesJSON, err := json.Marshal(matchesForDisplay)
+		if err != nil {
+			h.App.ErrorLog.Println("Error marshalling matchesForDisplay:", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(matchesJSON)
+		if err != nil {
+			h.App.ErrorLog.Println("error writing json")
+			return
+		}
 	}
 }
 
@@ -152,20 +176,20 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
-		fmt.Println("Error getting spotify token.", err)
+		h.App.ErrorLog.Println("Error getting spotify token.", err)
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
 
 	err = h.SetSpotifyArtistsForUser(userID)
 	if err != nil {
-		fmt.Println("Error setting spotify artists for user.", err)
+		h.App.ErrorLog.Println("Error setting spotify artists for user.", err)
 	}
 
 	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 18000
 	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
 	if expiry < fiveMinutesFromNow {
-		fmt.Println(fiveMinutesFromNow)
+		h.App.ErrorLog.Println(fiveMinutesFromNow)
 		http.Redirect(w, r, "users/newspotaccesstoken", http.StatusSeeOther)
 		return
 	}

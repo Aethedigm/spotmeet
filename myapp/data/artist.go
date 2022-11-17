@@ -16,6 +16,20 @@ func (a *Artist) Table() string {
 	return "artists"
 }
 
+func (a *Artist) GetOneID() (int, error) {
+	collection := upper.Collection(a.Table())
+
+	var art *Artist
+
+	res := collection.Find().Limit(1)
+	err := res.One(&art)
+	if err != nil {
+		return art.ID, err
+	}
+
+	return art.ID, nil
+}
+
 // GetAll returns a slice of all artists
 func (a *Artist) GetAll() ([]*Artist, error) {
 	collection := upper.Collection(a.Table())
