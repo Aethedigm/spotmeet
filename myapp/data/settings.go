@@ -1,7 +1,9 @@
 package data
 
 import (
+	"fmt"
 	up "github.com/upper/db/v4"
+	"strconv"
 )
 
 type Settings struct {
@@ -103,9 +105,30 @@ func (s *Settings) Insert(settings Settings) (int, error) {
 }
 
 func (s *Settings) Update(settings Settings) error {
+	currentUserSettings, err := s.GetByUserID(settings.UserID)
+	if err != nil {
+		return err
+	}
+
+	// wipe unlinked matches if looking-for and/or distance is changed
+	if settings.Distance != currentUserSettings.Distance ||
+		settings.LookingFor != currentUserSettings.LookingFor {
+		userID := settings.UserID
+		q := `delete 
+			from matches 
+			where user_a_id = ` + strconv.Itoa(userID) + ` and complete = false ` +
+			`or user_b_id = ` + strconv.Itoa(userID) + ` and complete = false;`
+
+		rows, err := upper.SQL().Query(q)
+		if err != nil {
+			fmt.Println("problem with query", rows, err)
+			return err
+		}
+	}
+
 	collection := upper.Collection(s.Table())
 	res := collection.Find(settings.ID)
-	err := res.Update(settings)
+	err = res.Update(settings)
 	if err != nil {
 		return err
 	}

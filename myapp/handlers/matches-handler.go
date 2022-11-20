@@ -108,6 +108,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		h.App.ErrorLog.Println(err)
 	}
 
+	// get potential matches that qualify based on coordinates and looking-for
 	users, err := h.Models.RQ.MatchQuery(*user, *settings)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -115,6 +116,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// loop though the potential matches and confirm Match by checking against music profiles
 	for i := range users {
 		match := data.Match{}
 		match.User_A_ID = userID
