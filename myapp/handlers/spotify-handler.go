@@ -9,6 +9,7 @@ import (
 	"myapp/data"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/zmb3/spotify"
 
@@ -225,19 +226,40 @@ func (h *Handlers) Tracks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.GetUserTopSongs(*user); err != nil {
-		fmt.Println("Errors", err)
-	}
+	// Get music profile for current user. If doesn't exist, make an empty one with current date/time.
+	musicProfile, err := h.Models.UserMusicProfiles.GetByUser(*user)
+	if musicProfile == nil {
+		newMusicProfile, err := h.GetUserMusicProfile(*user) // move this inside if statement, if errs go away
+		_, err = h.Models.UserMusicProfiles.Insert(newMusicProfile)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	} else if err != nil {
+		fmt.Println(err)
+		return
+	} else {
+		// if the user's music profile was updated more than a day ago, update the music profile
+		fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
+		if musicProfile.UpdatedAt.Before(time.Now().Truncate(time.Hour * 24)) {
+			updatedMusicProfile, err := h.GetUserMusicProfile(*user)
+			_, err = h.Models.UserMusicProfiles.Update(updatedMusicProfile)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
-	w.Write([]byte("Success"))
+			w.Write([]byte("Success"))
+		}
+	}
 }
 
-func (h *Handlers) GetUserTopSongs(user data.User) error {
+func (h *Handlers) GetUserMusicProfile(user data.User) (*data.UserMusicProfile, error) {
 	// By default will only collect the top 20 songs for this user
 	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
-		return err
+		return &data.UserMusicProfile{}, err
 	}
 
 	spotifyToken := &oauth2.Token{
@@ -249,13 +271,13 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 	_, err = client.CurrentUser()
 	if err != nil {
 		fmt.Println("Current user is nil")
-		return err
+		return &data.UserMusicProfile{}, err
 	}
 
 	songs, err := client.CurrentUsersTopTracks()
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return &data.UserMusicProfile{}, err
 	}
 
 	var (
@@ -271,7 +293,7 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 			fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
 		} else {
 			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-			loud, temp, time, err := BuildSectionAggregate(trackAnalysis.Sections)
+			loud, temp, timeSig, err := BuildSectionAggregate(trackAnalysis.Sections)
 			if err != nil {
 				fmt.Println("Error building section aggregate")
 				continue
@@ -279,7 +301,7 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 
 			loudnessAvg += loud
 			tempoAvg += temp
-			timesigAvg += time
+			timesigAvg += timeSig
 			total++
 		}
 	}
@@ -288,7 +310,14 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 	tempoAvg = tempoAvg / float64(total)
 	timesigAvg = timesigAvg / total
 
-	return nil
+	musicProfile := data.UserMusicProfile{
+		UserID:   user.ID,
+		Loudness: loudnessAvg,
+		Tempo:    tempoAvg,
+		TimeSig:  timesigAvg,
+	}
+
+	return &musicProfile, nil
 }
 
 func BuildSectionAggregate(sections []spotify.Section) (float64, float64, int, error) {

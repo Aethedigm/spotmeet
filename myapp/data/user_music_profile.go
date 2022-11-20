@@ -59,3 +59,15 @@ func (u *UserMusicProfile) Insert(ump *UserMusicProfile) (int, error) {
 
 	return id, nil
 }
+
+func (u *UserMusicProfile) Update(ump *UserMusicProfile) (int, error) {
+	ump.UpdatedAt = time.Now()
+	collection := upper.Collection(u.Table())
+	res := collection.Find(ump.ID)
+	err := res.Update(&ump)
+	if err != nil {
+		return 0, err
+	}
+
+	return ump.ID, nil
+}

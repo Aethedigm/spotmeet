@@ -181,10 +181,11 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.SetSpotifyArtistsForUser(userID)
-	if err != nil {
-		h.App.ErrorLog.Println("Error setting spotify artists for user.", err)
-	}
+	// Commenting out because this is already called on login (auth-handlers.go, PostUserLogin())
+	//err = h.SetSpotifyArtistsForUser(userID)
+	//if err != nil {
+	//	h.App.ErrorLog.Println("Error setting spotify artists for user.", err)
+	//}
 
 	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 18000
 	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()

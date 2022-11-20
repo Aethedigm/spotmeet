@@ -15,17 +15,18 @@ var upper db2.Session
 type Models struct {
 	// any models inserted here (and in the New function)
 	// are easily accessible throughout the entire application
-	Users         User
-	Tokens        Token
-	Matches       Match
-	Profiles      Profile
-	SpotifyTokens SpotifyToken
-	Settings      Settings
-	Messages      Message
-	Links         Link
-	RQ            RawQuery
-	LikedArtists  LikedArtist
-	Artists       Artist
+	Users             User
+	Tokens            Token
+	Matches           Match
+	Profiles          Profile
+	SpotifyTokens     SpotifyToken
+	Settings          Settings
+	Messages          Message
+	Links             Link
+	RQ                RawQuery
+	LikedArtists      LikedArtist
+	Artists           Artist
+	UserMusicProfiles UserMusicProfile
 }
 
 // New initializes the models package for use

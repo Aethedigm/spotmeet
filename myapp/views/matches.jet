@@ -271,6 +271,7 @@
 window.onload = function() {
         showLoadingAnimation();
         getLocationAndMatches();
+        getTracks();
 }
 
 function showLoadingAnimation() {
@@ -474,6 +475,14 @@ const declineMatch = (matchID) => {
             }
         });
 }
+
+const getTracks = () => {
+    fetch("/testtracks")
+        .then(data => {console.log("data")});
+        // delay(200);
+}
+
+// setInterval(getTracks, 5000);
 
 </script>
 {{end}}
