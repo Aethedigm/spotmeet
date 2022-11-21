@@ -6,6 +6,7 @@
 
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+    /*@import 'https://fonts.googleapis.com/css?family=Rubik+One'; */
 
     .inputGroup {
         background-color: #D1D7DC;
@@ -146,14 +147,6 @@
 
 /* Save Btn */
 @import 'https://fonts.googleapis.com/css?family=Rubik+One';
-/* body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  background: #e53935;
-  background: linear-gradient(to left, #e53935, #e35d5b);
-} */
 
 .save-button::after, .save-button::before {
   position: absolute;
@@ -176,25 +169,30 @@
   transition: all 0.2s;
   background-color: #1DB954;
 }
+
+.save-button:active, .save-button:focus {
+    color: white;
+}
+
 .save-button::before {
-  bottom: -15px;
-  height: 15px;
+  bottom: -7px;
+  height: 7px;
   width: 100%;
-  left: 8px;
+  left: 4px;
   transform: skewX(45deg);
   background-color: #328419;
 }
 .save-button::after {
-  right: -15px;
+  right: -7px;
   height: 100%;
-  width: 15px;
-  bottom: -8px;
+  width: 7px;
+  bottom: -4px;
   transform: skewY(45deg);
   background-color: #1e4c10;
 }
 .save-button:active {
-  margin-left: 10px;
-  margin-top: 10px;
+  margin-left: 4px;
+  margin-top: 4px;
 }
 .save-button:active::before {
   bottom: -5px;
