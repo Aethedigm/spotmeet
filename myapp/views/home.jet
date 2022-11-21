@@ -12,6 +12,10 @@ span.avoidwrap {
     font-size: 70px;
 }
 
+    .shadows{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
+
 @media only screen and (max-width: 768px) {
     .break {
         display: block;
@@ -37,9 +41,9 @@ span.avoidwrap {
     
 
     {{ if !.IsAuthenticated}}
-    <a href="/users/login" class="btn btn-secondary rounded-pill mb-3 w-25 mt-5">Log In</a>
+    <a href="/users/login" class="btn btn-secondary rounded-pill mb-3 w-25 mt-5 shadows">Log In</a>
     <br>
-    <a href="/users/register" class="btn btn-primary rounded-pill mb-3 w-25 mt-3">Sign Up</a>
+    <a href="/users/register" class="btn btn-primary rounded-pill mb-3 w-25 mt-3 shadows">Sign Up</a>
     {{end}}
     
 </div>

@@ -4,11 +4,18 @@
 
 {{block css()}}
 
+<style>
+    .shadowsRoundEdges{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 3vw;
+    padding: 10px 75px 10px 75px;
+    }
+</style>
+
 {{end}}
 
 {{block pageContent()}}
     <div id="topbar"
-        style="background-image: linear-gradient(white, #b6c4b9); display:flex; flex-direction:row; justify-content: space-between;"
         class="navbar fixed-top bg-light">
             <div class="btn" onclick="location.href = '/'">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
@@ -39,12 +46,12 @@
         </div>
 
         <div class="container">
-            <a href="#submit" class="btn btn-success mt-5" onclick="updateProfile()">Submit</a>
-            <a href="#cancel" class="btn btn-danger mt-5" onclick="cancel()">Cancel</a>
+            <a href="#submit" class="btn btn-success mt-5 shadowsRoundEdges" onclick="updateProfile()">Submit</a>
+            <a href="#cancel" class="btn btn-danger mt-5 shadowsRoundEdges" onclick="cancel()">Cancel</a>
         </div>
     </div>
 
-    <div id="footbar" style="background-image: linear-gradient(white, #b6c4b9);" class="navbar fixed-bottom">
+    <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
             <a href="/messages" class="btn float-left w-25"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25"><i class="fa-solid fa-user-group nav-icons"></i></a>
