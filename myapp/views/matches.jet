@@ -22,6 +22,15 @@
             top: calc(50% - 100px);
             left: calc(50% - 90px);
         }
+        .messageWait {
+            font-size: 1.5em;
+            color: white;
+            text-align: center;
+            position: absolute;
+            font-family: 'Fredoka One', cursive;
+            top: calc(50% - 125px);
+            left: calc(50% - 145px);
+        }
         .noMatches {
             font-size: 1em;
             color: green;
@@ -269,20 +278,34 @@
 <script>
 
 window.onload = function() {
-        showLoadingAnimation();
-        getLocationAndMatches();
-        getTracks();
+    updateMusicProfile();
+    var loadingMessage;
+    if ({{isFirstLogin}} == true) {
+        loadingMessage = "Setting you up.<br>(This may take a minute.)";
+        messageClass = "messageWait";
+    } else {
+        loadingMessage = "Finding matches";
+        messageClass = "message";
+    }
+    showLoadingAnimation(loadingMessage, messageClass);
+    getLocationAndMatches();
+
+
 }
 
-function showLoadingAnimation() {
+function updateMusicProfile() {
+    fetch("/updateMusicProfile");
+}
+
+function showLoadingAnimation(loadingMessage, messageClass) {
     if (document.getElementById("divWheelFrame") != null) {
         return;
     }
 
     var message = document.createElement("div");
     message.id = "divMessage";
-    message.classList.add("message");
-    message.innerHTML = `Finding matches`
+    message.classList.add(messageClass);
+    message.innerHTML = loadingMessage;
 
     var frame = document.createElement("div");
     frame.id = "divWheelFrame";
@@ -338,8 +361,7 @@ function sendLocationToServer(position) {
         .then(data => console.log(data));
 
     // give the server some time to write the location
-    delay(500).then(() => fetchMatches())
-        .then(() => removeLoading());
+    delay(500).then(() => fetchMatches());
 }
 
 function delay(time) {
@@ -364,7 +386,7 @@ function fetchMatches() {
             } else {
                 noMatches();
             }
-        });
+        }).then(() => removeLoading());
 }
 
 function removeLoading() {
@@ -475,14 +497,6 @@ const declineMatch = (matchID) => {
             }
         });
 }
-
-const getTracks = () => {
-    fetch("/testtracks")
-        .then(data => {console.log("data")});
-        // delay(200);
-}
-
-// setInterval(getTracks, 5000);
 
 </script>
 {{end}}

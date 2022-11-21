@@ -55,11 +55,11 @@ func (a *application) routes() *chi.Mux {
 		r.Post("/create", a.Handlers.CreateMessage)
 	})
 
+	a.App.Routes.Get("/updateMusicProfile", a.Handlers.UpdateUserMusicProfile)
+
 	a.App.Routes.Get("/settings", a.Handlers.Settings)
 
 	a.App.Routes.Get("/about", a.Handlers.About)
-
-	a.App.Routes.Get("/testtracks", a.Handlers.Tracks)
 
 	// static routes
 	fileServer := http.FileServer(http.Dir("./public"))
