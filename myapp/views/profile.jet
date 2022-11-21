@@ -3,6 +3,12 @@
 {{block browserTitle()}}Profile{{end}}
 
 {{block css()}}
+<style>
+    .shadows{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    }
+
+</style>
 
 {{end}}
 
@@ -27,7 +33,7 @@
 
         <!-- IF USER ONLY -->
         {{ if usersProfileID == userID }}
-        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary rounded-pill">Edit Profile</a>
+        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary rounded-pill shadows">Edit Profile</a>
         {{ end }}
         <!-- END IF -->
 
@@ -72,7 +78,7 @@
                             {{ Artist2 }}
                         </td>
                     </tr>
-                    <tr>
+                    <tr >
                         <td>
                             {{ Artist3 }}
                         </td>
