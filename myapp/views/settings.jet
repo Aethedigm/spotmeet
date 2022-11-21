@@ -22,6 +22,7 @@
         z-index: 2;
         transition: color 200ms ease-in;
         overflow: hidden;
+        margin-bottom: 15px;
     }
     .inputGroup label:before {
         width: 10px;
@@ -80,7 +81,10 @@
         cursor: pointer;
         visibility: hidden;
     }
-
+    .shadowsRoundEdges{
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 3vw;
+    }
     .form {
         padding: 0 16px;
         max-width: 550px;
@@ -139,24 +143,24 @@
     <div class="text-center mb-3"><span style="font-size:1.5em; color:#1DB954;">Settings</span></div>
 
     <div style="text-align:left"><label for="looking-for" class="form-label">Looking for...</label></div>
-    <div class="inputGroup">
-        <input id="btn-friends" name="btnradio" type="radio"/>
+    <div class="inputGroup shadowsRoundEdges">
+        <input id="btn-friends" name="btnradio" type="radio" value="friends"/>
         <label for="btn-friends">Friends</label>
     </div>
-    <div class="inputGroup">
-        <input id="btn-dating" name="btnradio" type="radio"/>
+    <div class="inputGroup shadowsRoundEdges">
+        <input id="btn-dating" name="btnradio" type="radio" value="dating"/>
         <label for="btn-dating">Dating</label>
     </div>
-    <div class="inputGroup">
-        <input id="btn-workout-partner" name="btnradio" type="radio"/>
+    <div class="inputGroup shadowsRoundEdges">
+        <input id="btn-workout-partner" name="btnradio" type="radio" value="workout"/>
         <label for="btn-workout-partner">Exersice Buddy</label>
     </div>
-    <div class="inputGroup">
-        <input id="btn-musicians" name="btnradio" type="radio"/>
+    <div class="inputGroup shadowsRoundEdges">
+        <input id="btn-musicians" name="btnradio" type="radio" value="music"/>
         <label for="btn-musicians">Fellow Mucisians</label>
     </div>
-    <div class="inputGroup">
-        <input id="btn-concert-goers" name="btnradio" type="radio"/>
+    <div class="inputGroup shadowsRoundEdges">
+        <input id="btn-concert-goers" name="btnradio" type="radio" value="concert"/>
         <label for="btn-concert-goers">Concert Goers</label>
     </div>
 
@@ -166,15 +170,15 @@
     </div>
 
     <div class="container">
-        <a href="#" class="btn btn-primary w-100 mb-4" onclick="setUserSettings()">Save Changes</a>
-        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary w-100 mb-4">Edit Profile</a>
+        <a href="#" class="btn btn-primary w-100 mb-4 shadowsRoundEdges" onclick="setUserSettings()">Save Changes</a>
+        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary w-100 mb-4 shadowsRoundEdges">Edit Profile</a>
     </div>
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
-            <a href="#" class="btn float-left w-25 green-font button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="#" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
-            <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
+            <a href="/settings" class="btn float-right rounded-pill w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
 </div>
