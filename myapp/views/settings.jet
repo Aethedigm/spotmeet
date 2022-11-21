@@ -5,11 +5,14 @@
 {{block css()}}
 
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+
     .inputGroup {
         background-color: #D1D7DC;
         display: block;
         margin: 10px 0;
         position: relative;
+        box-shadow: 2px 2px 2px 1px rgba(147, 147, 147, 0.71);
     }
     .inputGroup label {
         padding: 12px 30px;
@@ -22,6 +25,7 @@
         z-index: 2;
         transition: color 200ms ease-in;
         overflow: hidden;
+        
     }
     .inputGroup label:before {
         width: 10px;
@@ -105,6 +109,104 @@
         box-sizing: border-box;
     }
 
+#rangeContainer {
+  position: relative;
+  margin: 20px 0 75px 0;
+}
+#rangeValue {
+  position: relative;
+  display: block;
+  text-align: center;
+  font-family: "Fira Sans", sans-serif;
+  font-size: 2em;
+  color: #000;
+  font-weight: 200;
+}
+.range {
+  width: 100%;
+  height: 30px;
+  -webkit-appearance: none;
+  background: #111;
+  outline: none;
+  border-radius: 15px;
+  overflow: hidden;
+ /*box-shadow: inset 0 0 5px rgba(0, 0, 0, 1); */
+  box-shadow: 2px 2px 2px 1px rgba(147, 147, 147, 0.71);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #1DB954;
+  cursor: pointer;
+  border: 2px solid #333;
+  box-shadow: -407px 0 0 400px #b0f790;
+}
+
+/* Save Btn */
+@import 'https://fonts.googleapis.com/css?family=Rubik+One';
+/* body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background: #e53935;
+  background: linear-gradient(to left, #e53935, #e35d5b);
+} */
+
+.save-button::after, .save-button::before {
+  position: absolute;
+  content: "";
+  transition: all 0.2s;
+}
+
+.save-button {
+  display: inline-block;
+  padding: 20px 40px;
+  color: white;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  vertical-align: middle;
+  font-family: "Rubik One", sans-serif;
+  text-decoration: none;
+  font-size: 4vw;
+  transition: all 0.2s;
+  background-color: #1DB954;
+}
+.save-button::before {
+  bottom: -15px;
+  height: 15px;
+  width: 100%;
+  left: 8px;
+  transform: skewX(45deg);
+  background-color: #328419;
+}
+.save-button::after {
+  right: -15px;
+  height: 100%;
+  width: 15px;
+  bottom: -8px;
+  transform: skewY(45deg);
+  background-color: #1e4c10;
+}
+.save-button:active {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+.save-button:active::before {
+  bottom: -5px;
+  height: 5px;
+  left: 3px;
+}
+.save-button:active::after {
+  right: -5px;
+  width: 5px;
+  bottom: -3px;
+}
+
 </style>
 
 {{end}}
@@ -160,15 +262,21 @@
         <label for="btn-concert-goers">Concert Goers</label>
     </div>
 
-    <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within <div class="d-inline" id="matchPercentLabel">{{ distance }}</div> miles</label></div>
-    <div style="margin-bottom:2em">
-        <input type="range" class="form-range" id="matchRange" min="25" max="100" step="5" value="{{ distance }}" oninput="matchRangeChange()">
+    <div id="rangeContainer">
+        <span id="rangeValue">0</span>
+        <Input class="range" type="range" name "" step="5" value="25" min="25" max="100" onChange="rangeSlide(this.value)" onmousemove="rangeSlide(this.value)"></Input>
     </div>
 
-    <div class="container">
+    <!-- <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within <div class="d-inline" id="matchPercentLabel">{{ distance }}</div> miles</label></div>
+    <div style="margin-bottom:2em">
+        <input type="range" class="form-range" id="matchRange" min="25" max="100" step="5" value="{{ distance }}" oninput="matchRangeChange()">
+    </div> -->
+
+    <!-- <div class="container">
         <a href="#" class="btn btn-primary w-100 mb-4" onclick="setUserSettings()">Save Changes</a>
-        <a href="/users/edit-profile/{{ profileID }}" class="btn btn-primary w-100 mb-4">Edit Profile</a>
-    </div>
+    </div> -->
+
+    <a class="save-button" href="#">Save Changes</a>
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
@@ -235,6 +343,10 @@ const matchRangeChange = () => {
     const matchRange = document.getElementById("matchRange");
     const matchPercentLabel = document.getElementById("matchPercentLabel");
     matchPercentLabel.textContent = matchRange.value;
+}
+
+function rangeSlide(value) {
+    document.getElementById('rangeValue').innerHTML = value + ' miles';
 }
 
 </script>
