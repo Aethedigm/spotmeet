@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"myapp/data"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -91,11 +92,17 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 		latestMessagePreview,
 			latestMessageTimeSent,
 			otherUsersImage,
+			timeSentISO,
 			err := h.Models.RQ.ThreadPreviewQuery(userID, matchID)
 		if err != nil {
 			fmt.Println("Error in func ThreadPreviewQuery(), called in messages-handler.go.", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
+		}
+
+		var nullTime = "0001-01-01 00:00:00 +0000 UTC"
+		if timeSentISO.String() == nullTime {
+			timeSentISO = links.CreatedAt
 		}
 
 		tmp := data.Thread{
@@ -105,10 +112,15 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 			LatestMessagePreview:  latestMessagePreview,
 			LatestMessageTimeSent: latestMessageTimeSent,
 			OtherUsersImage:       otherUsersImage,
+			TimeSentISO:           timeSentISO,
 		}
 
 		threads = append(threads, tmp)
 	}
+
+	sort.Slice(threads, func(p, q int) bool {
+		return threads[p].TimeSentISO.After(threads[q].TimeSentISO)
+	})
 
 	err = json.NewEncoder(w).Encode(threads)
 	if err != nil {

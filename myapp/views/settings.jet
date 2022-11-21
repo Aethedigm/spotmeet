@@ -5,8 +5,10 @@
 {{block css()}}
 
 <style>
+
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
     /*@import 'https://fonts.googleapis.com/css?family=Rubik+One'; */
+
 
     .inputGroup {
         background-color: #D1D7DC;
@@ -14,6 +16,7 @@
         margin: 10px 0;
         position: relative;
         box-shadow: 2px 2px 2px 1px rgba(147, 147, 147, 0.71);
+
     }
     .inputGroup label {
         padding: 12px 30px;
@@ -26,7 +29,7 @@
         z-index: 2;
         transition: color 200ms ease-in;
         overflow: hidden;
-        
+
     }
     .inputGroup label:before {
         width: 10px;
@@ -109,6 +112,7 @@
     html {
         box-sizing: border-box;
     }
+
 
 #rangeContainer {
   position: relative;
@@ -205,6 +209,7 @@
   bottom: -3px;
 }
 
+
 </style>
 
 {{end}}
@@ -258,11 +263,13 @@
     <div class="inputGroup">
         <input id="btn-concert-goers" name="btnradio" type="radio"/>
         <label for="btn-concert-goers">Concert Goers</label>
+
     </div>
 
     <div id="rangeContainer">
         <span id="rangeValue">0</span>
         <Input class="range" type="range" name "" step="5" value="25" min="25" max="100" onChange="rangeSlide(this.value)" onmousemove="rangeSlide(this.value)"></Input>
+
     </div>
 
     <!-- <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within <div class="d-inline" id="matchPercentLabel">{{ distance }}</div> miles</label></div>
@@ -272,15 +279,19 @@
 
     <!-- <div class="container">
         <a href="#" class="btn btn-primary w-100 mb-4" onclick="setUserSettings()">Save Changes</a>
+
     </div> -->
 
     <a class="save-button" href="#">Save Changes</a>
+    
+    </div>
+
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
-            <a href="/messages" class="btn rounded-pill float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="#" class="btn float-left w-25 green-font button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
-            <a href="#" class="btn float-right w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
+            <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
 </div>

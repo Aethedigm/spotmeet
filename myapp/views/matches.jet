@@ -28,7 +28,13 @@
             text-align: center;
             font-family: 'Fredoka One', cursive;
             position: relative;
-            padding-top: 50%;
+            padding: 3%;
+        }
+        #MatchesContainer{
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;      
         }
         .wheel-frame {
             position: fixed;
