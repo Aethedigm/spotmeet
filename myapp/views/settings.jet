@@ -271,9 +271,8 @@
     </div>
 
     <div id="rangeContainer">
-        <span id="rangeValue">0</span>
-        <Input class="range" type="range" name "" step="5" value="25" min="25" max="100" onChange="rangeSlide(this.value)" onmousemove="rangeSlide(this.value)"></Input>
-
+        <span id="rangeValue">{{ distance }} miles</span>
+        <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" onChange="rangeSlide(this.value)" onmousemove="rangeSlide(this.value)"></input>
     </div>
 
     <!-- <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within <div class="d-inline" id="matchPercentLabel">{{ distance }}</div> miles</label></div>
@@ -281,14 +280,11 @@
         <input type="range" class="form-range" id="matchRange" min="25" max="100" step="5" value="{{ distance }}" oninput="matchRangeChange()">
     </div> -->
 
-
     <!-- <div class="container">
         <a href="#" class="btn btn-primary w-100 mb-4" onclick="setUserSettings()">Save Changes</a>
-
     </div> -->
 
-    <a class="save-button" href="#" onclick="setUserSettings()">Save Changes</a>
-
+    <a href="#" class="save-button" onclick="setUserSettings()">Save Changes</a>
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
@@ -320,9 +316,6 @@ window.onload = function() {
             break;
         case "concert":
             document.getElementById("btn-concert-goers").checked = true;
-            break;
-        case "notsure":
-            document.getElementById("btn-not-sure-yet").checked = true;
             break;
         default:
             document.getElementById("btn-friends").checked = true;

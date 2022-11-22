@@ -45,6 +45,29 @@ func (u *UserMusicProfile) GetByUser(user User) (*UserMusicProfile, error) {
 	return &ump, nil
 }
 
+func (u *UserMusicProfile) GetByUserID(userID int) (*UserMusicProfile, error) {
+	var ump UserMusicProfile
+
+	collection := upper.Collection(u.Table())
+	res := collection.Find(up.Cond{"user_id": userID})
+
+	exists, err := res.Exists()
+	if err != nil {
+		return nil, err
+	}
+
+	if exists {
+		err := res.One(&ump)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, nil
+	}
+
+	return &ump, nil
+}
+
 func (u *UserMusicProfile) Insert(ump *UserMusicProfile) (int, error) {
 	collection := upper.Collection(u.Table())
 
@@ -58,4 +81,16 @@ func (u *UserMusicProfile) Insert(ump *UserMusicProfile) (int, error) {
 	id := getInsertID(res.ID())
 
 	return id, nil
+}
+
+func (u *UserMusicProfile) Update(ump UserMusicProfile) (int, error) {
+	ump.UpdatedAt = time.Now()
+	collection := upper.Collection(u.Table())
+	res := collection.Find(up.Cond{"user_id": ump.UserID})
+	err := res.Update(ump)
+	if err != nil {
+		return 0, err
+	}
+
+	return ump.ID, nil
 }

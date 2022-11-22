@@ -9,6 +9,7 @@ import (
 	"myapp/data"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/zmb3/spotify"
 
@@ -159,7 +160,7 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
-func (h *Handlers) SetSpotifyArtistsForUser(userID int) error {
+func (h *Handlers) SetSpotifyArtistsForUser(userID int, songs spotify.FullTrackPage) error {
 	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
@@ -178,27 +179,28 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) error {
 		return err
 	}
 
-	artists, err := client.CurrentUsersFollowedArtistsOpt(50, "0")
-	if err != nil {
-		fmt.Println("Error getting artists", err)
-		return err
-	}
+	for x := range songs.Tracks {
+		id := songs.Tracks[x].Album.Artists[0].ID
+		name := songs.Tracks[x].Album.Artists[0].Name
 
-	if len(artists.Artists) < 1 {
-		fmt.Println("No artists returned")
-		return err
-	}
-
-	for i := range artists.Artists {
 		temp := data.Artist{
-			SpotifyID: artists.Artists[i].ID.String(),
-			Name:      artists.Artists[i].Name,
+			SpotifyID: id.String(),
+			Name:      name,
 		}
 
 		tID, err := temp.Insert(temp)
 		if err != nil {
 			fmt.Println("Error inserting artist ID", tID)
 			return err
+		}
+
+		if tID == 0 {
+			artist, err := h.Models.Artists.GetByName(name)
+			if err != nil {
+				fmt.Println("Error getting artist that has already been inserted into artists table", tID)
+				return err
+			}
+			tID = artist.ID
 		}
 
 		tempLart := data.LikedArtist{
@@ -209,35 +211,72 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int) error {
 
 		_, err = h.Models.LikedArtists.Insert(tempLart)
 		if err != nil {
-			fmt.Println("Error inserting liked artist", tID, temp.Name)
+			fmt.Println("Error inserting artist ", temp.Name, " with id ", tID, " into liked_artists table")
 			return err
 		}
 	}
 	return nil
 }
 
-func (h *Handlers) Tracks(w http.ResponseWriter, r *http.Request) {
-	userID := h.App.Session.Get(r.Context(), "userID")
+func (h *Handlers) CreateUserMusicProfile(userID int) error {
+	user, err := h.Models.Users.Get(userID)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
-	user, err := h.Models.Users.Get(userID.(int))
+	// If user's music profile doesn't exist, make an empty one with current date/time.
+	musicProfile, _ := h.Models.UserMusicProfiles.GetByUser(*user)
+	if musicProfile == nil {
+		newMusicProfile, err := h.GetTracksAnalysis(*user)
+		_, err = h.Models.UserMusicProfiles.Insert(newMusicProfile)
+		if err != nil {
+			return err
+		}
+	} else if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *Handlers) UpdateUserMusicProfile(w http.ResponseWriter, r *http.Request) {
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+	user, err := h.Models.Users.Get(userID)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	if err := h.GetUserTopSongs(*user); err != nil {
-		fmt.Println("Errors", err)
+	// Get music profile for current user.
+	musicProfile, err := h.Models.UserMusicProfiles.GetByUser(*user)
+	if err != nil {
+		return
 	}
 
-	w.Write([]byte("Success"))
+	// if the user's music profile was updated more than a day ago, update the music profile
+	fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
+	if musicProfile.UpdatedAt.Before(time.Now().Truncate(time.Hour * 24)) {
+		updatedMusicProfile, err := h.GetTracksAnalysis(*user)
+		_, err = h.Models.UserMusicProfiles.Update(*updatedMusicProfile)
+		if err != nil {
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"Musical preference profile updated": "true"}`))
+	} else {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"Musical preference profile updated": "false"}`))
+	}
+	return
 }
 
-func (h *Handlers) GetUserTopSongs(user data.User) error {
+func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, error) {
 	// By default will only collect the top 20 songs for this user
 	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
-		return err
+		return &data.UserMusicProfile{}, err
 	}
 
 	spotifyToken := &oauth2.Token{
@@ -249,13 +288,19 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 	_, err = client.CurrentUser()
 	if err != nil {
 		fmt.Println("Current user is nil")
-		return err
+		return &data.UserMusicProfile{}, err
 	}
 
 	songs, err := client.CurrentUsersTopTracks()
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return &data.UserMusicProfile{}, err
+	}
+
+	err = h.SetSpotifyArtistsForUser(user.ID, *songs)
+	if err != nil {
+		fmt.Println("There was an error setting the Spotify artists for the user: ", user.ID, ".")
+		return &data.UserMusicProfile{}, err
 	}
 
 	var (
@@ -271,7 +316,7 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 			fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
 		} else {
 			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-			loud, temp, time, err := BuildSectionAggregate(trackAnalysis.Sections)
+			loud, temp, timeSig, err := BuildSectionAggregate(trackAnalysis.Sections)
 			if err != nil {
 				fmt.Println("Error building section aggregate")
 				continue
@@ -279,7 +324,7 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 
 			loudnessAvg += loud
 			tempoAvg += temp
-			timesigAvg += time
+			timesigAvg += timeSig
 			total++
 		}
 	}
@@ -288,7 +333,14 @@ func (h *Handlers) GetUserTopSongs(user data.User) error {
 	tempoAvg = tempoAvg / float64(total)
 	timesigAvg = timesigAvg / total
 
-	return nil
+	musicProfile := data.UserMusicProfile{
+		UserID:   user.ID,
+		Loudness: loudnessAvg,
+		Tempo:    tempoAvg,
+		TimeSig:  timesigAvg,
+	}
+
+	return &musicProfile, nil
 }
 
 func BuildSectionAggregate(sections []spotify.Section) (float64, float64, int, error) {
