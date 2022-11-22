@@ -5,6 +5,7 @@ Capstone - Team E
 - [ ] Pages
   - [X]  Home Page
   - [X] Login Page
+    - [ ] Recover Password / Forgot Login
   - [X] Register Page
   - [X] Matches Page
   - [X] Messages Page
