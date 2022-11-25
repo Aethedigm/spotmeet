@@ -22,9 +22,9 @@ Capstone - Team E
   - [ ] Matching Algorithm
 - [ ] Middleware
   - [X] Spotify Auth
-  - [ ] Spotify Music Capture
+  - [X] Spotify Music Capture
   - [X] Spotify Artist Capture
-  - [ ] Trigger Matches
+  - [X] Trigger Matches
 
 # Setup
 - Inside of the myapp folder
