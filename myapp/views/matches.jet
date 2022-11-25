@@ -278,7 +278,6 @@
 <script>
 
 window.onload = function() {
-    updateMusicProfile();
     var loadingMessage;
     if ({{isFirstLogin}} == true) {
         loadingMessage = "Setting you up.<br>(This may take a minute.)";
@@ -289,8 +288,8 @@ window.onload = function() {
     }
     showLoadingAnimation(loadingMessage, messageClass);
     getLocationAndMatches();
-
-
+    // delay(1000).then(() => updateMusicProfile());
+    updateMusicProfile();
 }
 
 function updateMusicProfile() {
@@ -459,7 +458,7 @@ const addMatch = (match) => {
                    </div>
                </div>
                <div class="mt-2">
-                   matched most on: artist ID ${match.artist_id}
+                   ${match.artist_name} - ${match.song_name}
                </div>
                <div class="col">
                    

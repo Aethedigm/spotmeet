@@ -6,5 +6,7 @@ type MatchForDisplay struct {
 	OtherUserName string `json:"other_user_name"`
 	MatchID       int    `json:"match_id"`
 	PercentMatch  int    `json:"percent_match"`
-	ArtistID      int    `json:"artist_id"`
+	SongID        int    `json:"song_id"`
+	SongName      string `json:"song_name"`
+	ArtistName    string `json:"artist_name"`
 }

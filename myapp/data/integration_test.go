@@ -156,6 +156,15 @@ func ArtistInArray(a Artist, arr []*Artist) bool {
 	return false
 }
 
+func SongInArray(a Song, arr []*Song) bool {
+	for _, v := range arr {
+		if v.ID == a.ID {
+			return true
+		}
+	}
+	return false
+}
+
 func MessageInArray(m Message, arr []*Message) bool {
 	for _, v := range arr {
 		if v.ID == m.ID {
@@ -184,6 +193,15 @@ func SettingsInArray(s Settings, arr []*Settings) bool {
 }
 
 func LikedArtistInArray(l LikedArtist, arr []*LikedArtist) bool {
+	for _, v := range arr {
+		if v.ID == l.ID {
+			return true
+		}
+	}
+	return false
+}
+
+func LikedSongInArray(l LikedSong, arr []*LikedSong) bool {
 	for _, v := range arr {
 		if v.ID == l.ID {
 			return true
