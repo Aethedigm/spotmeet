@@ -160,7 +160,7 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
-func (h *Handlers) SetSpotifyArtistsForUser(userID int, songs spotify.FullTrackPage) error {
+func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPage) error {
 	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
@@ -179,39 +179,82 @@ func (h *Handlers) SetSpotifyArtistsForUser(userID int, songs spotify.FullTrackP
 		return err
 	}
 
-	for x := range songs.Tracks {
-		id := songs.Tracks[x].Album.Artists[0].ID
-		name := songs.Tracks[x].Album.Artists[0].Name
+	// delete user's liked songs (currently the top 20) before inserting new tracks
+	err = h.Models.LikedSongs.DeleteAllForUser(userID)
+	if err != nil {
+		fmt.Println("Error deleting all liked songs for user ", userID, ". ")
+		return err
+	}
 
-		temp := data.Artist{
-			SpotifyID: id.String(),
-			Name:      name,
+	// insert new songs and liked songs for the user (currently their top 20)
+	for x := range songs.Tracks {
+		id := songs.Tracks[x].ID
+		name := songs.Tracks[x].Name
+		artistName := songs.Tracks[x].Album.Artists[0].Name
+
+		temp := data.Song{
+			SpotifyID:  id.String(),
+			Name:       name,
+			ArtistName: artistName,
 		}
 
+		// Insert the song into the db, and get the table's song ID. tID will == 0 if song already
+		// exists in the songs table
 		tID, err := temp.Insert(temp)
 		if err != nil {
-			fmt.Println("Error inserting artist ID", tID)
+			fmt.Println("Error inserting song: ID", tID)
 			return err
 		}
 
+		// If song already exists in songs table, get the song ID by name, and no need to get song aspects.
+		// Else, use the current tID, get song aspects, and update the song records with musical aspects
 		if tID == 0 {
-			artist, err := h.Models.Artists.GetByName(name)
+			song, err := h.Models.Songs.GetByName(name)
 			if err != nil {
-				fmt.Println("Error getting artist that has already been inserted into artists table", tID)
+				fmt.Println("Error getting song that has already been inserted into songs table", tID)
 				return err
 			}
-			tID = artist.ID
+			tID = song.ID
+		} else {
+			trackAnalysis, err := client.GetAudioAnalysis(songs.Tracks[x].ID)
+			if err != nil {
+				fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
+				// add faux data here for the update of the record
+			} else {
+				fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
+				loud, tempo, timeSig, err := BuildSectionAggregate(trackAnalysis.Sections)
+				if err != nil {
+					fmt.Println("Error building section aggregate")
+					continue
+				}
+
+				// update the song in the songs table
+				temp = data.Song{
+					ID:          tID,
+					SpotifyID:   id.String(),
+					Name:        name,
+					ArtistName:  artistName,
+					LoudnessAvg: loud,
+					TempoAvg:    tempo,
+					TimeSigAvg:  timeSig,
+				}
+
+				err = temp.Update(temp)
+				if err != nil {
+					fmt.Println("Error updating song: ID", tID)
+					return err
+				}
+			}
 		}
 
-		tempLart := data.LikedArtist{
-			UserID:     userID,
-			ArtistID:   tID,
-			LikedLevel: 100,
+		tempLsng := data.LikedSong{
+			UserID: userID,
+			SongID: tID,
 		}
 
-		_, err = h.Models.LikedArtists.Insert(tempLart)
+		_, err = h.Models.LikedSongs.Insert(tempLsng)
 		if err != nil {
-			fmt.Println("Error inserting artist ", temp.Name, " with id ", tID, " into liked_artists table")
+			fmt.Println("Error inserting song ", temp.Name, " with id ", tID, " into liked_songs table")
 			return err
 		}
 	}
@@ -250,6 +293,8 @@ func (h *Handlers) UpdateUserMusicProfile(w http.ResponseWriter, r *http.Request
 	// Get music profile for current user.
 	musicProfile, err := h.Models.UserMusicProfiles.GetByUser(*user)
 	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"No user music profile created for user yet": "true"}`))
 		return
 	}
 
@@ -297,9 +342,10 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 		return &data.UserMusicProfile{}, err
 	}
 
-	err = h.SetSpotifyArtistsForUser(user.ID, *songs)
+	// Analyze songs' musical aspects, add them to songs table, and to current user's liked_songs
+	err = h.SetSpotifySongsForUser(user.ID, *songs)
 	if err != nil {
-		fmt.Println("There was an error setting the Spotify artists for the user: ", user.ID, ".")
+		fmt.Println("There was an error setting the Spotify songs for the user: ", user.ID, ".")
 		return &data.UserMusicProfile{}, err
 	}
 
@@ -310,25 +356,27 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 		total       int
 	)
 
-	for x := range songs.Tracks {
-		trackAnalysis, err := client.GetAudioAnalysis(songs.Tracks[x].ID)
-		if err != nil {
-			fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
-		} else {
-			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-			loud, temp, timeSig, err := BuildSectionAggregate(trackAnalysis.Sections)
-			if err != nil {
-				fmt.Println("Error building section aggregate")
-				continue
-			}
-
-			loudnessAvg += loud
-			tempoAvg += temp
-			timesigAvg += timeSig
-			total++
-		}
+	likedSongs, err := h.Models.LikedSongs.GetAllByOneUser(user.ID)
+	if err != nil {
+		fmt.Println("There was an error getting all liked songs for user ", user.ID, ".")
+		return &data.UserMusicProfile{}, err
 	}
 
+	// add up all the musical aspects from the user's liked songs
+	for x := range likedSongs {
+		song, err := h.Models.Songs.Get(likedSongs[x].SongID)
+		if err != nil {
+			fmt.Println("There was an error getting a song from the db. Song ID: ", likedSongs[x].SongID, ".")
+			return &data.UserMusicProfile{}, err
+		}
+
+		loudnessAvg += song.LoudnessAvg
+		tempoAvg += song.TempoAvg
+		timesigAvg += song.TimeSigAvg
+		total += 1
+	}
+
+	// find the averages of all the musical aspects from the user's liked songs
 	loudnessAvg = loudnessAvg / float64(total)
 	tempoAvg = tempoAvg / float64(total)
 	timesigAvg = timesigAvg / total

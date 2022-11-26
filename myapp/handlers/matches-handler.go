@@ -3,12 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"myapp/data"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/go-chi/chi/v5"
 
 	"github.com/CloudyKit/jet/v6"
 )
@@ -73,9 +72,9 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 	link.User_A_ID = match.User_A_ID
 	link.User_B_ID = match.User_B_ID
 	link.PercentLink = 100
-	link.ArtistID = match.ArtistID
-	if link.ArtistID == 0 {
-		link.ArtistID, err = h.Models.Artists.GetOneID()
+	link.SongID = match.SongID
+	if link.SongID == 0 {
+		link.SongID, err = h.Models.Artists.GetOneID()
 		if err != nil {
 			h.App.ErrorLog.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -145,6 +144,9 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				h.App.ErrorLog.Println(err)
 			}
+			if otherUserMusicProfile == nil {
+				continue
+			}
 
 			// get settings of the other user
 			otherUserSettings, err := h.Models.Settings.GetByUserID(users[i])
@@ -153,7 +155,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// check if the two users' musical preference profiles are compatible
-			itsAMatch, matchPercentage := h.CompareUserMusicProfiles(*currentUserMusicProfile,
+			itsAMatch, matchPercentage, songIDMatchedOn := h.CompareUserMusicProfiles(*currentUserMusicProfile,
 				*otherUserMusicProfile, settings.MatchSensitivity, otherUserSettings.MatchSensitivity)
 
 			if itsAMatch == true {
@@ -165,7 +167,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 				match.PercentMatch = float32(matchPercentage)
 				match.CreatedAt = time.Now()
 				// match.ArtistID, err = h.Models.Artists.GetOneID()
-				match.ArtistID = 0
+				match.SongID = songIDMatchedOn
 				if err != nil {
 					h.App.ErrorLog.Println(err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -261,7 +263,7 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
-	profileB data.UserMusicProfile, matchSensitivityUserA int, matchSensitivityUserB int) (bool, int) {
+	profileB data.UserMusicProfile, matchSensitivityUserA int, matchSensitivityUserB int) (bool, int, int) {
 
 	// Here are the values of the user_music_profile table that we are checking (for now)
 	// Loudness  float64   `db:"loudness" json:"loudness"`
@@ -271,6 +273,7 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 	var highestMatchSensitivity int
 	var matchOnProfiles bool // return value
 	var matchPercentage int  // return value
+	var songIDMatchedOn int  // return value
 	const aspectCount = 3    // Loudness, Tempo, TimeSig (more to come)
 	const loudnessRange = float64(4.0)
 	const tempoRange = float64(12.0)
@@ -280,6 +283,18 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 	const lowSensitivityRange = 2
 	const mediumSensitivityRange = 1
 	const highSensitivityRange = 0
+
+	userALikedSongs, err := h.Models.LikedSongs.GetAllByOneUser(profileA.UserID)
+	if err != nil {
+		fmt.Println("Error getting liked songs from user ", profileA.UserID, ". ")
+		return false, 0, 0
+	}
+
+	userBLikedSongs, err := h.Models.LikedSongs.GetAllByOneUser(profileB.UserID)
+	if err != nil {
+		fmt.Println("Error getting liked songs from user ", profileB.UserID, ". ")
+		return false, 0, 0
+	}
 
 	// using the highest match sensitivity given
 	if matchSensitivityUserA >= matchSensitivityUserB {
@@ -324,7 +339,7 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		} else {
 			matchOnProfiles = false
 		}
-	case highestMatchSensitivity >= 34 && matchSensitivityUserA <= 67:
+	case highestMatchSensitivity >= 34 && highestMatchSensitivity <= 67:
 		if similarCount <= aspectCount+mediumSensitivityRange &&
 			similarCount >= aspectCount-mediumSensitivityRange {
 			matchOnProfiles = true
@@ -342,5 +357,115 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 
 	matchPercentage = (similarCount / aspectCount) * 100
 
-	return matchOnProfiles, matchPercentage
+	// If a match on musical profiles, find the song ID of the liked song of both users that is closest
+	// to the aggregate of both user's musical preferences.
+	if matchOnProfiles == true {
+		// Get the averages of musical preferences of both users
+		aggregateMusicProfile := data.UserMusicProfile{
+			Loudness: (profileA.Loudness + profileB.Loudness) / 2,
+			Tempo:    (profileA.Tempo + profileB.Tempo) / 2,
+			TimeSig:  (profileA.TimeSig + profileB.TimeSig) / 2,
+		}
+
+		// put all songs in a slice
+		var songs []data.Song
+		for x := range userALikedSongs {
+			song, err := h.Models.Songs.Get(userALikedSongs[x].SongID)
+			if err != nil {
+				fmt.Println("Error getting a song from userALikedSongs. Song ID: ", userALikedSongs[x].SongID, ".")
+			}
+			songs = append(songs, *song)
+		}
+		for x := range userBLikedSongs {
+			song, err := h.Models.Songs.Get(userBLikedSongs[x].SongID)
+			if err != nil {
+				fmt.Println("Error getting a song from userBLikedSongs. Song ID: ", userBLikedSongs[x].SongID, ".")
+			}
+			songs = append(songs, *song)
+		}
+
+		var loudnessClosestSongID int
+		var tempoClosestSongID int
+		var timeSigClosestSongID int
+		var smallestDiffInt int
+		var smallestDiffFloat64 float64
+
+		// find the song that is closest to the aggregate music profile
+		// get song with closest Loudness
+		for i := range songs {
+			difference := aggregateMusicProfile.Loudness - songs[i].LoudnessAvg
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat64 = difference
+				continue
+			}
+			if difference < smallestDiffFloat64 {
+				smallestDiffFloat64 = difference
+				loudnessClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest Tempo
+		for i := range songs {
+			difference := aggregateMusicProfile.Tempo - songs[i].TempoAvg
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat64 = difference
+				continue
+			}
+			if difference < smallestDiffFloat64 {
+				smallestDiffFloat64 = difference
+				tempoClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest TimeSig
+		for i := range songs {
+			difference := aggregateMusicProfile.TimeSig - songs[i].TimeSigAvg
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffInt = difference
+				continue
+			}
+			if difference < smallestDiffInt {
+				smallestDiffInt = difference
+				timeSigClosestSongID = songs[i].ID
+			}
+		}
+
+		// Get the mode (highest occurring) of a slice of all of the IDs found to be the closest in each
+		// aspect area.
+		IDs := []int{loudnessClosestSongID, tempoClosestSongID, timeSigClosestSongID}
+		songIDMatchedOn = h.Mode(IDs, aspectCount)
+
+	} else {
+		songIDMatchedOn = 0
+	}
+
+	return matchOnProfiles, matchPercentage, songIDMatchedOn
+}
+
+func (h *Handlers) Mode(IDs []int, size int) int {
+	if size == 0 {
+		return 0
+	}
+	mp := make(map[int]int)
+	for _, i := range IDs {
+		mp[i]++
+	}
+	maxCount := 0
+	mode := 0
+
+	for value, count := range mp {
+		if count > maxCount {
+			maxCount = count
+			mode = value
+		}
+	}
+
+	return mode
 }

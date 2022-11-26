@@ -112,22 +112,26 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 }
 
 func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
-	q := `select *
-		  from (
-			select u.id, 
-			u.first_name, 
-			mm.id as match_id, 
-			mm.percent_match, 
-			mm.artist_id
-			from users u
-			inner join (
-				select *
-				from matches m
-				where m.user_a_id = ` + strconv.Itoa(userID) + ` and m.complete = false
-				or m.user_b_id = ` + strconv.Itoa(userID) + ` and m.complete = false
-				) as mm
-				on u.id = mm.user_b_id or u.id = mm.user_a_id) as r
-		  where r.id <> ` + strconv.Itoa(userID) + `;`
+	q := `select ma.id, ma.first_name, ma.match_id, ma.percent_match, ma.song_id, songs.song_name, songs.artist_name
+			from (
+					select *
+					from (
+						select u.id, 
+						u.first_name, 
+						mm.id as match_id, 
+						mm.percent_match, 
+						mm.song_id
+						from users u
+						inner join (
+							select *
+							from matches m
+							where m.user_a_id = ` + strconv.Itoa(userID) + ` and m.complete = false
+								or m.user_b_id = ` + strconv.Itoa(userID) + ` and m.complete = false
+							) as mm
+							on u.id = mm.user_b_id or u.id = mm.user_a_id) as r
+					where r.id <> ` + strconv.Itoa(userID) + `) as ma
+			inner join songs
+			on songs.ID = ma.song_id;`
 
 	rows, err := upper.SQL().Query(q)
 	if err != nil {
@@ -139,11 +143,13 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 	var otherUserName string
 	var matchID int
 	var percentMatch int
-	var artistID int
+	var songID int
+	var songName string
+	var artistName string
 
 	var matchesForDisplay []MatchForDisplay
 	for rows.Next() {
-		err := rows.Scan(&otherUserID, &otherUserName, &matchID, &percentMatch, &artistID)
+		err := rows.Scan(&otherUserID, &otherUserName, &matchID, &percentMatch, &songID, &songName, &artistName)
 		if err != nil {
 			fmt.Println("problem with filling variables from sql query called in MatchesDisplayQuery().", err)
 			return []MatchForDisplay{}, err
@@ -154,7 +160,9 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 			OtherUserName: otherUserName,
 			MatchID:       matchID,
 			PercentMatch:  percentMatch,
-			ArtistID:      artistID,
+			SongID:        songID,
+			SongName:      songName,
+			ArtistName:    artistName,
 		}
 
 		matchesForDisplay = append(matchesForDisplay, strct)

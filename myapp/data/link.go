@@ -13,7 +13,7 @@ type Link struct {
 	User_A_ID   int       `db:"user_a_id" json:"user_A_id"`
 	User_B_ID   int       `db:"user_b_id" json:"user_B_id"`
 	PercentLink int       `db:"percent_match" json:"percent_match"`
-	ArtistID    int       `db:"artist_id" json:"artist_id"`
+	SongID      int       `db:"song_id" json:"song_id"`
 	CreatedAt   time.Time `db:"created_at"`
 }
 

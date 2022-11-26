@@ -41,17 +41,21 @@ func TestLink_Insert(t *testing.T) {
 		t.Error(err)
 	}
 
-	a := Artist{
-		SpotifyID: "test1333",
-		Name:      "test2333",
+	s := Song{
+		SpotifyID:   "test1333",
+		Name:        "test1333",
+		ArtistName:  "test1333",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
 	}
 
-	aID, err := a.Insert(a)
-	if err != nil || aID == 0 {
+	sID, err := s.Insert(s)
+	if err != nil || sID == 0 {
 		t.Error(err)
 	}
 
-	artist, err := a.Get(aID)
+	song, err := s.Get(sID)
 	if err != nil {
 		t.Error(err)
 	}
@@ -59,7 +63,7 @@ func TestLink_Insert(t *testing.T) {
 	l := Link{
 		User_A_ID:   uID,
 		User_B_ID:   uID2,
-		ArtistID:    artist.ID,
+		SongID:      song.ID,
 		PercentLink: 100,
 		CreatedAt:   time.Now(),
 	}
@@ -91,12 +95,16 @@ func TestLink_Get_Bad_User_A_ID(t *testing.T) {
 
 	ub.ID = ubID
 
-	a := Artist{
-		SpotifyID: "testA",
-		Name:      "testA",
+	s := Song{
+		SpotifyID:   "testA",
+		Name:        "testA",
+		ArtistName:  "testA",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
 	}
 
-	aID, err := a.Insert(a)
+	sID, err := s.Insert(s)
 	if err != nil {
 		t.Error(err)
 	}
@@ -104,7 +112,7 @@ func TestLink_Get_Bad_User_A_ID(t *testing.T) {
 	l := Link{
 		User_A_ID: 0,
 		User_B_ID: ubID,
-		ArtistID:  aID,
+		SongID:    sID,
 	}
 
 	_, err = l.Insert(l)
@@ -121,27 +129,31 @@ func TestLink_Get_Bad_User_B_ID(t *testing.T) {
 		Active:    1,
 	}
 
-	uaID, err := ua.Insert(ua)
+	usID, err := ua.Insert(ua)
 	if err != nil {
 		t.Error(err)
 	}
 
-	ua.ID = uaID
+	ua.ID = usID
 
-	a := Artist{
-		SpotifyID: "testA",
-		Name:      "testA",
+	s := Song{
+		SpotifyID:   "testA",
+		Name:        "testA",
+		ArtistName:  "testA",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
 	}
 
-	aID, err := a.Insert(a)
+	sID, err := s.Insert(s)
 	if err != nil {
 		t.Error(err)
 	}
 
 	l := Link{
-		User_A_ID: uaID,
+		User_A_ID: usID,
 		User_B_ID: 0,
-		ArtistID:  aID,
+		SongID:    sID,
 	}
 
 	_, err = l.Insert(l)
@@ -175,12 +187,16 @@ func TestLink_Delete(t *testing.T) {
 		t.Error(err)
 	}
 
-	a := Artist{
-		SpotifyID: "test_del",
-		Name:      "test_del",
+	s := Song{
+		SpotifyID:   "test_del",
+		Name:        "test_del",
+		ArtistName:  "test_del",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
 	}
 
-	aID, err := a.Insert(a)
+	sID, err := s.Insert(s)
 	if err != nil {
 		t.Error(err)
 	}
@@ -188,7 +204,7 @@ func TestLink_Delete(t *testing.T) {
 	l := Link{
 		User_A_ID: uID,
 		User_B_ID: uID2,
-		ArtistID:  aID,
+		SongID:    sID,
 	}
 
 	lID, err := l.Insert(l)
@@ -234,12 +250,16 @@ func TestLink_GetAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	a := Artist{
-		SpotifyID: "test_getall",
-		Name:      "test_getall",
+	s := Song{
+		SpotifyID:   "test_getall",
+		Name:        "test_getall",
+		ArtistName:  "test_getall",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
 	}
 
-	aID, err := a.Insert(a)
+	sID, err := s.Insert(s)
 	if err != nil {
 		t.Error(err)
 	}
@@ -247,7 +267,7 @@ func TestLink_GetAll(t *testing.T) {
 	l := Link{
 		User_A_ID: uID,
 		User_B_ID: uID2,
-		ArtistID:  aID,
+		SongID:    sID,
 	}
 
 	lID, err := l.Insert(l)
@@ -292,12 +312,16 @@ func TestLink_GetAllForOneUser(t *testing.T) {
 		t.Error(err)
 	}
 
-	a := Artist{
-		SpotifyID: "test_gafou",
-		Name:      "test_gafou",
+	s := Song{
+		SpotifyID:   "test_gafou",
+		Name:        "test_gafou",
+		ArtistName:  "test_gafou",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
 	}
 
-	aID, err := a.Insert(a)
+	sID, err := s.Insert(s)
 	if err != nil {
 		t.Error(err)
 	}
@@ -305,7 +329,7 @@ func TestLink_GetAllForOneUser(t *testing.T) {
 	l := Link{
 		User_A_ID: uID,
 		User_B_ID: uID2,
-		ArtistID:  aID,
+		SongID:    sID,
 	}
 
 	lID, err := l.Insert(l)

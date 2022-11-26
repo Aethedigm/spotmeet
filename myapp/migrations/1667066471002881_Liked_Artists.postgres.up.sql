@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS "Liked_Artists" CASCADE;
+DROP TABLE IF EXISTS Liked_Artists CASCADE;
 
 CREATE TABLE liked_artists (
     id SERIAL PRIMARY KEY,
