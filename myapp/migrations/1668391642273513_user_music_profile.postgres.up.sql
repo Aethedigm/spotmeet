@@ -7,4 +7,4 @@ CREATE TABLE user_music_profile (
     tempo float NOT NULL,
     time_sig int NOT NULL,
     updated_at timestamp without time zone NOT NULL DEFAULT now()
-)
+);
