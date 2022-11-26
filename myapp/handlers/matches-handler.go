@@ -339,7 +339,7 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		} else {
 			matchOnProfiles = false
 		}
-	case highestMatchSensitivity >= 34 && matchSensitivityUserA <= 67:
+	case highestMatchSensitivity >= 34 && highestMatchSensitivity <= 67:
 		if similarCount <= aspectCount+mediumSensitivityRange &&
 			similarCount >= aspectCount-mediumSensitivityRange {
 			matchOnProfiles = true
