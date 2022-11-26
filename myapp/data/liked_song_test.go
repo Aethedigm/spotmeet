@@ -99,9 +99,9 @@ func TestLikedSong_Update(t *testing.T) {
 	ls.ID = lsID
 
 	s2 := Song{
-		SpotifyID:   "likedtest_update",
-		Name:        "likedtest_update",
-		ArtistName:  "likedtest_update",
+		SpotifyID:   "likedtest_update2",
+		Name:        "likedtest_update2",
+		ArtistName:  "likedtest_update2",
 		LoudnessAvg: 0.0,
 		TempoAvg:    0.0,
 		TimeSigAvg:  0,
@@ -118,12 +118,12 @@ func TestLikedSong_Update(t *testing.T) {
 		t.Error(err)
 	}
 
-	la2, err := ls.Get(lsID)
+	ls2, err := ls.Get(lsID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if la2.SongID != sID2 {
+	if ls2.SongID != sID2 {
 		t.Error("song ID should be ", sID2)
 	}
 }
