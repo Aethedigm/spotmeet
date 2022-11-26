@@ -62,6 +62,19 @@ func (a *Song) GetByName(name string) (*Song, error) {
 	return &theSong, nil
 }
 
+// GetByNameAndArtist gets one song, by name
+func (a *Song) GetByNameAndArtist(name string, artistName string) (*Song, error) {
+	var theSong Song
+	collection := upper.Collection(a.Table())
+	res := collection.Find(up.Cond{"song_name": name, "artist_name": artistName})
+	err := res.One(&theSong)
+	if err != nil {
+		return nil, err
+	}
+
+	return &theSong, nil
+}
+
 // Get gets one song by id
 func (a *Song) Get(id int) (*Song, error) {
 	var theSong Song
@@ -114,7 +127,7 @@ func (a *Song) Insert(theSong Song) (int, error) {
 	collection := upper.Collection(a.Table())
 
 	// Make sure this song doesn't already exist
-	song, err := a.GetByName(theSong.Name)
+	song, err := a.GetByNameAndArtist(theSong.Name, theSong.ArtistName)
 	if song != nil {
 		return 0, nil
 	}
