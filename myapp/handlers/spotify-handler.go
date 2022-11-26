@@ -222,7 +222,7 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 				// add faux data here for the update of the record
 			} else {
 				fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-				loud, tempo, timeSig, err := BuildSectionAggregate(trackAnalysis.Sections)
+				loud, tempo, timeSig, err := h.BuildSectionAggregate(trackAnalysis.Sections)
 				if err != nil {
 					fmt.Println("Error building section aggregate")
 					continue
@@ -352,7 +352,7 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 	var (
 		loudnessAvg float64
 		tempoAvg    float64
-		timesigAvg  int
+		timesigAvg  []int
 		total       int
 	)
 
@@ -372,30 +372,30 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 
 		loudnessAvg += song.LoudnessAvg
 		tempoAvg += song.TempoAvg
-		timesigAvg += song.TimeSigAvg
+		timesigAvg = append(timesigAvg, song.TimeSigAvg)
 		total += 1
 	}
 
 	// find the averages of all the musical aspects from the user's liked songs
 	loudnessAvg = loudnessAvg / float64(total)
 	tempoAvg = tempoAvg / float64(total)
-	timesigAvg = timesigAvg / total
+	timesigMode := h.Mode(timesigAvg, total)
 
 	musicProfile := data.UserMusicProfile{
 		UserID:   user.ID,
 		Loudness: loudnessAvg,
 		Tempo:    tempoAvg,
-		TimeSig:  timesigAvg,
+		TimeSig:  timesigMode,
 	}
 
 	return &musicProfile, nil
 }
 
-func BuildSectionAggregate(sections []spotify.Section) (float64, float64, int, error) {
+func (h *Handlers) BuildSectionAggregate(sections []spotify.Section) (float64, float64, int, error) {
 	var (
 		loudness float64
 		tempo    float64
-		timesig  int
+		timesig  []int
 	)
 
 	if len(sections) < 1 {
@@ -405,12 +405,12 @@ func BuildSectionAggregate(sections []spotify.Section) (float64, float64, int, e
 	for x := range sections {
 		loudness += sections[x].Loudness
 		tempo += sections[x].Tempo
-		timesig += sections[x].TimeSignature
+		timesig = append(timesig, sections[x].TimeSignature)
 	}
 
 	loudness = loudness / float64(len(sections))
 	tempo = tempo / float64(len(sections))
-	timesig = timesig / len(sections)
+	timesigMode := h.Mode(timesig, len(sections))
 
-	return loudness, tempo, timesig, nil
+	return loudness, tempo, timesigMode, nil
 }

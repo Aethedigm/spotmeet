@@ -355,7 +355,8 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		}
 	}
 
-	matchPercentage = (similarCount / aspectCount) * 100
+	matchPercentageFloat := (float64(similarCount) / float64(aspectCount)) * 100.00
+	matchPercentage = int(matchPercentageFloat)
 
 	// If a match on musical profiles, find the song ID of the liked song of both users that is closest
 	// to the aggregate of both user's musical preferences.
@@ -364,7 +365,8 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		aggregateMusicProfile := data.UserMusicProfile{
 			Loudness: (profileA.Loudness + profileB.Loudness) / 2,
 			Tempo:    (profileA.Tempo + profileB.Tempo) / 2,
-			TimeSig:  (profileA.TimeSig + profileB.TimeSig) / 2,
+			TimeSig:  profileA.TimeSig, // Averaging timesigs does not make sense, so just pick one since
+			// we found previously that both for each user of the match are either the same, or are similar.
 		}
 
 		// put all songs in a slice
@@ -385,9 +387,15 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		}
 
 		var loudnessClosestSongID int
+		var loudnessClosestSongID2 int
+		var loudnessClosestSongID3 int
+
 		var tempoClosestSongID int
-		var timeSigClosestSongID int
-		var smallestDiffInt int
+		var tempoClosestSongID2 int
+		var tempoClosestSongID3 int
+
+		var timeSigsMatchingSongIDs []int
+		// var smallestDiffInt int
 		var smallestDiffFloat64 float64
 
 		// find the song that is closest to the aggregate music profile
@@ -399,10 +407,15 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 			}
 			if i == 0 {
 				smallestDiffFloat64 = difference
+				loudnessClosestSongID3 = songs[i].ID
+				loudnessClosestSongID2 = songs[i].ID
+				loudnessClosestSongID = songs[i].ID
 				continue
 			}
 			if difference < smallestDiffFloat64 {
 				smallestDiffFloat64 = difference
+				loudnessClosestSongID3 = loudnessClosestSongID2
+				loudnessClosestSongID2 = loudnessClosestSongID
 				loudnessClosestSongID = songs[i].ID
 			}
 		}
@@ -414,33 +427,51 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 			}
 			if i == 0 {
 				smallestDiffFloat64 = difference
+				tempoClosestSongID3 = songs[i].ID
+				tempoClosestSongID2 = songs[i].ID
+				tempoClosestSongID = songs[i].ID
 				continue
 			}
 			if difference < smallestDiffFloat64 {
 				smallestDiffFloat64 = difference
+				tempoClosestSongID3 = tempoClosestSongID2
+				tempoClosestSongID2 = tempoClosestSongID
 				tempoClosestSongID = songs[i].ID
 			}
 		}
-		// get song with closest TimeSig
+		// get songs with identical TimeSigs
 		for i := range songs {
-			difference := aggregateMusicProfile.TimeSig - songs[i].TimeSigAvg
-			if difference < 0 {
-				difference *= -1
-			}
-			if i == 0 {
-				smallestDiffInt = difference
-				continue
-			}
-			if difference < smallestDiffInt {
-				smallestDiffInt = difference
-				timeSigClosestSongID = songs[i].ID
+			if aggregateMusicProfile.TimeSig == songs[i].TimeSigAvg {
+				timeSigsMatchingSongIDs = append(timeSigsMatchingSongIDs, songs[i].ID)
 			}
 		}
 
 		// Get the mode (highest occurring) of a slice of all of the IDs found to be the closest in each
-		// aspect area.
-		IDs := []int{loudnessClosestSongID, tempoClosestSongID, timeSigClosestSongID}
-		songIDMatchedOn = h.Mode(IDs, aspectCount)
+		// aspect area (except timesig, just yet).
+		IDs := []int{loudnessClosestSongID, loudnessClosestSongID2, loudnessClosestSongID3,
+			tempoClosestSongID, tempoClosestSongID2, tempoClosestSongID3}
+		FinalIDs := IDs
+
+		// Now, timesigs...
+		// If there were any songs with matching timesigs to the aggregate music profile, AND
+		// those songs were already in the IDs slice, add them to the new slice of IDs.
+		if timeSigsMatchingSongIDs != nil {
+			for t := range timeSigsMatchingSongIDs {
+				idExists := false
+				for x := range IDs {
+					if IDs[x] == timeSigsMatchingSongIDs[t] {
+						idExists = true
+					}
+				}
+				if idExists == true {
+					FinalIDs = append(FinalIDs, timeSigsMatchingSongIDs[t])
+				}
+			}
+		}
+
+		// Find the most common-occurring song ID in our slice that was made from the song IDs that are musically
+		// closest to our music profile that was made from the aggregate of both users in the confirmed match.
+		songIDMatchedOn = h.Mode(FinalIDs, aspectCount)
 
 	} else {
 		songIDMatchedOn = 0
