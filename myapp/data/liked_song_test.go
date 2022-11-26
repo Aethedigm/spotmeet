@@ -98,7 +98,21 @@ func TestLikedSong_Update(t *testing.T) {
 
 	ls.ID = lsID
 
-	ls.SongID = 50
+	s2 := Song{
+		SpotifyID:   "likedtest_update",
+		Name:        "likedtest_update",
+		ArtistName:  "likedtest_update",
+		LoudnessAvg: 0.0,
+		TempoAvg:    0.0,
+		TimeSigAvg:  0,
+	}
+
+	sID2, err := s.Insert(s2)
+	if err != nil {
+		t.Error(err)
+	}
+
+	ls.SongID = sID2
 	err = ls.Update(ls)
 	if err != nil {
 		t.Error(err)
@@ -109,8 +123,8 @@ func TestLikedSong_Update(t *testing.T) {
 		t.Error(err)
 	}
 
-	if la2.SongID != 50 {
-		t.Error("song ID should be 50")
+	if la2.SongID != sID2 {
+		t.Error("song ID should be ", sID2)
 	}
 }
 
@@ -118,7 +132,7 @@ func TestLikedSong_Delete(t *testing.T) {
 	u := User{
 		FirstName: "temp",
 		LastName:  "temp_last",
-		Email:     "likedaritst_delete@test.com",
+		Email:     "likedsong_delete@test.com",
 		Active:    1,
 	}
 
