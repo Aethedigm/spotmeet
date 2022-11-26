@@ -72,9 +72,9 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 	link.User_A_ID = match.User_A_ID
 	link.User_B_ID = match.User_B_ID
 	link.PercentLink = 100
-	link.ArtistID = match.ArtistID
-	if link.ArtistID == 0 {
-		link.ArtistID, err = h.Models.Artists.GetOneID()
+	link.SongID = match.SongID
+	if link.SongID == 0 {
+		link.SongID, err = h.Models.Artists.GetOneID()
 		if err != nil {
 			h.App.ErrorLog.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -167,7 +167,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 				match.PercentMatch = float32(matchPercentage)
 				match.CreatedAt = time.Now()
 				// match.ArtistID, err = h.Models.Artists.GetOneID()
-				match.ArtistID = songIDMatchedOn
+				match.SongID = songIDMatchedOn
 				if err != nil {
 					h.App.ErrorLog.Println(err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)

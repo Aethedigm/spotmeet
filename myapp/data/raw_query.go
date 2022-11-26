@@ -112,7 +112,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 }
 
 func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
-	q := `select ma.id, ma.first_name, ma.match_id, ma.percent_match, ma.artist_id, songs.song_name, songs.artist_name
+	q := `select ma.id, ma.first_name, ma.match_id, ma.percent_match, ma.song_id, songs.song_name, songs.artist_name
 			from (
 					select *
 					from (
@@ -120,7 +120,7 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 						u.first_name, 
 						mm.id as match_id, 
 						mm.percent_match, 
-						mm.artist_id
+						mm.song_id
 						from users u
 						inner join (
 							select *
@@ -131,7 +131,7 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 							on u.id = mm.user_b_id or u.id = mm.user_a_id) as r
 					where r.id <> ` + strconv.Itoa(userID) + `) as ma
 			inner join songs
-			on songs.ID = ma.artist_id;`
+			on songs.ID = ma.song_id;`
 
 	rows, err := upper.SQL().Query(q)
 	if err != nil {
