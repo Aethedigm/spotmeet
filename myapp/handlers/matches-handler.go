@@ -6,6 +6,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"myapp/data"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 
@@ -446,202 +447,177 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 
 		var loudnessClosestSongID int
 		var loudnessClosestSongID2 int
-		var loudnessClosestSongID3 int
+		// var loudnessClosestSongID3 int
 
 		var tempoClosestSongID int
 		var tempoClosestSongID2 int
-		var tempoClosestSongID3 int
+		// var tempoClosestSongID3 int
 
 		var acousticnessClosestSongID int
 		var acousticnessClosestSongID2 int
-		var acousticnessClosestSongID3 int
+		// var acousticnessClosestSongID3 int
 
 		var danceabilityClosestSongID int
 		var danceabilityClosestSongID2 int
-		var danceabilityClosestSongID3 int
+		// var danceabilityClosestSongID3 int
 
 		var energyClosestSongID int
 		var energyClosestSongID2 int
-		var energyClosestSongID3 int
+		// var energyClosestSongID3 int
 
 		var instrumentalnessClosestSongID int
 		var instrumentalnessClosestSongID2 int
-		var instrumentalnessClosestSongID3 int
+		// var instrumentalnessClosestSongID3 int
 
 		var speechinessClosestSongID int
 		var speechinessClosestSongID2 int
-		var speechinessClosestSongID3 int
+		// var speechinessClosestSongID3 int
 
 		var valenceClosestSongID int
 		var valenceClosestSongID2 int
-		var valenceClosestSongID3 int
+		// var valenceClosestSongID3 int
 
 		var timeSigsMatchingSongIDs []int
 		var modesMatchingSongIDs []int
-		var smallestDiffFloat64 float64
-		var smallestDiffFloat32 float32
+		var differences []float64
 
 		// find the song that is closest to the aggregate music profile
-		// get song with closest Loudness
+		// get songs with closest Loudness
+		var diffMap = make(map[float64]int)
 		for i := range songs {
 			difference := aggregateMusicProfile.Loudness - songs[i].LoudnessAvg
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat64 = difference
-				loudnessClosestSongID3 = songs[i].ID
-				loudnessClosestSongID2 = songs[i].ID
-				loudnessClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat64 {
-				smallestDiffFloat64 = difference
-				loudnessClosestSongID3 = loudnessClosestSongID2
-				loudnessClosestSongID2 = loudnessClosestSongID
-				loudnessClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Tempo
+		sort.Float64s(differences)
+		length := len(differences)
+		loudnessClosestSongID = diffMap[differences[length-1]]
+		loudnessClosestSongID2 = diffMap[differences[length-2]]
+		// loudnessClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Tempo
+		// for k := range diffMap { delete(diffMap, k) }
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
 			difference := aggregateMusicProfile.Tempo - songs[i].TempoAvg
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat64 = difference
-				tempoClosestSongID3 = songs[i].ID
-				tempoClosestSongID2 = songs[i].ID
-				tempoClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat64 {
-				smallestDiffFloat64 = difference
-				tempoClosestSongID3 = tempoClosestSongID2
-				tempoClosestSongID2 = tempoClosestSongID
-				tempoClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Acousticness
+		sort.Float64s(differences)
+		length = len(differences)
+		tempoClosestSongID = diffMap[differences[length-1]]
+		tempoClosestSongID2 = diffMap[differences[length-2]]
+		// tempoClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Acousticness
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
-			difference := aggregateMusicProfile.Acousticness - songs[i].Acousticness
+			difference := float64(aggregateMusicProfile.Acousticness - songs[i].Acousticness)
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat32 = difference
-				acousticnessClosestSongID3 = songs[i].ID
-				acousticnessClosestSongID2 = songs[i].ID
-				acousticnessClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat32 {
-				smallestDiffFloat32 = difference
-				acousticnessClosestSongID3 = acousticnessClosestSongID2
-				acousticnessClosestSongID2 = acousticnessClosestSongID
-				acousticnessClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Danceability
+		sort.Float64s(differences)
+		length = len(differences)
+		acousticnessClosestSongID = diffMap[differences[length-1]]
+		acousticnessClosestSongID2 = diffMap[differences[length-2]]
+		// acousticnessClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Danceability
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
-			difference := aggregateMusicProfile.Danceability - songs[i].Danceability
+			difference := float64(aggregateMusicProfile.Danceability - songs[i].Danceability)
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat32 = difference
-				danceabilityClosestSongID3 = songs[i].ID
-				danceabilityClosestSongID2 = songs[i].ID
-				danceabilityClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat32 {
-				smallestDiffFloat32 = difference
-				danceabilityClosestSongID3 = danceabilityClosestSongID2
-				danceabilityClosestSongID2 = danceabilityClosestSongID
-				danceabilityClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Energy
+		sort.Float64s(differences)
+		length = len(differences)
+		danceabilityClosestSongID = diffMap[differences[length-1]]
+		danceabilityClosestSongID2 = diffMap[differences[length-2]]
+		// danceabilityClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Energy
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
-			difference := aggregateMusicProfile.Energy - songs[i].Energy
+			difference := float64(aggregateMusicProfile.Energy - songs[i].Energy)
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat32 = difference
-				energyClosestSongID3 = songs[i].ID
-				energyClosestSongID2 = songs[i].ID
-				energyClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat32 {
-				smallestDiffFloat32 = difference
-				energyClosestSongID3 = energyClosestSongID2
-				energyClosestSongID2 = energyClosestSongID
-				energyClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Instrumentalness
+		sort.Float64s(differences)
+		length = len(differences)
+		energyClosestSongID = diffMap[differences[length-1]]
+		energyClosestSongID2 = diffMap[differences[length-2]]
+		// energyClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Instrumentalness
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
-			difference := aggregateMusicProfile.Instrumentalness - songs[i].Instrumentalness
+			difference := float64(aggregateMusicProfile.Instrumentalness - songs[i].Instrumentalness)
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat32 = difference
-				instrumentalnessClosestSongID3 = songs[i].ID
-				instrumentalnessClosestSongID2 = songs[i].ID
-				instrumentalnessClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat32 {
-				smallestDiffFloat32 = difference
-				instrumentalnessClosestSongID3 = instrumentalnessClosestSongID2
-				instrumentalnessClosestSongID2 = instrumentalnessClosestSongID
-				instrumentalnessClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Speechiness
+		sort.Float64s(differences)
+		length = len(differences)
+		instrumentalnessClosestSongID = diffMap[differences[length-1]]
+		instrumentalnessClosestSongID2 = diffMap[differences[length-2]]
+		// instrumentalnessClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Speechiness
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
-			difference := aggregateMusicProfile.Speechiness - songs[i].Speechiness
+			difference := float64(aggregateMusicProfile.Speechiness - songs[i].Speechiness)
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat32 = difference
-				speechinessClosestSongID3 = songs[i].ID
-				speechinessClosestSongID2 = songs[i].ID
-				speechinessClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat32 {
-				smallestDiffFloat32 = difference
-				speechinessClosestSongID3 = speechinessClosestSongID2
-				speechinessClosestSongID2 = speechinessClosestSongID
-				speechinessClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
-		// get song with closest Valence
+		sort.Float64s(differences)
+		length = len(differences)
+		speechinessClosestSongID = diffMap[differences[length-1]]
+		speechinessClosestSongID2 = diffMap[differences[length-2]]
+		// speechinessClosestSongID3 = diffMap[differences[length-3]]
+
+		// get songs with closest Valence
+		diffMap = make(map[float64]int)
+		differences = nil
 		for i := range songs {
-			difference := aggregateMusicProfile.Valence - songs[i].Valence
+			difference := float64(aggregateMusicProfile.Valence - songs[i].Valence)
 			if difference < 0 {
 				difference *= -1
 			}
-			if i == 0 {
-				smallestDiffFloat32 = difference
-				valenceClosestSongID3 = songs[i].ID
-				valenceClosestSongID2 = songs[i].ID
-				valenceClosestSongID = songs[i].ID
-				continue
-			}
-			if difference < smallestDiffFloat32 {
-				smallestDiffFloat32 = difference
-				valenceClosestSongID3 = valenceClosestSongID2
-				valenceClosestSongID2 = valenceClosestSongID
-				valenceClosestSongID = songs[i].ID
-			}
+			diffMap[difference] = songs[i].ID
+			differences = append(differences, difference)
 		}
+		sort.Float64s(differences)
+		length = len(differences)
+		valenceClosestSongID = diffMap[differences[length-1]]
+		valenceClosestSongID2 = diffMap[differences[length-2]]
+		// valenceClosestSongID3 = diffMap[differences[length-3]]
+
 		// get songs with identical TimeSigs and Modes
 		for i := range songs {
 			if aggregateMusicProfile.TimeSig == songs[i].TimeSigAvg {
@@ -654,14 +630,14 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 
 		// Get the mode (highest occurring) of a slice of all of the IDs found to be the closest in each
 		// aspect area (except timesig, just yet).
-		IDs := []int{loudnessClosestSongID, loudnessClosestSongID2, loudnessClosestSongID3,
-			tempoClosestSongID, tempoClosestSongID2, tempoClosestSongID3,
-			acousticnessClosestSongID, acousticnessClosestSongID2, acousticnessClosestSongID3,
-			danceabilityClosestSongID, danceabilityClosestSongID2, danceabilityClosestSongID3,
-			energyClosestSongID, energyClosestSongID2, energyClosestSongID3,
-			instrumentalnessClosestSongID, instrumentalnessClosestSongID2, instrumentalnessClosestSongID3,
-			speechinessClosestSongID, speechinessClosestSongID2, speechinessClosestSongID3,
-			valenceClosestSongID, valenceClosestSongID2, valenceClosestSongID3,
+		IDs := []int{loudnessClosestSongID, loudnessClosestSongID2, // loudnessClosestSongID3,
+			tempoClosestSongID, tempoClosestSongID2, // tempoClosestSongID3,
+			acousticnessClosestSongID, acousticnessClosestSongID2, // acousticnessClosestSongID3,
+			danceabilityClosestSongID, danceabilityClosestSongID2, // danceabilityClosestSongID3,
+			energyClosestSongID, energyClosestSongID2, // energyClosestSongID3,
+			instrumentalnessClosestSongID, instrumentalnessClosestSongID2, // instrumentalnessClosestSongID3,
+			speechinessClosestSongID, speechinessClosestSongID2, // speechinessClosestSongID3,
+			valenceClosestSongID, valenceClosestSongID2, // valenceClosestSongID3,
 		}
 		FinalIDs := IDs
 
