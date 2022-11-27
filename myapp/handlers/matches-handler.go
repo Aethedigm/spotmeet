@@ -265,24 +265,37 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 	profileB data.UserMusicProfile, matchSensitivityUserA int, matchSensitivityUserB int) (bool, int, int) {
 
-	// Here are the values of the user_music_profile table that we are checking (for now)
-	// Loudness  float64   `db:"loudness" json:"loudness"`
-	// Tempo     float64   `db:"tempo" json:"tempo"`
-	// TimeSig   int       `db:"time_sig" json:"time_sig"`
+	// Here are the values of the user_music_profile table that we are checking
+	// Loudness  		float64   `db:"loudness" json:"loudness"`
+	// Tempo     		float64   `db:"tempo" json:"tempo"`
+	// TimeSig   		int       `db:"time_sig" json:"time_sig"`
+	// Acousticness     float32   `db:"acousticness" json:"acousticness"`
+	// Danceability     float32   `db:"danceability" json:"danceability"`
+	// Energy           float32   `db:"energy" json:"energy"`
+	// Instrumentalness float32   `db:"instrumentalness" json:"instrumentalness"`
+	// Mode             int       `db:"mode" json:"mode"`
+	// Speechiness      float32   `db:"speechiness" json:"speechiness"`
+	// Valence          float32   `db:"valence" json:"valence"`
 	var similarCount int
 	var highestMatchSensitivity int
 	var matchOnProfiles bool // return value
 	var matchPercentage int  // return value
 	var songIDMatchedOn int  // return value
-	const aspectCount = 3    // Loudness, Tempo, TimeSig (more to come)
+	const aspectCount = 10
 	const loudnessRange = float64(4.0)
 	const tempoRange = float64(12.0)
+	const acousticnessRange = float32(0.1)
+	const danceabilityRange = float32(0.1)
+	const energyRange = float32(0.1)
+	const instrumentalnessRange = float32(0.1)
+	const speechinessRange = float32(0.1)
+	const valenceRange = float32(0.1)
 
 	// lower sensitivity means more chances of matching (looser aspect count restrictions)
 	// higher sensitivity means less chances of matching (stricter aspect count restrictions)
-	const lowSensitivityRange = 2
-	const mediumSensitivityRange = 1
-	const highSensitivityRange = 0
+	const lowSensitivityRange = 8
+	const mediumSensitivityRange = 5
+	const highSensitivityRange = 2
 
 	userALikedSongs, err := h.Models.LikedSongs.GetAllByOneUser(profileA.UserID)
 	if err != nil {
@@ -315,6 +328,47 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		similarCount += 1
 	}
 
+	// compare acousticness averages
+	if (profileA.Acousticness <= profileB.Acousticness+acousticnessRange) &&
+		(profileA.Acousticness >= profileB.Acousticness-acousticnessRange) {
+		similarCount += 1
+	}
+
+	// compare danceability averages
+	if (profileA.Danceability <= profileB.Danceability+danceabilityRange) &&
+		(profileA.Danceability >= profileB.Danceability-danceabilityRange) {
+		similarCount += 1
+	}
+
+	// compare energy averages
+	if (profileA.Energy <= profileB.Energy+energyRange) &&
+		(profileA.Energy >= profileB.Energy-energyRange) {
+		similarCount += 1
+	}
+
+	// compare instrumentalness averages
+	if (profileA.Instrumentalness <= profileB.Instrumentalness+instrumentalnessRange) &&
+		(profileA.Instrumentalness >= profileB.Instrumentalness-instrumentalnessRange) {
+		similarCount += 1
+	}
+
+	// compare mode (major/minor key) preferences
+	if profileA.Mode == profileB.Mode {
+		similarCount += 1
+	}
+
+	// compare speechiness averages
+	if (profileA.Speechiness <= profileB.Speechiness+speechinessRange) &&
+		(profileA.Speechiness >= profileB.Speechiness-speechinessRange) {
+		similarCount += 1
+	}
+
+	// compare valence averages
+	if (profileA.Valence <= profileB.Valence+valenceRange) &&
+		(profileA.Valence >= profileB.Valence-valenceRange) {
+		similarCount += 1
+	}
+
 	// Compare time signature averages. See if users prefer signatures that are
 	// multiples of 2, eg. 4/4, 2/4, multiples of 3, eg. 3/4, 6/4, 12/8,
 	// or if both users prefer signatures that do not fit into these two standard,
@@ -333,22 +387,19 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 	// the number of musical aspects that were marked as similar.
 	switch {
 	case highestMatchSensitivity <= 33:
-		if similarCount <= aspectCount+lowSensitivityRange &&
-			similarCount >= aspectCount-lowSensitivityRange {
+		if similarCount >= aspectCount-lowSensitivityRange {
 			matchOnProfiles = true
 		} else {
 			matchOnProfiles = false
 		}
 	case highestMatchSensitivity >= 34 && highestMatchSensitivity <= 67:
-		if similarCount <= aspectCount+mediumSensitivityRange &&
-			similarCount >= aspectCount-mediumSensitivityRange {
+		if similarCount >= aspectCount-mediumSensitivityRange {
 			matchOnProfiles = true
 		} else {
 			matchOnProfiles = false
 		}
 	case highestMatchSensitivity >= 68:
-		if similarCount <= aspectCount+highSensitivityRange &&
-			similarCount >= aspectCount-highSensitivityRange {
+		if similarCount >= aspectCount-highSensitivityRange {
 			matchOnProfiles = true
 		} else {
 			matchOnProfiles = false
@@ -367,6 +418,13 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 			Tempo:    (profileA.Tempo + profileB.Tempo) / 2,
 			TimeSig:  profileA.TimeSig, // Averaging timesigs does not make sense, so just pick one since
 			// we found previously that both for each user of the match are either the same, or are similar.
+			Acousticness:     (profileA.Acousticness + profileB.Acousticness) / 2,
+			Danceability:     (profileA.Danceability + profileB.Danceability) / 2,
+			Energy:           (profileA.Energy + profileB.Energy) / 2,
+			Instrumentalness: (profileA.Instrumentalness + profileB.Instrumentalness) / 2,
+			Mode:             profileA.Mode,
+			Speechiness:      (profileA.Speechiness + profileB.Speechiness) / 2,
+			Valence:          (profileA.Valence + profileB.Valence) / 2,
 		}
 
 		// put all songs in a slice
@@ -394,9 +452,34 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		var tempoClosestSongID2 int
 		var tempoClosestSongID3 int
 
+		var acousticnessClosestSongID int
+		var acousticnessClosestSongID2 int
+		var acousticnessClosestSongID3 int
+
+		var danceabilityClosestSongID int
+		var danceabilityClosestSongID2 int
+		var danceabilityClosestSongID3 int
+
+		var energyClosestSongID int
+		var energyClosestSongID2 int
+		var energyClosestSongID3 int
+
+		var instrumentalnessClosestSongID int
+		var instrumentalnessClosestSongID2 int
+		var instrumentalnessClosestSongID3 int
+
+		var speechinessClosestSongID int
+		var speechinessClosestSongID2 int
+		var speechinessClosestSongID3 int
+
+		var valenceClosestSongID int
+		var valenceClosestSongID2 int
+		var valenceClosestSongID3 int
+
 		var timeSigsMatchingSongIDs []int
-		// var smallestDiffInt int
+		var modesMatchingSongIDs []int
 		var smallestDiffFloat64 float64
+		var smallestDiffFloat32 float32
 
 		// find the song that is closest to the aggregate music profile
 		// get song with closest Loudness
@@ -439,17 +522,147 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 				tempoClosestSongID = songs[i].ID
 			}
 		}
-		// get songs with identical TimeSigs
+		// get song with closest Acousticness
+		for i := range songs {
+			difference := aggregateMusicProfile.Acousticness - songs[i].Acousticness
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat32 = difference
+				acousticnessClosestSongID3 = songs[i].ID
+				acousticnessClosestSongID2 = songs[i].ID
+				acousticnessClosestSongID = songs[i].ID
+				continue
+			}
+			if difference < smallestDiffFloat32 {
+				smallestDiffFloat32 = difference
+				acousticnessClosestSongID3 = acousticnessClosestSongID2
+				acousticnessClosestSongID2 = acousticnessClosestSongID
+				acousticnessClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest Danceability
+		for i := range songs {
+			difference := aggregateMusicProfile.Danceability - songs[i].Danceability
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat32 = difference
+				danceabilityClosestSongID3 = songs[i].ID
+				danceabilityClosestSongID2 = songs[i].ID
+				danceabilityClosestSongID = songs[i].ID
+				continue
+			}
+			if difference < smallestDiffFloat32 {
+				smallestDiffFloat32 = difference
+				danceabilityClosestSongID3 = danceabilityClosestSongID2
+				danceabilityClosestSongID2 = danceabilityClosestSongID
+				danceabilityClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest Energy
+		for i := range songs {
+			difference := aggregateMusicProfile.Energy - songs[i].Energy
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat32 = difference
+				energyClosestSongID3 = songs[i].ID
+				energyClosestSongID2 = songs[i].ID
+				energyClosestSongID = songs[i].ID
+				continue
+			}
+			if difference < smallestDiffFloat32 {
+				smallestDiffFloat32 = difference
+				energyClosestSongID3 = energyClosestSongID2
+				energyClosestSongID2 = energyClosestSongID
+				energyClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest Instrumentalness
+		for i := range songs {
+			difference := aggregateMusicProfile.Instrumentalness - songs[i].Instrumentalness
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat32 = difference
+				instrumentalnessClosestSongID3 = songs[i].ID
+				instrumentalnessClosestSongID2 = songs[i].ID
+				instrumentalnessClosestSongID = songs[i].ID
+				continue
+			}
+			if difference < smallestDiffFloat32 {
+				smallestDiffFloat32 = difference
+				instrumentalnessClosestSongID3 = instrumentalnessClosestSongID2
+				instrumentalnessClosestSongID2 = instrumentalnessClosestSongID
+				instrumentalnessClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest Speechiness
+		for i := range songs {
+			difference := aggregateMusicProfile.Speechiness - songs[i].Speechiness
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat32 = difference
+				speechinessClosestSongID3 = songs[i].ID
+				speechinessClosestSongID2 = songs[i].ID
+				speechinessClosestSongID = songs[i].ID
+				continue
+			}
+			if difference < smallestDiffFloat32 {
+				smallestDiffFloat32 = difference
+				speechinessClosestSongID3 = speechinessClosestSongID2
+				speechinessClosestSongID2 = speechinessClosestSongID
+				speechinessClosestSongID = songs[i].ID
+			}
+		}
+		// get song with closest Valence
+		for i := range songs {
+			difference := aggregateMusicProfile.Valence - songs[i].Valence
+			if difference < 0 {
+				difference *= -1
+			}
+			if i == 0 {
+				smallestDiffFloat32 = difference
+				valenceClosestSongID3 = songs[i].ID
+				valenceClosestSongID2 = songs[i].ID
+				valenceClosestSongID = songs[i].ID
+				continue
+			}
+			if difference < smallestDiffFloat32 {
+				smallestDiffFloat32 = difference
+				valenceClosestSongID3 = valenceClosestSongID2
+				valenceClosestSongID2 = valenceClosestSongID
+				valenceClosestSongID = songs[i].ID
+			}
+		}
+		// get songs with identical TimeSigs and Modes
 		for i := range songs {
 			if aggregateMusicProfile.TimeSig == songs[i].TimeSigAvg {
 				timeSigsMatchingSongIDs = append(timeSigsMatchingSongIDs, songs[i].ID)
+			}
+			if aggregateMusicProfile.Mode == songs[i].Mode {
+				modesMatchingSongIDs = append(modesMatchingSongIDs, songs[i].ID)
 			}
 		}
 
 		// Get the mode (highest occurring) of a slice of all of the IDs found to be the closest in each
 		// aspect area (except timesig, just yet).
 		IDs := []int{loudnessClosestSongID, loudnessClosestSongID2, loudnessClosestSongID3,
-			tempoClosestSongID, tempoClosestSongID2, tempoClosestSongID3}
+			tempoClosestSongID, tempoClosestSongID2, tempoClosestSongID3,
+			acousticnessClosestSongID, acousticnessClosestSongID2, acousticnessClosestSongID3,
+			danceabilityClosestSongID, danceabilityClosestSongID2, danceabilityClosestSongID3,
+			energyClosestSongID, energyClosestSongID2, energyClosestSongID3,
+			instrumentalnessClosestSongID, instrumentalnessClosestSongID2, instrumentalnessClosestSongID3,
+			speechinessClosestSongID, speechinessClosestSongID2, speechinessClosestSongID3,
+			valenceClosestSongID, valenceClosestSongID2, valenceClosestSongID3,
+		}
 		FinalIDs := IDs
 
 		// Now, timesigs...
@@ -465,6 +678,21 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 				}
 				if idExists == true {
 					FinalIDs = append(FinalIDs, timeSigsMatchingSongIDs[t])
+				}
+			}
+		}
+
+		// Same thing for modes...
+		if modesMatchingSongIDs != nil {
+			for t := range modesMatchingSongIDs {
+				idExists := false
+				for x := range IDs {
+					if IDs[x] == modesMatchingSongIDs[t] {
+						idExists = true
+					}
+				}
+				if idExists == true {
+					FinalIDs = append(FinalIDs, modesMatchingSongIDs[t])
 				}
 			}
 		}
