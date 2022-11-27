@@ -24,7 +24,7 @@
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
             >
-                <i class="fa-solid fa-right-from-bracket nav-icons"></i>
+                <i class="fa-solid fa-right-from-bracket nav-icons green-font"></i>
             </a>
     </div>
 
@@ -90,7 +90,7 @@
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
-            <a href="#" class="btn float-left w-25 green-font button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="#" class="btn float-left w-25 button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
             <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
