@@ -6,13 +6,20 @@ import (
 
 // Song is the type for a song
 type Song struct {
-	ID          int     `db:"id,omitempty"`
-	SpotifyID   string  `db:"spotify_id" json:"spotify_id"`
-	Name        string  `db:"song_name" json:"song_name"`
-	ArtistName  string  `db:"artist_name" json:"artist_name"`
-	LoudnessAvg float64 `db:"loudness" json:"loudness"`
-	TempoAvg    float64 `db:"tempo" json:"tempo"`
-	TimeSigAvg  int     `db:"time_sig" json:"time_sig"`
+	ID               int     `db:"id,omitempty"`
+	SpotifyID        string  `db:"spotify_id" json:"spotify_id"`
+	Name             string  `db:"song_name" json:"song_name"`
+	ArtistName       string  `db:"artist_name" json:"artist_name"`
+	LoudnessAvg      float64 `db:"loudness" json:"loudness"`
+	TempoAvg         float64 `db:"tempo" json:"tempo"`
+	TimeSigAvg       int     `db:"time_sig" json:"time_sig"`
+	Acousticness     float32 `db:"acousticness" json:"acousticness"`
+	Danceability     float32 `db:"danceability" json:"danceability"`
+	Energy           float32 `db:"energy" json:"energy"`
+	Instrumentalness float32 `db:"instrumentalness" json:"instrumentalness"`
+	Mode             int     `db:"mode" json:"mode"`
+	Speechiness      float32 `db:"speechiness" json:"speechiness"`
+	Valence          float32 `db:"valence" json:"valence"`
 }
 
 // Table returns the table name associated with this model in the database
@@ -62,11 +69,11 @@ func (a *Song) GetByName(name string) (*Song, error) {
 	return &theSong, nil
 }
 
-// GetByNameAndArtist gets one song, by name
-func (a *Song) GetByNameAndArtist(name string, artistName string) (*Song, error) {
+// GetBySpotifyID gets one song, by Spotify ID
+func (a *Song) GetBySpotifyID(spotifyID string) (*Song, error) {
 	var theSong Song
 	collection := upper.Collection(a.Table())
-	res := collection.Find(up.Cond{"song_name": name, "artist_name": artistName})
+	res := collection.Find(up.Cond{"spotify_id": spotifyID})
 	err := res.One(&theSong)
 	if err != nil {
 		return nil, err
@@ -127,7 +134,7 @@ func (a *Song) Insert(theSong Song) (int, error) {
 	collection := upper.Collection(a.Table())
 
 	// Make sure this song doesn't already exist
-	song, err := a.GetByNameAndArtist(theSong.Name, theSong.ArtistName)
+	song, err := a.GetBySpotifyID(theSong.SpotifyID)
 	if song != nil {
 		return 0, nil
 	}

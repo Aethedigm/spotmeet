@@ -19,10 +19,17 @@ func TestUserMusicProfile_Insert(t *testing.T) {
 	}
 
 	ump := &UserMusicProfile{
-		UserID:   uID,
-		Loudness: 10,
-		Tempo:    10,
-		TimeSig:  4,
+		UserID:           uID,
+		Loudness:         10,
+		Tempo:            10,
+		TimeSig:          4,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	_, err = ump.Insert(ump)
@@ -47,10 +54,17 @@ func TestUserMusicProfile_Get(t *testing.T) {
 	}
 
 	ump := &UserMusicProfile{
-		UserID:   uID,
-		Loudness: 10,
-		Tempo:    10,
-		TimeSig:  4,
+		UserID:           uID,
+		Loudness:         10,
+		Tempo:            10,
+		TimeSig:          4,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	umpID, err := ump.Insert(ump)
@@ -89,10 +103,17 @@ func TestUserMusicProfile_GetByUser(t *testing.T) {
 	u.ID = uID
 
 	ump := &UserMusicProfile{
-		UserID:   uID,
-		Loudness: 10,
-		Tempo:    10,
-		TimeSig:  4,
+		UserID:           uID,
+		Loudness:         10,
+		Tempo:            10,
+		TimeSig:          4,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	umpID, err := ump.Insert(ump)

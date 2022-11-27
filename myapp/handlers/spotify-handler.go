@@ -219,32 +219,44 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 			trackAnalysis, err := client.GetAudioAnalysis(songs.Tracks[x].ID)
 			if err != nil {
 				fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
-				// add faux data here for the update of the record
-			} else {
-				fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-				loud, tempo, timeSig, err := h.BuildSectionAggregate(trackAnalysis.Sections)
-				if err != nil {
-					fmt.Println("Error building section aggregate")
-					continue
-				}
-
-				// update the song in the songs table
-				temp = data.Song{
-					ID:          tID,
-					SpotifyID:   id.String(),
-					Name:        name,
-					ArtistName:  artistName,
-					LoudnessAvg: loud,
-					TempoAvg:    tempo,
-					TimeSigAvg:  timeSig,
-				}
-
-				err = temp.Update(temp)
-				if err != nil {
-					fmt.Println("Error updating song: ID", tID)
-					return err
-				}
+				return err
 			}
+			trackFeatures, err := client.GetAudioFeatures(songs.Tracks[x].ID)
+			if err != nil {
+				fmt.Println("Error getting audio features for track", songs.Tracks[x].ID)
+				return err
+			}
+			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
+			loud, tempo, timeSig, err := h.BuildSectionAggregate(trackAnalysis.Sections)
+			if err != nil {
+				fmt.Println("Error building section aggregate")
+				continue
+			}
+
+			// update the song in the songs table
+			temp = data.Song{
+				ID:               tID,
+				SpotifyID:        id.String(),
+				Name:             name,
+				ArtistName:       artistName,
+				LoudnessAvg:      loud,
+				TempoAvg:         tempo,
+				TimeSigAvg:       timeSig,
+				Acousticness:     trackFeatures[0].Acousticness,
+				Danceability:     trackFeatures[0].Danceability,
+				Energy:           trackFeatures[0].Energy,
+				Instrumentalness: trackFeatures[0].Instrumentalness,
+				Mode:             trackFeatures[0].Mode,
+				Speechiness:      trackFeatures[0].Speechiness,
+				Valence:          trackFeatures[0].Valence,
+			}
+
+			err = temp.Update(temp)
+			if err != nil {
+				fmt.Println("Error updating song: ID", tID)
+				return err
+			}
+
 		}
 
 		tempLsng := data.LikedSong{
@@ -350,10 +362,17 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 	}
 
 	var (
-		loudnessAvg float64
-		tempoAvg    float64
-		timesigAvg  []int
-		total       int
+		loudnessAvg         float64
+		tempoAvg            float64
+		timesigAvg          []int
+		acousticnessAvg     float32
+		danceabilityAvg     float32
+		energyAvg           float32
+		instrumentalnessAvg float32
+		modeMostCommon      []int
+		speechinessAvg      float32
+		valenceAvg          float32
+		total               int
 	)
 
 	likedSongs, err := h.Models.LikedSongs.GetAllByOneUser(user.ID)
@@ -373,6 +392,13 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 		loudnessAvg += song.LoudnessAvg
 		tempoAvg += song.TempoAvg
 		timesigAvg = append(timesigAvg, song.TimeSigAvg)
+		acousticnessAvg += song.Acousticness
+		danceabilityAvg += song.Danceability
+		energyAvg += song.Energy
+		instrumentalnessAvg += song.Instrumentalness
+		modeMostCommon = append(modeMostCommon, song.Mode)
+		speechinessAvg += song.Speechiness
+		valenceAvg += song.Valence
 		total += 1
 	}
 
@@ -380,12 +406,26 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 	loudnessAvg = loudnessAvg / float64(total)
 	tempoAvg = tempoAvg / float64(total)
 	timesigMode := h.Mode(timesigAvg, total)
+	acousticnessAvg = acousticnessAvg / float32(total)
+	danceabilityAvg = danceabilityAvg / float32(total)
+	energyAvg = energyAvg / float32(total)
+	instrumentalnessAvg = instrumentalnessAvg / float32(total)
+	modeMode := h.Mode(modeMostCommon, total)
+	speechinessAvg = speechinessAvg / float32(total)
+	valenceAvg = valenceAvg / float32(total)
 
 	musicProfile := data.UserMusicProfile{
-		UserID:   user.ID,
-		Loudness: loudnessAvg,
-		Tempo:    tempoAvg,
-		TimeSig:  timesigMode,
+		UserID:           user.ID,
+		Loudness:         loudnessAvg,
+		Tempo:            tempoAvg,
+		TimeSig:          timesigMode,
+		Acousticness:     acousticnessAvg,
+		Danceability:     danceabilityAvg,
+		Energy:           energyAvg,
+		Instrumentalness: instrumentalnessAvg,
+		Mode:             modeMode,
+		Speechiness:      speechinessAvg,
+		Valence:          valenceAvg,
 	}
 
 	return &musicProfile, nil

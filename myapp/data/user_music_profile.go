@@ -7,12 +7,19 @@ import (
 )
 
 type UserMusicProfile struct {
-	ID        int       `db:"id,omitempty" json:"id"`
-	UserID    int       `db:"user_id" json:"user_id"`
-	Loudness  float64   `db:"loudness" json:"loudness"`
-	Tempo     float64   `db:"tempo" json:"tempo"`
-	TimeSig   int       `db:"time_sig" json:"time_sig"`
-	UpdatedAt time.Time `db:"updated_at" json:"update_at"`
+	ID               int       `db:"id,omitempty" json:"id"`
+	UserID           int       `db:"user_id" json:"user_id"`
+	Loudness         float64   `db:"loudness" json:"loudness"`
+	Tempo            float64   `db:"tempo" json:"tempo"`
+	TimeSig          int       `db:"time_sig" json:"time_sig"`
+	Acousticness     float32   `db:"acousticness" json:"acousticness"`
+	Danceability     float32   `db:"danceability" json:"danceability"`
+	Energy           float32   `db:"energy" json:"energy"`
+	Instrumentalness float32   `db:"instrumentalness" json:"instrumentalness"`
+	Mode             int       `db:"mode" json:"mode"`
+	Speechiness      float32   `db:"speechiness" json:"speechiness"`
+	Valence          float32   `db:"valence" json:"valence"`
+	UpdatedAt        time.Time `db:"updated_at" json:"update_at"`
 }
 
 func (u *UserMusicProfile) Table() string {

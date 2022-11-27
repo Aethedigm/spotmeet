@@ -7,5 +7,12 @@ CREATE TABLE songs (
     artist_name VARCHAR(255) NOT NULL,
     loudness float NOT NULL,
     tempo float NOT NULL,
-    time_sig int NOT NULL
+    time_sig int NOT NULL,
+    acousticness float NOT NULL,
+    danceability float NOT NULL,
+    energy float NOT NULL,
+    instrumentalness float NOT NULL,
+    mode int NOT NULL,
+    speechiness float NOT NULL,
+    valence float NOT NULL
 );
