@@ -18,12 +18,19 @@ func TestSong_GetAll(t *testing.T) {
 	a.ID = sID
 
 	s := Song{
-		SpotifyID:   "test2",
-		Name:        "test2",
-		ArtistName:  "test2",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "test2",
+		Name:             "test2",
+		ArtistName:       "test2",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID2, err := s.Insert(s)
@@ -45,12 +52,19 @@ func TestSong_GetAll(t *testing.T) {
 
 func TestSong_GetByName(t *testing.T) {
 	s := Song{
-		SpotifyID:   "test3",
-		Name:        "test3",
-		ArtistName:  "test3",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "test3",
+		Name:             "test3",
+		ArtistName:       "test3",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -71,12 +85,19 @@ func TestSong_GetByName(t *testing.T) {
 
 func TestSong_Get(t *testing.T) {
 	s := Song{
-		SpotifyID:   "test4",
-		Name:        "test4",
-		ArtistName:  "test4",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "test4",
+		Name:             "test4",
+		ArtistName:       "test4",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -97,12 +118,19 @@ func TestSong_Get(t *testing.T) {
 
 func TestSong_Update(t *testing.T) {
 	s := Song{
-		SpotifyID:   "test5",
-		Name:        "test5",
-		ArtistName:  "test5",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "test5",
+		Name:             "test5",
+		ArtistName:       "test5",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -130,12 +158,19 @@ func TestSong_Update(t *testing.T) {
 
 func TestSong_Delete(t *testing.T) {
 	s := Song{
-		SpotifyID:   "test7",
-		Name:        "test7",
-		ArtistName:  "test7",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "test7",
+		Name:             "test7",
+		ArtistName:       "test7",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -152,12 +187,19 @@ func TestSong_Delete(t *testing.T) {
 
 func TestSong_DeleteByName(t *testing.T) {
 	s := Song{
-		SpotifyID:   "test8",
-		Name:        "test8",
-		ArtistName:  "test8",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "test8",
+		Name:             "test8",
+		ArtistName:       "test8",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)

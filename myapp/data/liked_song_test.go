@@ -27,12 +27,19 @@ func TestLikedSong_Insert(t *testing.T) {
 	}
 
 	s := Song{
-		SpotifyID:   "likedtest",
-		Name:        "likedtest",
-		ArtistName:  "artist_name",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "likedtest",
+		Name:             "likedtest",
+		ArtistName:       "artist_name",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -69,12 +76,19 @@ func TestLikedSong_Update(t *testing.T) {
 	}
 
 	s := Song{
-		SpotifyID:   "likedtest_update",
-		Name:        "likedtest_update",
-		ArtistName:  "likedtest_update",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "likedtest_update",
+		Name:             "likedtest_update",
+		ArtistName:       "likedtest_update",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -99,12 +113,19 @@ func TestLikedSong_Update(t *testing.T) {
 	ls.ID = lsID
 
 	s2 := Song{
-		SpotifyID:   "likedtest_update2",
-		Name:        "likedtest_update2",
-		ArtistName:  "likedtest_update2",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "likedtest_update2",
+		Name:             "likedtest_update2",
+		ArtistName:       "likedtest_update2",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID2, err := s.Insert(s2)
@@ -142,12 +163,19 @@ func TestLikedSong_Delete(t *testing.T) {
 	}
 
 	s := Song{
-		SpotifyID:   "likedtest_delete",
-		Name:        "likedtest_delete",
-		ArtistName:  "likedtest_delete",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "likedtest_delete",
+		Name:             "likedtest_delete",
+		ArtistName:       "likedtest_delete",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -196,12 +224,19 @@ func TestLikedSong_GetAll(t *testing.T) {
 	}
 
 	s := Song{
-		SpotifyID:   "likedtest_getall",
-		Name:        "likedtest_getall",
-		ArtistName:  "likedtest_getall",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "likedtest_getall",
+		Name:             "likedtest_getall",
+		ArtistName:       "likedtest_getall",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	aID, err := s.Insert(s)
@@ -265,12 +300,19 @@ func TestLikedSong_GetAllByOneUser(t *testing.T) {
 	}
 
 	s := Song{
-		SpotifyID:   "likedtest_getallbyoneuser",
-		Name:        "likedtest_getallbyoneuser",
-		ArtistName:  "likedtest_getallbyoneuser",
-		LoudnessAvg: 0.0,
-		TempoAvg:    0.0,
-		TimeSigAvg:  0,
+		SpotifyID:        "likedtest_getallbyoneuser",
+		Name:             "likedtest_getallbyoneuser",
+		ArtistName:       "likedtest_getallbyoneuser",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID, err := s.Insert(s)
@@ -279,8 +321,19 @@ func TestLikedSong_GetAllByOneUser(t *testing.T) {
 	}
 
 	a2 := Song{
-		SpotifyID: "likedtest_getallbyoneuser2",
-		Name:      "likedtest_getallbyoneuser2",
+		SpotifyID:        "likedtest_getallbyoneuser2",
+		Name:             "likedtest_getallbyoneuser2",
+		ArtistName:       "likedtest_getallbyoneuser2",
+		LoudnessAvg:      0.0,
+		TempoAvg:         0.0,
+		TimeSigAvg:       0,
+		Acousticness:     0,
+		Danceability:     0,
+		Energy:           0,
+		Instrumentalness: 0,
+		Mode:             0,
+		Speechiness:      0,
+		Valence:          0,
 	}
 
 	sID2, err := a2.Insert(a2)
