@@ -29,6 +29,7 @@ type Models struct {
 	UserMusicProfiles UserMusicProfile
 	Songs             Song
 	LikedSongs        LikedSong
+	RecoveryEmails    RecoveryEmail
 }
 
 // New initializes the models package for use

@@ -1,0 +1,17 @@
+{{extends "./layouts/base.jet"}}
+
+{{block browserTitle()}}Check your email{{end}}
+
+{{block css()}}
+
+{{end}}
+
+{{block pageContent()}}
+<div>
+    Password reset request sent, check your email.
+</div>
+{{end}}
+
+{{block js()}}
+
+{{end}}
