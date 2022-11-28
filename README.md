@@ -5,7 +5,7 @@ Capstone - Team E
 - [ ] Pages
   - [X]  Home Page
   - [X] Login Page
-    - [ ] Recover Password / Forgot Login
+    - [X] Recover Password / Forgot Login
   - [X] Register Page
   - [X] Matches Page
   - [X] Messages Page
@@ -20,7 +20,7 @@ Capstone - Team E
   - [X] Migrations
   - [X] 80%+ Testing
   - [ ] Matching Algorithm
-- [ ] Middleware
+- [X] Middleware
   - [X] Spotify Auth
   - [X] Spotify Music Capture
   - [X] Spotify Artist Capture
