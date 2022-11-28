@@ -37,8 +37,14 @@ func (a *application) routes() *chi.Mux {
 		r.Get("/profile/{profileID:[0-9]+}", a.Handlers.ProfileByID)
 		r.Get("/edit-profile/{profileID:[0-9]+}", a.Handlers.EditProfile)
 
+		r.Get("/forgot-password", a.Handlers.ForgotPassword)
+		r.Get("/reset-complete", a.Handlers.PasswordResetSent)
+		r.Get("/recover-password/{email}", a.Handlers.SendRecoveryEmail)
+		r.Get("/password-reset/{recoverID:[0-9]+}", a.Handlers.RecoveryEmailAccepted)
+
 		r.Post("/login", a.Handlers.PostUserLogin)
 		r.Post("/create", a.Handlers.CreateUserAndProfile)
+		r.Post("/{userID:[0-9]+}/change-password", a.Handlers.ChangePassword)
 
 		r.Put("/settings/{settingsID:[0-9]+}", a.Handlers.UpdateSettings)
 		r.Put("/update-profile/{profileID:[0-9]+}", a.Handlers.UpdateProfile)

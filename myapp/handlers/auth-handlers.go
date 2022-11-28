@@ -1,9 +1,51 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
+	"strconv"
+
+	"github.com/go-chi/chi/v5"
 )
+
+type PasswordRequest struct {
+	Password string `json:"password"`
+}
+
+func (h *Handlers) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	var p PasswordRequest
+
+	userIDstr := chi.URLParam(r, "userID")
+	userID, err := strconv.Atoi(userIDstr)
+	if err != nil {
+		h.App.ErrorLog.Println("Unable to convert to int", err)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&p)
+	if err != nil {
+		h.App.ErrorLog.Println("Unable to deserialize", err)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	err = h.Models.Users.ResetPassword(userID, p.Password)
+	if err != nil {
+		h.App.ErrorLog.Println("Unable to change password", err)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	w.Write([]byte(`{"status":"ok"}`))
+
+	// Delete all requests for this user
+	err = h.Models.RecoveryEmails.DeleteAllForUser(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("Error clearing password reset requests for user", userID)
+		return
+	}
+}
 
 func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 	err := h.App.Render.Page(w, r, "register", nil, nil)
@@ -22,7 +64,7 @@ func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
-		fmt.Println("Error parsing form", err)
+		h.App.ErrorLog.Println("Error parsing form", err)
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
@@ -32,20 +74,20 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Models.Users.GetByEmail(email)
 	if err != nil {
-		fmt.Println("Error getting user by email", err)
+		h.App.ErrorLog.Println("Error getting user by email", err)
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	matches, err := user.PasswordMatches(password)
 	if err != nil {
-		fmt.Println("Error checking password", err)
+		h.App.ErrorLog.Println("Error checking password", err)
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
 
 	if !matches {
-		fmt.Println("Password does not match")
+		h.App.ErrorLog.Println("Password does not match")
 		http.Redirect(w, r, "/users/login?loginFailed=true", http.StatusSeeOther)
 		return
 	}
@@ -54,7 +96,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	_, err = h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
-		fmt.Println("Spotify token for user does not exist. Going to /users/spotauth to get one.", err)
+		h.App.ErrorLog.Println("Spotify token for user does not exist. Going to /users/spotauth to get one.", err)
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		return
 	}
