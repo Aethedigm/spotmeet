@@ -2,12 +2,80 @@ package handlers
 
 import (
 	"fmt"
+	"io/fs"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/go-chi/chi/v5"
 )
+
+func (h *Handlers) UpdateUserPicture(w http.ResponseWriter, r *http.Request) {
+	// Get profile ID
+	profileIDstr := chi.URLParam(r, "profileID")
+
+	// Check for directory + create if missing
+	if _, err := os.Stat("public/images/u/" + profileIDstr); os.IsNotExist(err) {
+		h.App.InfoLog.Println("Directory does not exist", err)
+		if err := os.MkdirAll("public/images/u/"+profileIDstr, os.ModePerm); err != nil {
+			h.App.ErrorLog.Println("Error creating directory", err)
+			http.Error(w, "Error creating image", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	// Create file separately
+	_, err := os.Create("public/images/u/" + profileIDstr + "/pfp.jpg")
+	if err != nil {
+		h.App.ErrorLog.Println("Error creating output file")
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// Read image from stream
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		h.App.ErrorLog.Println("Error", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// Write image to file
+	err = ioutil.WriteFile("public/images/u/"+profileIDstr+"/pfp.jpg", data, fs.ModePerm)
+	if err != nil {
+		h.App.ErrorLog.Println("Error writing file", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// Get ID
+	profileID, err := strconv.Atoi(profileIDstr)
+	if err != nil {
+		h.App.ErrorLog.Println("Error converting id to int", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// get profile
+	profile, err := h.Models.Profiles.Get(profileID)
+	if err != nil {
+		h.App.ErrorLog.Println("Error getting profile", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// Update DB url
+	profile.ImageURL = "/public/images/u/" + profileIDstr + "/pfp.jpg"
+
+	err = h.Models.Profiles.Update(*profile)
+	if err != nil {
+		h.App.ErrorLog.Println("Error updating profile", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+}
 
 func (h *Handlers) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
@@ -52,7 +120,7 @@ func (h *Handlers) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) EditProfile(w http.ResponseWriter, r *http.Request) {
 	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 		return
 	}
 
