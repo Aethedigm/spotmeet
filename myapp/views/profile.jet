@@ -63,24 +63,34 @@
         <div id="top-artists" class="mt-5 container w-50">
             <div class="row">
                 <div class="fw-bold">
-                    {{ FirstName }}'s Top Artists:
+                    {{ FirstName }}'s Top Tracks:
                 </div>
             </div>
             <div class="row">
                 <table class="table table-striped">
                     <tr>
                         <td>
-                            {{ Artist1 }}
+                            {{ Song1 }}
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            {{ Artist2 }}
+                            {{ Song2 }}
                         </td>
                     </tr>
                     <tr >
                         <td>
-                            {{ Artist3 }}
+                            {{ Song3 }}
+                        </td>
+                    </tr>
+                    <tr >
+                        <td>
+                            {{ Song4 }}
+                        </td>
+                    </tr>
+                    <tr >
+                        <td>
+                            {{ Song5 }}
                         </td>
                     </tr>
                 </table>

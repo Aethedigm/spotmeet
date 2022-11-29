@@ -198,6 +198,48 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		thisUser := h.App.Session.GetInt(r.Context(), "userID")
+		likedSongs, err := h.Models.LikedSongs.GetAllByOneUser(profile.UserID)
+		if err != nil {
+			fmt.Println("Error getting liked songs from user:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		song1, err := h.Models.Songs.Get(likedSongs[0].SongID)
+		if err != nil {
+			fmt.Println("Error getting song:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		song2, err := h.Models.Songs.Get(likedSongs[1].SongID)
+		if err != nil {
+			fmt.Println("Error getting song:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		song3, err := h.Models.Songs.Get(likedSongs[2].SongID)
+		if err != nil {
+			fmt.Println("Error getting song:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		song4, err := h.Models.Songs.Get(likedSongs[3].SongID)
+		if err != nil {
+			fmt.Println("Error getting song:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		song5, err := h.Models.Songs.Get(likedSongs[4].SongID)
+		if err != nil {
+			fmt.Println("Error getting song:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		fullName1 := song1.Name + "  by  " + song1.ArtistName
+		fullName2 := song2.Name + "  by  " + song2.ArtistName
+		fullName3 := song3.Name + "  by  " + song3.ArtistName
+		fullName4 := song4.Name + "  by  " + song4.ArtistName
+		fullName5 := song5.Name + "  by  " + song5.ArtistName
 
 		vars := make(jet.VarMap)
 		vars.Set("userID", thisUser)
@@ -206,33 +248,11 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 		vars.Set("FirstName", user.FirstName)
 		vars.Set("imgurl", profile.ImageURL)
 		vars.Set("description", profile.Description)
-
-		// GET TOP 3 ARTISTS
-
-		Artists := []string{"Artist #1", "Artist #2", "Artist #3"}
-
-		lart, err := h.Models.LikedArtists.GetAllByOneUser(profile.UserID)
-		if err != nil {
-			fmt.Println("Error getting liked artists for user", profile.UserID, err)
-		}
-
-		maxArt := 3
-		if len(lart) < 3 {
-			maxArt = len(lart)
-		}
-
-		for i := 0; i < maxArt; i++ {
-			tmpArt, err := h.Models.Artists.Get(lart[i].ArtistID)
-			if err != nil {
-				fmt.Println("Error getting artist from liked artists")
-				break
-			}
-			Artists[i] = tmpArt.Name
-		}
-
-		vars.Set("Artist1", Artists[0])
-		vars.Set("Artist2", Artists[1])
-		vars.Set("Artist3", Artists[2])
+		vars.Set("Song1", fullName1)
+		vars.Set("Song2", fullName2)
+		vars.Set("Song3", fullName3)
+		vars.Set("Song4", fullName4)
+		vars.Set("Song5", fullName5)
 
 		err = h.App.Render.JetPage(w, r, "profile", vars, nil)
 		if err != nil {
