@@ -96,6 +96,8 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("MyMatchResults has been called.")
+
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	user, err := h.Models.Users.Get(userID)
 	if err != nil {
@@ -109,6 +111,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	// The Update version of this is called from the view via fetch() for behind-the-scenes updating.
 	// The Create version is called here when we have a new user, in order to prioritize gathering this
 	// info, so that Matches can be displayed upon first matches.jet page load.
+	fmt.Println("Calling CreateUserMusicProfile")
 	err = h.CreateUserMusicProfile(userID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -120,6 +123,8 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		h.App.ErrorLog.Println(err)
 		return
 	}
+
+	fmt.Println("Calling MatchQuery")
 
 	// get potential matches that qualify based on coordinates and looking-for
 	users, err := h.Models.RQ.MatchQuery(*user, *settings)
@@ -245,17 +250,31 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var isFirstLogin bool
+	var locationUpdateNeeded bool
 	musicProfile, _ := h.Models.UserMusicProfiles.GetByUserID(userID)
 	fmt.Println("THIS IS THE CURRENT USER ID: ", userID)
 	if musicProfile == nil {
 		isFirstLogin = true
+		locationUpdateNeeded = true
 	} else {
 		isFirstLogin = false
+		user, err := h.Models.Users.Get(userID)
+		if err != nil {
+			h.App.ErrorLog.Println("error getting struct for user ", userID, ". ")
+		}
+
+		// Only get user's location if the user was updated more than 10 minutes prior to the current time.
+		if user.UpdatedAt.Before(time.Now().Truncate(time.Minute * 10)) {
+			locationUpdateNeeded = true
+		} else {
+			locationUpdateNeeded = false
+		}
 	}
 
 	vars := make(jet.VarMap)
 	vars.Set("userID", userID)
 	vars.Set("isFirstLogin", isFirstLogin)
+	vars.Set("locationUpdateNeeded", locationUpdateNeeded)
 
 	err = h.App.Render.Page(w, r, "matches", vars, nil)
 	if err != nil {

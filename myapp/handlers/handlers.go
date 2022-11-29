@@ -24,6 +24,7 @@ func (h *Handlers) About(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Starting to get location for user--")
 	err := r.ParseForm()
 	if err != nil {
 		h.App.ErrorLog.Println("error parsing form:", err)
@@ -89,6 +90,10 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		h.App.ErrorLog.Println("error updating user ", userID, err)
 		return
 	}
+	fmt.Println("Current user location updated--")
+	fmt.Println("Returning to webpage from matches/location--")
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fmt.Sprintf("%d", userID)))
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {

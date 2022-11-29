@@ -186,6 +186,34 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		return err
 	}
 
+	fmt.Println("STARTING GETTING SONGS' ANALYSES FROM SPOTIFY.")
+	songID1 := songs.Tracks[0].ID
+	songID2 := songs.Tracks[1].ID
+	songID3 := songs.Tracks[2].ID
+	songID4 := songs.Tracks[3].ID
+	songID5 := songs.Tracks[4].ID
+	songID6 := songs.Tracks[5].ID
+	songID7 := songs.Tracks[6].ID
+	songID8 := songs.Tracks[7].ID
+	songID9 := songs.Tracks[8].ID
+	songID10 := songs.Tracks[9].ID
+	songID11 := songs.Tracks[10].ID
+	songID12 := songs.Tracks[11].ID
+	songID13 := songs.Tracks[12].ID
+	songID14 := songs.Tracks[13].ID
+	songID15 := songs.Tracks[14].ID
+	songID16 := songs.Tracks[15].ID
+	songID17 := songs.Tracks[16].ID
+	songID18 := songs.Tracks[17].ID
+	songID19 := songs.Tracks[18].ID
+	songID20 := songs.Tracks[19].ID
+
+	allTracksFeatures, err := client.GetAudioFeatures(songID1, songID2, songID3, songID4, songID5,
+		songID6, songID7, songID8, songID9, songID10, songID11, songID12, songID13, songID14, songID15,
+		songID16, songID17, songID18, songID19, songID20)
+
+	fmt.Println("END GETTING SONGS' ANALYSES FROM SPOTIFY.")
+
 	// insert new songs and liked songs for the user (currently their top 20)
 	for x := range songs.Tracks {
 		id := songs.Tracks[x].ID
@@ -216,39 +244,39 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 			}
 			tID = song.ID
 		} else {
-			trackAnalysis, err := client.GetAudioAnalysis(songs.Tracks[x].ID)
-			if err != nil {
-				fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
-				return err
-			}
-			trackFeatures, err := client.GetAudioFeatures(songs.Tracks[x].ID)
+			// trackFeatures, err := client.GetAudioFeatures(songs.Tracks[x].ID)
 			if err != nil {
 				fmt.Println("Error getting audio features for track", songs.Tracks[x].ID)
 				return err
 			}
 			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-			loud, tempo, timeSig, err := h.BuildSectionAggregate(trackAnalysis.Sections)
-			if err != nil {
-				fmt.Println("Error building section aggregate")
-				continue
-			}
 
 			// update the song in the songs table
 			temp = data.Song{
-				ID:               tID,
-				SpotifyID:        id.String(),
-				Name:             name,
-				ArtistName:       artistName,
-				LoudnessAvg:      loud,
-				TempoAvg:         tempo,
-				TimeSigAvg:       timeSig,
-				Acousticness:     trackFeatures[0].Acousticness,
-				Danceability:     trackFeatures[0].Danceability,
-				Energy:           trackFeatures[0].Energy,
-				Instrumentalness: trackFeatures[0].Instrumentalness,
-				Mode:             trackFeatures[0].Mode,
-				Speechiness:      trackFeatures[0].Speechiness,
-				Valence:          trackFeatures[0].Valence,
+				ID:         tID,
+				SpotifyID:  id.String(),
+				Name:       name,
+				ArtistName: artistName,
+				//LoudnessAvg:      float64(trackFeatures[0].Loudness),
+				//TempoAvg:         float64(trackFeatures[0].Tempo),
+				//TimeSigAvg:       trackFeatures[0].TimeSignature,
+				//Acousticness:     trackFeatures[0].Acousticness,
+				//Danceability:     trackFeatures[0].Danceability,
+				//Energy:           trackFeatures[0].Energy,
+				//Instrumentalness: trackFeatures[0].Instrumentalness,
+				//Mode:             trackFeatures[0].Mode,
+				//Speechiness:      trackFeatures[0].Speechiness,
+				//Valence:          trackFeatures[0].Valence,
+				LoudnessAvg:      float64(allTracksFeatures[x].Loudness),
+				TempoAvg:         float64(allTracksFeatures[x].Tempo),
+				TimeSigAvg:       allTracksFeatures[x].TimeSignature,
+				Acousticness:     allTracksFeatures[x].Acousticness,
+				Danceability:     allTracksFeatures[x].Danceability,
+				Energy:           allTracksFeatures[x].Energy,
+				Instrumentalness: allTracksFeatures[x].Instrumentalness,
+				Mode:             allTracksFeatures[x].Mode,
+				Speechiness:      allTracksFeatures[x].Speechiness,
+				Valence:          allTracksFeatures[x].Valence,
 			}
 
 			err = temp.Update(temp)
@@ -307,6 +335,7 @@ func (h *Handlers) UpdateUserMusicProfile(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"No user music profile created for user yet": "true"}`))
+		fmt.Println("No user music profile created for user yet. Creating one--")
 		return
 	}
 

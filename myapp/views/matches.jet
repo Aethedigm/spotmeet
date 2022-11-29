@@ -47,7 +47,7 @@
         }
         .wheel-frame {
             position: fixed;
-            background-color: #000000;
+            background-color: #FFFFFF;
             left: 0;
             top: 0;
             right: 0;
@@ -278,6 +278,7 @@
 <script>
 
 window.onload = function() {
+    var locationUpdateNeeded = {{locationUpdateNeeded}};
     var loadingMessage;
     if ({{isFirstLogin}} == true) {
         loadingMessage = "Setting you up.<br>(This may take a minute.)";
@@ -287,8 +288,7 @@ window.onload = function() {
         messageClass = "message";
     }
     showLoadingAnimation(loadingMessage, messageClass);
-    getLocationAndMatches();
-    // delay(1000).then(() => updateMusicProfile());
+    getLocationAndMatches(locationUpdateNeeded);
     updateMusicProfile();
 }
 
@@ -333,15 +333,24 @@ function showLoadingAnimation(loadingMessage, messageClass) {
     }
 };
 
-function getLocationAndMatches() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(sendLocationToServer, geolocationDenied);
+function getLocationAndMatches(locationUpdateNeeded) {
+    if (locationUpdateNeeded == true) {
+        if (navigator.geolocation) {
+            const loadingFrame = document.querySelector('.wheel-frame')
+            loadingFrame.style.backgroundColor = 'black';
+            console.log("Started calling navigator.geolocation.getCurrentPostion");
+            navigator.geolocation.getCurrentPosition(sendLocationToServer, geolocationDenied);
+            console.log("Finished calling navigator.geolocation.getCurrentPostion");
+        } else {
+            noGeolocation();
+        }
     } else {
-        noGeolocation();
+        fetchMatches();
     }
 }
 
 function sendLocationToServer(position) {
+    console.log("Started running sendLocationToServer()");
     const data = new URLSearchParams();
     const coordinates = {lat: position.coords.latitude, long: position.coords.longitude};
 
@@ -358,9 +367,10 @@ function sendLocationToServer(position) {
     })
         .then(response => response.json())
         .then(data => console.log(data));
+        //.then(() => fetchMatches());
 
     // give the server some time to write the location
-    delay(500).then(() => fetchMatches());
+    delay(1000).then(() => fetchMatches());
 }
 
 function delay(time) {
