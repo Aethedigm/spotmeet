@@ -48,6 +48,8 @@ func (a *application) routes() *chi.Mux {
 
 		r.Put("/settings/{settingsID:[0-9]+}", a.Handlers.UpdateSettings)
 		r.Put("/update-profile/{profileID:[0-9]+}", a.Handlers.UpdateProfile)
+
+		r.Put("/update-picture/{profileID:[0-9]+}", a.Handlers.UpdateUserPicture)
 	})
 
 	a.App.Routes.Get("/spotauth/callback", a.Handlers.SpotifyAuthorizationCallback)

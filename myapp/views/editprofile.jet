@@ -80,7 +80,7 @@
         <div class="container">
             <a href="#submit" class="btn btn-success mt-5 shadowsRoundEdges" onclick="updateProfile()">Submit</a>
             <a href="#cancel" class="btn btn-danger mt-5 mb-5 shadowsRoundEdges" onclick="cancel()">Cancel</a>
-            <input type="file" title=" " id="image_input" accept="image/png, image/jpg" class ="btn rounded-pill choosefile">
+            <input type="file" title=" " id="image_input" accept="image/png, image/jpg" class ="btn rounded-pill choosefile" onchange="submitImage()">
         </div>
     </div>
 
@@ -117,19 +117,16 @@ const updateProfile = () => {
 
 const cancel = () => {
     window.location.href = "/users/profile/{{ profileID }}";
+}
 
-
-// Not a clue if this code is correct so might need some help with this. - Landon
-const image_input = document.querySelector("#image_input");
-var upload_image = "";
-
-image_input.addEventListener("change", function()){
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-        upload_image = reader.result;
-        document.querySelector("#display_image").style.backgroundImage = url(${upload_image})
+const submitImage = () => {
+    var inFile = document.querySelector('input[type="file"]');
+    
+    fetch('/users/update-picture/{{ profileID }}', {
+        mode: 'same-origin',
+        method: 'PUT',
+        body: inFile.files[0]
     });
-    reader.readAsDataURL(this.files[0]);
 }
 </script>
 {{end}}
