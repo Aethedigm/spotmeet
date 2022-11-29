@@ -72,7 +72,7 @@ Login
         <hr>
         <br>
         <a href="javascript:void(0)" class="btn btn-primary w-100 mb-5 shadowsRoundEdges" onclick="val()">Log in</a>
-        <a href="/users/forgot-password" class="btn btn-secondary w-100 mb-5 shadowsRoundEdges" onclick="val()">Forgot password?</a>
+        <a href="/users/forgot-password" class="btn btn-secondary w-100 mb-5 shadowsRoundEdges">Forgot password?</a>
         <a href="/" class="btn btn-secondary w-100 mb-5 shadowsRoundEdges">Back</a>
 
     </form>
