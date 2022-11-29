@@ -15,11 +15,11 @@ Capstone - Team E
   - [X] Profiles
     - [X] Edit Profiles
   - [ ] About
-- [ ] Backend
+- [X] Backend
   - [X] Models
   - [X] Migrations
   - [X] 80%+ Testing
-  - [ ] Matching Algorithm
+  - [X] Matching Algorithm
 - [X] Middleware
   - [X] Spotify Auth
   - [X] Spotify Music Capture
