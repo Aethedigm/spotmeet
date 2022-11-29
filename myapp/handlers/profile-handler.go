@@ -21,10 +21,8 @@ func (h *Handlers) UpdateUserPicture(w http.ResponseWriter, r *http.Request) {
 		h.App.InfoLog.Println("Directory does not exist", err)
 		if err := os.MkdirAll("public/images/u/"+profileIDstr, os.ModePerm); err != nil {
 			h.App.ErrorLog.Println("Error creating directory", err)
-			http.Error(w, "Error creating user file storage", http.StatusInternalServerError)
+			http.Error(w, "Error creating image", http.StatusInternalServerError)
 			return
-		} else {
-			h.App.InfoLog.Println("Directory created")
 		}
 	}
 
@@ -39,7 +37,7 @@ func (h *Handlers) UpdateUserPicture(w http.ResponseWriter, r *http.Request) {
 	// Read image from stream
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println("Error", err)
+		h.App.ErrorLog.Println("Error", err)
 		http.Error(w, "Error creating image", http.StatusInternalServerError)
 		return
 	}
@@ -47,7 +45,33 @@ func (h *Handlers) UpdateUserPicture(w http.ResponseWriter, r *http.Request) {
 	// Write image to file
 	err = ioutil.WriteFile("public/images/u/"+profileIDstr+"/pfp.jpg", data, fs.ModePerm)
 	if err != nil {
-		fmt.Println("Error writing file", err)
+		h.App.ErrorLog.Println("Error writing file", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// Get ID
+	profileID, err := strconv.Atoi(profileIDstr)
+	if err != nil {
+		h.App.ErrorLog.Println("Error converting id to int", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// get profile
+	profile, err := h.Models.Profiles.Get(profileID)
+	if err != nil {
+		h.App.ErrorLog.Println("Error getting profile", err)
+		http.Error(w, "Error creating image", http.StatusInternalServerError)
+		return
+	}
+
+	// Update DB url
+	profile.ImageURL = "/public/images/u/" + profileIDstr + "/pfp.jpg"
+
+	err = h.Models.Profiles.Update(*profile)
+	if err != nil {
+		h.App.ErrorLog.Println("Error updating profile", err)
 		http.Error(w, "Error creating image", http.StatusInternalServerError)
 		return
 	}
