@@ -7,5 +7,7 @@ CREATE TABLE matches (
     percent_match float,
     song_id integer,
     created_at timestamp without time zone NOT NULL DEFAULT now(),
-    expiry timestamp without time zone NOT NULL DEFAULT now() + interval '5 day'
+    expiry timestamp without time zone NOT NULL DEFAULT now() + interval '5 day',
+    user_a_viewed BOOLEAN NOT NULL DEFAULT FALSE,
+    user_b_viewed BOOLEAN NOT NULL DEFAULT FALSE
 );

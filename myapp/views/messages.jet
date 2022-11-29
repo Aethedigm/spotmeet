@@ -244,6 +244,10 @@
 
                     for (i = 0; i < data.length; i++) {
                         const thread = data[i];
+                        var newThread = "";
+                        if (thread.UserHasOpenedThread == false) {
+                            newThread = "<span style='font-size:1.2em'><b>&#129395; New match!</b></span>";
+                        }
                         const threadTemplate = `
                             <li onclick="location.href = '/messages/getMessages/${thread.MatchID}';" class="list-group-item message-container container-fluid">
                                 <div class="media">
@@ -255,7 +259,7 @@
                                             </div>
                                             <time style="text-align:right" class="hidden-sm-down" datetime="2017">${thread.LatestMessageTimeSent}</time>
                                         </div>
-                                        <p class="msg">${thread.LatestMessagePreview}</p>
+                                        <p class="msg">${newThread}${thread.LatestMessagePreview}</p>
                                     </div>
                                 </div>
                             </li>

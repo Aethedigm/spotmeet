@@ -174,6 +174,8 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 				match.CreatedAt = time.Now()
 				// match.ArtistID, err = h.Models.Artists.GetOneID()
 				match.SongID = songIDMatchedOn
+				match.UserAViewedThread = false
+				match.UserBViewedThread = false
 				if err != nil {
 					h.App.ErrorLog.Println(err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)

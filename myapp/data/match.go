@@ -9,17 +9,16 @@ import (
 
 // Match is the type for a match
 type Match struct {
-	ID        int `db:"id,omitempty"`
-	User_A_ID int `db:"user_a_id" json:"user_A_id"`
-	User_B_ID int `db:"user_b_id" json:"user_B_id"`
-	// // MessageStatus status numbers:
-	// // 0 = no message sent, 1 = message(s) only sent from A, 2 = message(s) only sent from B, 3 = both messaged (linked)
-	// MessageStatus int       `db:"message_status" json:"message_status"`
-	PercentMatch float32   `db:"percent_match" json:"percent_match"`
-	SongID       int       `db:"song_id" json:"song_id"`
-	CreatedAt    time.Time `db:"created_at"`
-	Expires      time.Time `db:"expiry" json:"expiry"`
-	Complete     bool      `db:"complete" json:"complete"`
+	ID                int       `db:"id,omitempty"`
+	User_A_ID         int       `db:"user_a_id" json:"user_A_id"`
+	User_B_ID         int       `db:"user_b_id" json:"user_B_id"`
+	PercentMatch      float32   `db:"percent_match" json:"percent_match"`
+	SongID            int       `db:"song_id" json:"song_id"`
+	CreatedAt         time.Time `db:"created_at"`
+	Expires           time.Time `db:"expiry" json:"expiry"`
+	Complete          bool      `db:"complete" json:"complete"`
+	UserAViewedThread bool      `db:"user_a_viewed" json:"user_a_viewed"`
+	UserBViewedThread bool      `db:"user_b_viewed" json:"user_b_viewed"`
 }
 
 // Table returns the table name associated with this model in the database
@@ -107,6 +106,24 @@ func (m *Match) Get(id int) (*Match, error) {
 	return &thematch, nil
 }
 
+// Get gets one match by id
+func (m *Match) GetByBothUsers(id int, id2 int) (*Match, error) {
+	var thematch Match
+	collection := upper.Collection(m.Table())
+	res1 := collection.Find(up.Cond{"user_a_id": id, "user_b_id": id2})
+	res2 := collection.Find(up.Cond{"user_a_id": id2, "user_b_id": id})
+
+	err := res1.One(&thematch)
+	if err != nil {
+		err := res2.One(&thematch)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &thematch, nil
+}
+
 // Delete deletes a match by id
 func (m *Match) Delete(id int) error {
 	collection := upper.Collection(m.Table())
@@ -143,4 +160,25 @@ func (m *Match) Insert(thematch Match) (int, error) {
 	id := getInsertID(res.ID())
 
 	return id, nil
+}
+
+func (m *Match) MarkAsViewedForUser(userID int, otherUserID int) error {
+	collection := upper.Collection(m.Table())
+	match, err := m.GetByBothUsers(userID, otherUserID)
+	if err != nil {
+		return err
+	}
+	res := collection.Find(match.ID)
+
+	if match.User_A_ID == userID {
+		match.UserAViewedThread = true
+	} else if match.User_B_ID == userID {
+		match.UserBViewedThread = true
+	}
+
+	err = res.Update(match)
+	if err != nil {
+		return err
+	}
+	return nil
 }

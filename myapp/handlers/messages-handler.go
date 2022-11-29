@@ -66,10 +66,20 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 	threads := []data.Thread{}
 	for _, links := range links {
 		var user *data.User
+		var match *data.Match
+		var userHasOpenedThread bool
+		match, err = h.Models.Matches.GetByBothUsers(links.User_A_ID, links.User_B_ID)
+		if err != nil {
+			fmt.Println("Error getting match:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		if links.User_A_ID == userID {
 			user, err = h.Models.Users.Get(links.User_B_ID)
+			userHasOpenedThread = match.UserAViewedThread
 		} else {
 			user, err = h.Models.Users.Get(links.User_A_ID)
+			userHasOpenedThread = match.UserBViewedThread
 		}
 
 		if err != nil {
@@ -113,6 +123,7 @@ func (h *Handlers) GetThreads(w http.ResponseWriter, r *http.Request) {
 			LatestMessageTimeSent: latestMessageTimeSent,
 			OtherUsersImage:       otherUsersImage,
 			TimeSentISO:           timeSentISO,
+			UserHasOpenedThread:   userHasOpenedThread,
 		}
 
 		threads = append(threads, tmp)
@@ -137,22 +148,24 @@ func (h *Handlers) Thread(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	matchIDstr := chi.URLParam(r, "fromUserID")
-	matchID, err := strconv.Atoi(matchIDstr)
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+
+	otherUserIDstr := chi.URLParam(r, "fromUserID")
+	otherUserID, err := strconv.Atoi(otherUserIDstr)
 	if err != nil {
 		fmt.Println("Error converting matchID to int:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	match, err := h.Models.Users.Get(matchID)
+	otherUser, err := h.Models.Users.Get(otherUserID)
 	if err != nil {
 		fmt.Println("Error getting match:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	profile, err := h.Models.Profiles.GetByUserID(matchID)
+	profile, err := h.Models.Profiles.GetByUserID(otherUserID)
 	if err != nil {
 		fmt.Println("Error getting profile ID", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -160,10 +173,13 @@ func (h *Handlers) Thread(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := make(jet.VarMap)
-	vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
-	vars.Set("matchID", matchID)
-	vars.Set("matchFirstName", match.FirstName)
+	vars.Set("userID", userID)
+	vars.Set("matchID", otherUserID)
+	vars.Set("matchFirstName", otherUser.FirstName)
 	vars.Set("matchProfileID", profile.ID)
+
+	// save in match record that current user is viewing the thread for the first time
+	h.Models.Matches.MarkAsViewedForUser(userID, otherUserID)
 
 	err = h.App.Render.JetPage(w, r, "message_thread", vars, nil)
 	if err != nil {
