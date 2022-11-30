@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"myapp/data"
 	"net/http"
 	"os"
 	"strconv"
@@ -204,42 +205,32 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		song1, err := h.Models.Songs.Get(likedSongs[0].SongID)
-		if err != nil {
-			fmt.Println("Error getting song:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		song2, err := h.Models.Songs.Get(likedSongs[1].SongID)
-		if err != nil {
-			fmt.Println("Error getting song:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		song3, err := h.Models.Songs.Get(likedSongs[2].SongID)
-		if err != nil {
-			fmt.Println("Error getting song:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		song4, err := h.Models.Songs.Get(likedSongs[3].SongID)
-		if err != nil {
-			fmt.Println("Error getting song:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		song5, err := h.Models.Songs.Get(likedSongs[4].SongID)
-		if err != nil {
-			fmt.Println("Error getting song:", err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
+
+		var songs []data.Song
+		var numberOfSongNames = 0
+		for i := range likedSongs {
+			song, err := h.Models.Songs.Get(likedSongs[i].SongID)
+			if err != nil {
+				fmt.Println("Error getting song:", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			songs = append(songs, *song)
+			numberOfSongNames += 1
+			if i == 4 {
+				break
+			}
 		}
 
-		fullName1 := song1.Name + "  by  " + song1.ArtistName
-		fullName2 := song2.Name + "  by  " + song2.ArtistName
-		fullName3 := song3.Name + "  by  " + song3.ArtistName
-		fullName4 := song4.Name + "  by  " + song4.ArtistName
-		fullName5 := song5.Name + "  by  " + song5.ArtistName
+		var fullSongNames []string
+		for i := 0; i < 5; i++ {
+			if i < numberOfSongNames {
+				fullSongName := songs[i].Name + "  by  " + songs[i].ArtistName
+				fullSongNames = append(fullSongNames, fullSongName)
+			} else {
+				fullSongNames = append(fullSongNames, "")
+			}
+		}
 
 		vars := make(jet.VarMap)
 		vars.Set("userID", thisUser)
@@ -248,11 +239,11 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 		vars.Set("FirstName", user.FirstName)
 		vars.Set("imgurl", profile.ImageURL)
 		vars.Set("description", profile.Description)
-		vars.Set("Song1", fullName1)
-		vars.Set("Song2", fullName2)
-		vars.Set("Song3", fullName3)
-		vars.Set("Song4", fullName4)
-		vars.Set("Song5", fullName5)
+		vars.Set("numberOfSongNames", numberOfSongNames)
+		for i := range fullSongNames {
+			varName := "song" + strconv.Itoa(i+1)
+			vars.Set(varName, fullSongNames[i])
+		}
 
 		err = h.App.Render.JetPage(w, r, "profile", vars, nil)
 		if err != nil {

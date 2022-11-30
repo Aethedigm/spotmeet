@@ -186,7 +186,6 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		return err
 	}
 
-	fmt.Println("STARTING GETTING SONGS' ANALYSES FROM SPOTIFY.")
 	songID1 := songs.Tracks[0].ID
 	songID2 := songs.Tracks[1].ID
 	songID3 := songs.Tracks[2].ID
@@ -211,8 +210,6 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 	allTracksFeatures, err := client.GetAudioFeatures(songID1, songID2, songID3, songID4, songID5,
 		songID6, songID7, songID8, songID9, songID10, songID11, songID12, songID13, songID14, songID15,
 		songID16, songID17, songID18, songID19, songID20)
-
-	fmt.Println("END GETTING SONGS' ANALYSES FROM SPOTIFY.")
 
 	// insert new songs and liked songs for the user (currently their top 20)
 	for x := range songs.Tracks {
@@ -335,12 +332,11 @@ func (h *Handlers) UpdateUserMusicProfile(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"No user music profile created for user yet": "true"}`))
-		fmt.Println("No user music profile created for user yet. Creating one--")
 		return
 	}
 
 	// if the user's music profile was updated more than a day ago, update the music profile
-	fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
+	// fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
 	if musicProfile.UpdatedAt.Before(time.Now().Truncate(time.Hour * 24)) {
 		updatedMusicProfile, err := h.GetTracksAnalysis(*user)
 		_, err = h.Models.UserMusicProfiles.Update(*updatedMusicProfile)

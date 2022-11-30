@@ -161,24 +161,3 @@ func (m *Match) Insert(thematch Match) (int, error) {
 
 	return id, nil
 }
-
-func (m *Match) MarkAsViewedForUser(userID int, otherUserID int) error {
-	collection := upper.Collection(m.Table())
-	match, err := m.GetByBothUsers(userID, otherUserID)
-	if err != nil {
-		return err
-	}
-	res := collection.Find(match.ID)
-
-	if match.User_A_ID == userID {
-		match.UserAViewedThread = true
-	} else if match.User_B_ID == userID {
-		match.UserBViewedThread = true
-	}
-
-	err = res.Update(match)
-	if err != nil {
-		return err
-	}
-	return nil
-}

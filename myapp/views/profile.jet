@@ -60,42 +60,7 @@
             </div>
         </div>
 
-        <div id="top-artists" class="mt-5 container w-50">
-            <div class="row">
-                <div class="fw-bold">
-                    {{ FirstName }}'s Top Tracks:
-                </div>
-            </div>
-            <div class="row">
-                <table class="table table-striped">
-                    <tr>
-                        <td>
-                            {{ Song1 }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ Song2 }}
-                        </td>
-                    </tr>
-                    <tr >
-                        <td>
-                            {{ Song3 }}
-                        </td>
-                    </tr>
-                    <tr >
-                        <td>
-                            {{ Song4 }}
-                        </td>
-                    </tr>
-                    <tr >
-                        <td>
-                            {{ Song5 }}
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+        <div id="songs_container" class="mt-5 container w-50"></div>
     </div>
 
     <div id="footbar" class="navbar fixed-bottom">
@@ -108,4 +73,45 @@
 {{end}}
 
 {{block js()}}
+<script>
+    window.onload = function() {
+        getSongs();
+    }
+
+    const getSongs = () => {
+        const songsContainer = document.getElementById("songs_container");
+        const songs = ["{{song1}}", "{{song2}}", "{{song3}}", "{{song4}}", "{{song5}}"];
+
+        var listTitle;
+        if ({{numberOfSongNames}} == 0) {
+            listTitle = "{{ FirstName }} has no Top Tracks yet";
+        } else {
+            listTitle = "{{ FirstName }}'s Top Tracks:";
+        }
+
+        songsTemplateAll = `
+            <div class="row">
+                <div class="fw-bold">
+                    ${listTitle}
+                </div>
+            </div>
+            <div class="row">
+                <table class="table table-striped">
+        `;
+        for (i = 1; i <= {{numberOfSongNames}}; i++) {
+            if (songs[i-1] == "") { break; }
+            songName = songs[i-1];
+            songsTemplate = `
+                <tr>
+                    <td>
+                        ${songName}
+                    </td>
+                </tr>
+            `
+            songsTemplateAll += songsTemplate;
+        }
+        songsTemplateAll += `</table></div>`;
+        songsContainer.innerHTML = songsTemplateAll;
+    }
+</script>
 {{end}}

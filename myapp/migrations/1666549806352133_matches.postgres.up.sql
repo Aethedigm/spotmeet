@@ -5,9 +5,7 @@ CREATE TABLE matches (
     user_a_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     user_b_id integer NOT NULL REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     percent_match float,
-    song_id integer,
+    artist_id integer,
     created_at timestamp without time zone NOT NULL DEFAULT now(),
-    expiry timestamp without time zone NOT NULL DEFAULT now() + interval '5 day',
-    user_a_viewed BOOLEAN NOT NULL DEFAULT FALSE,
-    user_b_viewed BOOLEAN NOT NULL DEFAULT FALSE
+    expiry timestamp without time zone NOT NULL DEFAULT now() + interval '5 day'
 );

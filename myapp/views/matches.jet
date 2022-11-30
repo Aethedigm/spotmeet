@@ -338,9 +338,7 @@ function getLocationAndMatches(locationUpdateNeeded) {
         if (navigator.geolocation) {
             const loadingFrame = document.querySelector('.wheel-frame')
             loadingFrame.style.backgroundColor = 'black';
-            console.log("Started calling navigator.geolocation.getCurrentPostion");
             navigator.geolocation.getCurrentPosition(sendLocationToServer, geolocationDenied);
-            console.log("Finished calling navigator.geolocation.getCurrentPostion");
         } else {
             noGeolocation();
         }

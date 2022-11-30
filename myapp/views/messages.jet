@@ -259,7 +259,7 @@
                                             </div>
                                             <time style="text-align:right" class="hidden-sm-down" datetime="2017">${thread.LatestMessageTimeSent}</time>
                                         </div>
-                                        <p class="msg">${newThread}${thread.LatestMessagePreview}</p>
+                                        <p class="msg">${newThread}&nbsp;&nbsp;${thread.LatestMessagePreview}</p>
                                     </div>
                                 </div>
                             </li>

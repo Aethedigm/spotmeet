@@ -179,7 +179,17 @@ func (h *Handlers) Thread(w http.ResponseWriter, r *http.Request) {
 	vars.Set("matchProfileID", profile.ID)
 
 	// save in match record that current user is viewing the thread for the first time
-	h.Models.Matches.MarkAsViewedForUser(userID, otherUserID)
+	match, err := h.Models.Matches.GetByBothUsers(userID, otherUserID)
+	if match.User_A_ID == userID {
+		match.UserAViewedThread = true
+	} else if match.User_B_ID == userID {
+		match.UserBViewedThread = true
+	}
+	err = h.Models.Matches.Update(*match)
+	if err != nil {
+		h.App.ErrorLog.Println("error updating matches table:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 
 	err = h.App.Render.JetPage(w, r, "message_thread", vars, nil)
 	if err != nil {
