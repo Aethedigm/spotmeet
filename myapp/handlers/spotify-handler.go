@@ -186,6 +186,20 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		return err
 	}
 
+	var songIDs []spotify.ID
+	for i := range songs.Tracks {
+		songIDs = append(songIDs, songs.Tracks[i].ID)
+	}
+
+	var allTracksFeatures []*spotify.AudioFeatures
+	if songIDs != nil {
+		allTracksFeatures, err = client.GetAudioFeatures(songIDs...)
+		if err != nil {
+			fmt.Println("Error getting audio features from Spotify.")
+			return err
+		}
+	}
+
 	// insert new songs and liked songs for the user (currently their top 20)
 	for x := range songs.Tracks {
 		id := songs.Tracks[x].ID
@@ -216,22 +230,12 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 			}
 			tID = song.ID
 		} else {
-			trackAnalysis, err := client.GetAudioAnalysis(songs.Tracks[x].ID)
-			if err != nil {
-				fmt.Println("Error getting audio analysis for track", songs.Tracks[x].ID)
-				return err
-			}
-			trackFeatures, err := client.GetAudioFeatures(songs.Tracks[x].ID)
+			// trackFeatures, err := client.GetAudioFeatures(songs.Tracks[x].ID)
 			if err != nil {
 				fmt.Println("Error getting audio features for track", songs.Tracks[x].ID)
 				return err
 			}
 			fmt.Println("ID:", songs.Tracks[x].ID, "| Name:", songs.Tracks[x].Name, "| Artist:", songs.Tracks[x].Artists[0].Name)
-			loud, tempo, timeSig, err := h.BuildSectionAggregate(trackAnalysis.Sections)
-			if err != nil {
-				fmt.Println("Error building section aggregate")
-				continue
-			}
 
 			// update the song in the songs table
 			temp = data.Song{
@@ -239,16 +243,16 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 				SpotifyID:        id.String(),
 				Name:             name,
 				ArtistName:       artistName,
-				LoudnessAvg:      loud,
-				TempoAvg:         tempo,
-				TimeSigAvg:       timeSig,
-				Acousticness:     trackFeatures[0].Acousticness,
-				Danceability:     trackFeatures[0].Danceability,
-				Energy:           trackFeatures[0].Energy,
-				Instrumentalness: trackFeatures[0].Instrumentalness,
-				Mode:             trackFeatures[0].Mode,
-				Speechiness:      trackFeatures[0].Speechiness,
-				Valence:          trackFeatures[0].Valence,
+				LoudnessAvg:      float64(allTracksFeatures[x].Loudness),
+				TempoAvg:         float64(allTracksFeatures[x].Tempo),
+				TimeSigAvg:       allTracksFeatures[x].TimeSignature,
+				Acousticness:     allTracksFeatures[x].Acousticness,
+				Danceability:     allTracksFeatures[x].Danceability,
+				Energy:           allTracksFeatures[x].Energy,
+				Instrumentalness: allTracksFeatures[x].Instrumentalness,
+				Mode:             allTracksFeatures[x].Mode,
+				Speechiness:      allTracksFeatures[x].Speechiness,
+				Valence:          allTracksFeatures[x].Valence,
 			}
 
 			err = temp.Update(temp)
@@ -311,7 +315,7 @@ func (h *Handlers) UpdateUserMusicProfile(w http.ResponseWriter, r *http.Request
 	}
 
 	// if the user's music profile was updated more than a day ago, update the music profile
-	fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
+	// fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
 	if musicProfile.UpdatedAt.Before(time.Now().Truncate(time.Hour * 24)) {
 		updatedMusicProfile, err := h.GetTracksAnalysis(*user)
 		_, err = h.Models.UserMusicProfiles.Update(*updatedMusicProfile)

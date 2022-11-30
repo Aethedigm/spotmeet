@@ -10,4 +10,5 @@ type Thread struct {
 	LatestMessageTimeSent string
 	OtherUsersImage       string
 	TimeSentISO           time.Time
+	UserHasOpenedThread   bool
 }

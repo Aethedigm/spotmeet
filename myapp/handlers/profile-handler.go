@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"myapp/data"
 	"net/http"
 	"os"
 	"strconv"
@@ -198,6 +199,38 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		thisUser := h.App.Session.GetInt(r.Context(), "userID")
+		likedSongs, err := h.Models.LikedSongs.GetAllByOneUser(profile.UserID)
+		if err != nil {
+			fmt.Println("Error getting liked songs from user:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		var songs []data.Song
+		var numberOfSongNames = 0
+		for i := range likedSongs {
+			song, err := h.Models.Songs.Get(likedSongs[i].SongID)
+			if err != nil {
+				fmt.Println("Error getting song:", err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			songs = append(songs, *song)
+			numberOfSongNames += 1
+			if i == 4 {
+				break
+			}
+		}
+
+		var fullSongNames []string
+		for i := 0; i < 5; i++ {
+			if i < numberOfSongNames {
+				fullSongName := songs[i].Name + "  by  " + songs[i].ArtistName
+				fullSongNames = append(fullSongNames, fullSongName)
+			} else {
+				fullSongNames = append(fullSongNames, "")
+			}
+		}
 
 		vars := make(jet.VarMap)
 		vars.Set("userID", thisUser)
@@ -206,33 +239,11 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 		vars.Set("FirstName", user.FirstName)
 		vars.Set("imgurl", profile.ImageURL)
 		vars.Set("description", profile.Description)
-
-		// GET TOP 3 ARTISTS
-
-		Artists := []string{"Artist #1", "Artist #2", "Artist #3"}
-
-		lart, err := h.Models.LikedArtists.GetAllByOneUser(profile.UserID)
-		if err != nil {
-			fmt.Println("Error getting liked artists for user", profile.UserID, err)
+		vars.Set("numberOfSongNames", numberOfSongNames)
+		for i := range fullSongNames {
+			varName := "song" + strconv.Itoa(i+1)
+			vars.Set(varName, fullSongNames[i])
 		}
-
-		maxArt := 3
-		if len(lart) < 3 {
-			maxArt = len(lart)
-		}
-
-		for i := 0; i < maxArt; i++ {
-			tmpArt, err := h.Models.Artists.Get(lart[i].ArtistID)
-			if err != nil {
-				fmt.Println("Error getting artist from liked artists")
-				break
-			}
-			Artists[i] = tmpArt.Name
-		}
-
-		vars.Set("Artist1", Artists[0])
-		vars.Set("Artist2", Artists[1])
-		vars.Set("Artist3", Artists[2])
 
 		err = h.App.Render.JetPage(w, r, "profile", vars, nil)
 		if err != nil {

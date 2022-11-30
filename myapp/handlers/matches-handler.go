@@ -169,6 +169,8 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 				match.CreatedAt = time.Now()
 				// match.ArtistID, err = h.Models.Artists.GetOneID()
 				match.SongID = songIDMatchedOn
+				match.UserAViewedThread = false
+				match.UserBViewedThread = false
 				if err != nil {
 					h.App.ErrorLog.Println(err)
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -245,17 +247,30 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var isFirstLogin bool
+	var locationUpdateNeeded bool
 	musicProfile, _ := h.Models.UserMusicProfiles.GetByUserID(userID)
-	fmt.Println("THIS IS THE CURRENT USER ID: ", userID)
 	if musicProfile == nil {
 		isFirstLogin = true
+		locationUpdateNeeded = true
 	} else {
 		isFirstLogin = false
+		user, err := h.Models.Users.Get(userID)
+		if err != nil {
+			h.App.ErrorLog.Println("error getting struct for user ", userID, ". ")
+		}
+
+		// Only get user's location if the user was updated more than 10 minutes prior to the current time.
+		if user.UpdatedAt.Before(time.Now().Truncate(time.Minute * 10)) {
+			locationUpdateNeeded = true
+		} else {
+			locationUpdateNeeded = false
+		}
 	}
 
 	vars := make(jet.VarMap)
 	vars.Set("userID", userID)
 	vars.Set("isFirstLogin", isFirstLogin)
+	vars.Set("locationUpdateNeeded", locationUpdateNeeded)
 
 	err = h.App.Render.Page(w, r, "matches", vars, nil)
 	if err != nil {

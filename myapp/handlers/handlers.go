@@ -89,6 +89,9 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		h.App.ErrorLog.Println("error updating user ", userID, err)
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fmt.Sprintf("%d", userID)))
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
