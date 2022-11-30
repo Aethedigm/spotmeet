@@ -186,30 +186,19 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		return err
 	}
 
-	songID1 := songs.Tracks[0].ID
-	songID2 := songs.Tracks[1].ID
-	songID3 := songs.Tracks[2].ID
-	songID4 := songs.Tracks[3].ID
-	songID5 := songs.Tracks[4].ID
-	songID6 := songs.Tracks[5].ID
-	songID7 := songs.Tracks[6].ID
-	songID8 := songs.Tracks[7].ID
-	songID9 := songs.Tracks[8].ID
-	songID10 := songs.Tracks[9].ID
-	songID11 := songs.Tracks[10].ID
-	songID12 := songs.Tracks[11].ID
-	songID13 := songs.Tracks[12].ID
-	songID14 := songs.Tracks[13].ID
-	songID15 := songs.Tracks[14].ID
-	songID16 := songs.Tracks[15].ID
-	songID17 := songs.Tracks[16].ID
-	songID18 := songs.Tracks[17].ID
-	songID19 := songs.Tracks[18].ID
-	songID20 := songs.Tracks[19].ID
+	var songIDs []spotify.ID
+	for i := range songs.Tracks {
+		songIDs = append(songIDs, songs.Tracks[i].ID)
+	}
 
-	allTracksFeatures, err := client.GetAudioFeatures(songID1, songID2, songID3, songID4, songID5,
-		songID6, songID7, songID8, songID9, songID10, songID11, songID12, songID13, songID14, songID15,
-		songID16, songID17, songID18, songID19, songID20)
+	var allTracksFeatures []*spotify.AudioFeatures
+	if songIDs != nil {
+		allTracksFeatures, err = client.GetAudioFeatures(songIDs...)
+		if err != nil {
+			fmt.Println("Error getting audio features from Spotify.")
+			return err
+		}
+	}
 
 	// insert new songs and liked songs for the user (currently their top 20)
 	for x := range songs.Tracks {
