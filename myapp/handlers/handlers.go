@@ -95,11 +95,6 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
-	if h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "/matches", http.StatusSeeOther)
-		return
-	}
-
 	err := h.App.Render.Page(w, r, "home", nil, nil)
 
 	if err != nil {
