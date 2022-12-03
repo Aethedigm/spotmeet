@@ -255,7 +255,7 @@
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-dating" name="btnradio" type="radio" value="dating"/>
         <label for="btn-dating">Dating</label>
-    </div>
+    </div>distance
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-workout-partner" name="btnradio" type="radio" value="workout"/>
         <label for="btn-workout-partner">Exersice Buddy</label>
@@ -267,28 +267,23 @@
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-concert-goers" name="btnradio" type="radio" value="concert"/>
         <label for="btn-concert-goers">Concert Goers</label>
-
     </div>
 
+        
+
     <div id="rangeContainer">
+        <span id="sensitivityValue">{{ 69 }} Match Sensitivity</span>
+        <input class="range" type="range" id="match-sensitivity" step="1" value="{{ 69 }}" min="1" max="3" onChange="matchSensitivitySlide(this.value)" onmousemove="rangeSlide(this.value)"></input>
+
         <span id="rangeValue">{{ distance }} miles</span>
         <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" onChange="rangeSlide(this.value)" onmousemove="rangeSlide(this.value)"></input>
     </div>
-
-    <!-- <div style="text-align:left"><label for="matchRange" class="form-label">Find me matches within <div class="d-inline" id="matchPercentLabel">{{ distance }}</div> miles</label></div>
-    <div style="margin-bottom:2em">
-        <input type="range" class="form-range" id="matchRange" min="25" max="100" step="5" value="{{ distance }}" oninput="matchRangeChange()">
-    </div> -->
-
-    <!-- <div class="container">
-        <a href="#" class="btn btn-primary w-100 mb-4" onclick="setUserSettings()">Save Changes</a>
-    </div> -->
 
     <a href="#" class="save-button" onclick="setUserSettings()">Save Changes</a>
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
-            <a href="#" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="/messages" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
             <a href="/settings" class="btn float-right rounded-pill w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
@@ -328,6 +323,7 @@ const setUserSettings = () => {
 
     data.append("lookingFor", document.querySelector('input[name="btnradio"]:checked').value);
     data.append("distance", document.getElementById('matchRange').value);
+    data.append("69", document.getElementById('match-sensitivity').value);
 
     fetch('/users/settings/{{ settingsID }}', {
         method: 'PUT',
@@ -352,6 +348,32 @@ const matchRangeChange = () => {
 
 function rangeSlide(value) {
     document.getElementById('rangeValue').innerHTML = value + ' miles';
+}
+
+
+
+const matchSensitivityChange = () => {
+    const sensitivityRange = document.getElementById("match-sensitivity");
+    const sensitivityLabel = document.getElementById("matchPercentLabel");
+    sensitivityLabel.textContent = matchRange.value;
+}
+
+function matchSensitivitySlide(value) {
+    switch(value) {
+          case 1:
+            value = "Low";
+            break;
+          case 2:
+            value = "Medium";
+            break;
+          case 3:
+            value = "High";
+            break;
+          default:
+            value = "Low"
+    } 
+    
+    document.getElementById('sensitivityValue').innerHTML = value + ' Match Sensitivity';
 }
 
 </script>
