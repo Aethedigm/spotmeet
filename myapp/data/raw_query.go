@@ -53,10 +53,13 @@ func (r *RawQuery) MatchQuery(user User, settings Settings) ([]int, error) {
 		err := rows.Scan(&u)
 		if err != nil {
 			fmt.Println("problem with filling users", u, err)
+			rows.Close()
 			return nil, err
 		}
 		userIDs = append(userIDs, u)
 	}
+
+	rows.Close()
 
 	return userIDs, nil
 }
@@ -108,6 +111,9 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	q2rows.Next()
 	q2rows.Scan(&OtherUsersImage)
 
+	q1rows.Close()
+	q1rows.Close()
+
 	return LatestMessagePreview, strLatestMessageTimeSent, OtherUsersImage, LatestMessageTimeSent, nil
 }
 
@@ -152,6 +158,7 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 		err := rows.Scan(&otherUserID, &otherUserName, &matchID, &percentMatch, &songID, &songName, &artistName)
 		if err != nil {
 			fmt.Println("problem with filling variables from sql query called in MatchesDisplayQuery().", err)
+			rows.Close()
 			return []MatchForDisplay{}, err
 		}
 
@@ -167,6 +174,8 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 
 		matchesForDisplay = append(matchesForDisplay, strct)
 	}
+
+	rows.Close()
 
 	return matchesForDisplay, nil
 }
