@@ -19,6 +19,7 @@ func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
 
 	lookingFor := r.Form.Get("lookingFor")
 	distance := r.Form.Get("distance")
+	sensitivity := r.Form.Get("sensitivity")
 
 	if settingsID := chi.URLParam(r, "settingsID"); settingsID != "" {
 		sID, err := strconv.Atoi(settingsID)
@@ -39,6 +40,13 @@ func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
 		settings.Distance, err = strconv.Atoi(distance)
 		if err != nil {
 			fmt.Println("Error converting distance to int:", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		settings.MatchSensitivity, err = strconv.Atoi(sensitivity)
+		if err != nil {
+			fmt.Println("Error converting sensitivity to int", err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
