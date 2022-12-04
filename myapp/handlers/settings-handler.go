@@ -93,6 +93,8 @@ func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 	vars.Set("distance", settings.Distance)
 	vars.Set("settingsID", settings.ID)
 	vars.Set("lookingFor", settings.LookingFor)
+	vars.Set("matchSensitivity", settings.MatchSensitivity)
+	vars.Set("matchSensitivityString", settings.MatchSensitivityString())
 
 	err = h.App.Render.JetPage(w, r, "settings", vars, nil)
 	if err != nil {
