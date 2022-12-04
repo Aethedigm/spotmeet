@@ -40,6 +40,9 @@ func TestSong_GetAll(t *testing.T) {
 	s.ID = sID2
 
 	songs, err := a.GetAll()
+	if err != nil {
+		t.Error("Failed to collect songs")
+	}
 
 	if SongInArray(a, songs) == false {
 		t.Error("failed to return song")

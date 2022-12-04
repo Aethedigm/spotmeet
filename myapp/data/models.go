@@ -34,7 +34,6 @@ type Models struct {
 // New initializes the models package for use
 func New(databasePool *sql.DB) Models {
 	db = databasePool
-
 	upper, _ = postgresql.New(databasePool)
 
 	return Models{

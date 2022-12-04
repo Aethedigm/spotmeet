@@ -1,6 +1,8 @@
 package data
 
 import (
+	"errors"
+
 	up "github.com/upper/db/v4"
 )
 
@@ -135,8 +137,12 @@ func (a *Song) Insert(theSong Song) (int, error) {
 
 	// Make sure this song doesn't already exist
 	song, err := a.GetBySpotifyID(theSong.SpotifyID)
+	if err != nil {
+		return 0, err
+	}
+
 	if song != nil {
-		return 0, nil
+		return 0, errors.New("song id already exists")
 	}
 
 	res, err := collection.Insert(&theSong)
