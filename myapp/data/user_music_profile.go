@@ -1,6 +1,7 @@
 package data
 
 import (
+	"errors"
 	"time"
 
 	up "github.com/upper/db/v4"
@@ -24,19 +25,6 @@ type UserMusicProfile struct {
 
 func (u *UserMusicProfile) Table() string {
 	return "user_music_profile"
-}
-
-func (u *UserMusicProfile) Get(id int) (*UserMusicProfile, error) {
-	var ump UserMusicProfile
-
-	collection := upper.Collection(u.Table())
-	res := collection.Find(up.Cond{"id": id})
-	err := res.One(&ump)
-	if err != nil {
-		return nil, err
-	}
-
-	return &ump, nil
 }
 
 func (u *UserMusicProfile) GetByUser(user User) (*UserMusicProfile, error) {
@@ -69,7 +57,7 @@ func (u *UserMusicProfile) GetByUserID(userID int) (*UserMusicProfile, error) {
 			return nil, err
 		}
 	} else {
-		return nil, nil
+		return nil, errors.New("User Music Profile ID invalid")
 	}
 
 	return &ump, nil

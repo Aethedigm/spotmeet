@@ -21,21 +21,6 @@ func (p *Profile) Table() string {
 	return "profiles"
 }
 
-// GetAll returns a slice of all profiles
-func (p *Profile) GetAll() ([]*Profile, error) {
-	collection := upper.Collection(p.Table())
-
-	var all []*Profile
-
-	res := collection.Find().OrderBy("user_id")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
 // Get gets one user by profile id
 func (p *Profile) Get(id int) (*Profile, error) {
 	var profile Profile
@@ -70,28 +55,6 @@ func (p *Profile) Update(profile Profile) error {
 	collection := upper.Collection(p.Table())
 	res := collection.Find(profile.ID)
 	err := res.Update(&profile)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Delete deletes a profile by id
-func (p *Profile) Delete(id int) error {
-	collection := upper.Collection(p.Table())
-	res := collection.Find(id)
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// DeleteByUserID deletes a profile by user id
-func (p *Profile) DeleteByUserID(user_id int) error {
-	collection := upper.Collection(p.Table())
-	res := collection.Find(up.Cond{"user_id =": user_id})
-	err := res.Delete()
 	if err != nil {
 		return err
 	}

@@ -17,27 +17,12 @@ type User struct {
 	Password  string    `db:"password" json:"password"`
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
-	Token     Token     `db:"-"`
 	Latitude  float64   `db:"lat" json:"lat"`
 	Longitude float64   `db:"long" json:"long"`
 }
 
 func (u *User) Table() string {
 	return "users"
-}
-
-func (u *User) GetAll() ([]*User, error) {
-	collection := upper.Collection(u.Table())
-
-	var all []*User
-
-	res := collection.Find().OrderBy("last_name")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
 }
 
 func (u *User) GetByEmail(email string) (*User, error) {
@@ -48,18 +33,6 @@ func (u *User) GetByEmail(email string) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	var token Token
-	collection = upper.Collection(token.Table())
-	res = collection.Find(up.Cond{"user_id": theUser.ID, "expiry >": time.Now()}).OrderBy("created_at desc")
-	err = res.One(&token)
-	if err != nil {
-		if err != up.ErrNilRecord && err != up.ErrNoMoreRows {
-			return nil, err
-		}
-	}
-
-	theUser.Token = token
 
 	return &theUser, nil
 }
@@ -74,18 +47,6 @@ func (u *User) Get(id int) (*User, error) {
 		return nil, err
 	}
 
-	var token Token
-	collection = upper.Collection(token.Table())
-	res = collection.Find(up.Cond{"user_id =": theUser.ID, "expiry >": time.Now()}).OrderBy("created_at desc")
-	err = res.One(&token)
-	if err != nil {
-		if err != up.ErrNilRecord && err != up.ErrNoMoreRows {
-			return nil, err
-		}
-	}
-
-	theUser.Token = token
-
 	return &theUser, nil
 }
 
@@ -98,17 +59,6 @@ func (u *User) Update(theUser User) error {
 		return err
 	}
 	return nil
-}
-
-func (u *User) Delete(id int) error {
-	collection := upper.Collection(u.Table())
-	res := collection.Find(id)
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
-
 }
 
 func (u *User) Insert(theUser User) (int, error) {

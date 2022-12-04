@@ -21,21 +21,6 @@ func (m *Message) Table() string {
 	return "messages"
 }
 
-// GetAll returns a slice of all messages.
-func (m *Message) GetAll() ([]*Message, error) {
-	collection := upper.Collection(m.Table())
-
-	var all []*Message
-
-	res := collection.Find().OrderBy("id")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
 func (m *Message) GetAllForIDFromID(userID, matchID int) ([]*Message, error) {
 	var all []*Message
 	var all2 []*Message
@@ -98,26 +83,13 @@ func (m *Message) Get(id int) (*Message, error) {
 	return &themessage, nil
 }
 
-// Delete deletes a message by id
-func (m *Message) Delete(id int) error {
-	collection := upper.Collection(m.Table())
-	res := collection.Find(id)
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // Insert inserts a new message, and returns the newly inserted message's id
 func (m *Message) Insert(themessage Message) (int, error) {
-
 	if themessage.UserID == 0 || themessage.MatchID == 0 {
 		return 0, errors.New("UserID and MatchID must be set")
 	}
 
 	themessage.CreatedAt = time.Now()
-
 	collection := upper.Collection(m.Table())
 	res, err := collection.Insert(themessage)
 	if err != nil {

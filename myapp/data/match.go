@@ -36,62 +36,6 @@ func (m *Match) Update(match Match) error {
 	return nil
 }
 
-// GetAll returns a slice of all matches.
-func (m *Match) GetAll() ([]*Match, error) {
-	collection := upper.Collection(m.Table())
-
-	var all []*Match
-
-	res := collection.Find().OrderBy("id")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
-func (m *Match) GetAllActive() ([]*Match, error) {
-	collection := upper.Collection(m.Table())
-
-	var all []*Match
-
-	res := collection.Find(up.Cond{"complete": false}).OrderBy("id")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
-// GetAllForOneUser returns a slice of all matches for a user.
-func (m *Match) GetAllForOneUser(userID int) ([]Match, error) {
-
-	var all []Match
-
-	var a1 []Match
-	var a2 []Match
-
-	collection := upper.Collection(m.Table())
-	res1 := collection.Find(up.Cond{"user_a_id": userID, "complete": false})
-	res2 := collection.Find(up.Cond{"user_b_id": userID, "complete": false})
-
-	err := res1.All(&a1)
-	if err != nil {
-		return nil, err
-	}
-
-	err = res2.All(&a2)
-	if err != nil {
-		return nil, err
-	}
-
-	all = append(a1, a2...)
-
-	return all, nil
-}
-
 // Get gets one match by id
 func (m *Match) Get(id int) (*Match, error) {
 	var thematch Match
@@ -122,18 +66,6 @@ func (m *Match) GetByBothUsers(id int, id2 int) (*Match, error) {
 	}
 
 	return &thematch, nil
-}
-
-// Delete deletes a match by id
-func (m *Match) Delete(id int) error {
-	collection := upper.Collection(m.Table())
-	res := collection.Find(id)
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
-
 }
 
 // Insert inserts a new match, and returns the newly inserted match's id

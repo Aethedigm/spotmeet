@@ -25,20 +25,6 @@ func (re *RecoveryEmail) Get(id int) (*RecoveryEmail, error) {
 	return &rec, nil
 }
 
-func (re *RecoveryEmail) GetByUserID(userid int) (*RecoveryEmail, error) {
-	collection := upper.Collection(re.Table())
-
-	var rec RecoveryEmail
-
-	res := collection.Find(up.Cond{"userid": userid})
-	err := res.One(&rec)
-	if err != nil {
-		return nil, err
-	}
-
-	return &rec, nil
-}
-
 func (re *RecoveryEmail) Insert(rec RecoveryEmail) (int, error) {
 	collection := upper.Collection(re.Table())
 	res, err := collection.Insert(rec)
@@ -48,16 +34,6 @@ func (re *RecoveryEmail) Insert(rec RecoveryEmail) (int, error) {
 	id := getInsertID(res.ID())
 
 	return id, nil
-}
-
-func (re *RecoveryEmail) Delete(rec RecoveryEmail) error {
-	collection := upper.Collection(re.Table())
-	res := collection.Find(up.Cond{"id": rec.ID})
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (re *RecoveryEmail) DeleteAllForUser(userID int) error {

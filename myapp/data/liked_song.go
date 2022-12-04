@@ -16,21 +16,6 @@ func (l *LikedSong) Table() string {
 	return "liked_songs"
 }
 
-// GetAll returns a slice of all liked songs
-func (l *LikedSong) GetAll() ([]*LikedSong, error) {
-	collection := upper.Collection(l.Table())
-
-	var all []*LikedSong
-
-	res := collection.Find().OrderBy("id")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
 func (l *LikedSong) GetAllByOneUser(userID int) ([]*LikedSong, error) {
 	collection := upper.Collection(l.Table())
 
@@ -43,40 +28,6 @@ func (l *LikedSong) GetAllByOneUser(userID int) ([]*LikedSong, error) {
 	}
 
 	return all, nil
-}
-
-func (l *LikedSong) Get(id int) (*LikedSong, error) {
-	var theLikedSong LikedSong
-	collection := upper.Collection(l.Table())
-	res := collection.Find(up.Cond{"id =": id})
-
-	err := res.One(&theLikedSong)
-	if err != nil {
-		return nil, err
-	}
-	return &theLikedSong, nil
-}
-
-// Update updates a liked song record in the database
-func (l *LikedSong) Update(theLikedSong LikedSong) error {
-	collection := upper.Collection(l.Table())
-	res := collection.Find(theLikedSong.ID)
-	err := res.Update(&theLikedSong)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-// Delete deletes a liked song record by id
-func (l *LikedSong) Delete(id int) error {
-	collection := upper.Collection(l.Table())
-	res := collection.Find(id)
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // DeleteAllForUser deletes all liked songs for a user

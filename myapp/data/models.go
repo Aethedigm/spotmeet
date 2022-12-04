@@ -16,7 +16,6 @@ type Models struct {
 	// any models inserted here (and in the New function)
 	// are easily accessible throughout the entire application
 	Users             User
-	Tokens            Token
 	Matches           Match
 	Profiles          Profile
 	SpotifyTokens     SpotifyToken
@@ -39,8 +38,7 @@ func New(databasePool *sql.DB) Models {
 	upper, _ = postgresql.New(databasePool)
 
 	return Models{
-		Users:  User{},
-		Tokens: Token{},
+		Users: User{},
 	}
 }
 

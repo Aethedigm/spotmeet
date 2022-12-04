@@ -22,21 +22,6 @@ func (m *Link) Table() string {
 	return "links"
 }
 
-// GetAll returns a slice of all links.
-func (m *Link) GetAll() ([]*Link, error) {
-	collection := upper.Collection(m.Table())
-
-	var all []*Link
-
-	res := collection.Find().OrderBy("id")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
 // GetAllForOneUser returns a slice of all links for a user.
 func (m *Link) GetAllForOneUser(userID int) ([]Link, error) {
 
@@ -62,32 +47,6 @@ func (m *Link) GetAllForOneUser(userID int) ([]Link, error) {
 	all = append(a1, a2...)
 
 	return all, nil
-}
-
-// Get gets one link by id
-func (m *Link) Get(id int) (*Link, error) {
-	var thelink Link
-	collection := upper.Collection(m.Table())
-	res := collection.Find(up.Cond{"id =": id})
-
-	err := res.One(&thelink)
-	if err != nil {
-		return nil, err
-	}
-
-	return &thelink, nil
-}
-
-// Delete deletes a link by id
-func (m *Link) Delete(id int) error {
-	collection := upper.Collection(m.Table())
-	res := collection.Find(id)
-	err := res.Delete()
-	if err != nil {
-		return err
-	}
-	return nil
-
 }
 
 // Insert inserts a new link, and returns the newly inserted link's id

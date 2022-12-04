@@ -62,13 +62,6 @@ func TestUser_Get(t *testing.T) {
 	}
 }
 
-func TestUser_GetAll(t *testing.T) {
-	_, err := models.Users.GetAll()
-	if err != nil {
-		t.Error("failed to get user: ", err)
-	}
-}
-
 func TestUser_GetByEmail(t *testing.T) {
 
 	u1 := User{
@@ -173,17 +166,5 @@ func TestUser_ResetPassword(t *testing.T) {
 	err = models.Users.ResetPassword(1000, "new_password")
 	if err == nil {
 		t.Error("did not get an error when trying to reset password for non-existent user")
-	}
-}
-
-func TestUser_Delete(t *testing.T) {
-	err := models.Users.Delete(1)
-	if err != nil {
-		t.Error("failed to delete user: ", err)
-	}
-
-	_, err = models.Users.Get(1)
-	if err == nil {
-		t.Error("retrieved user who was supposed to be deleted")
 	}
 }
