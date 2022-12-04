@@ -255,7 +255,7 @@
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-dating" name="btnradio" type="radio" value="dating"/>
         <label for="btn-dating">Dating</label>
-    </div>distance
+    </div>
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-workout-partner" name="btnradio" type="radio" value="workout"/>
         <label for="btn-workout-partner">Exersice Buddy</label>
@@ -370,7 +370,7 @@ function matchSensitivitySlide(value) {
             value = "High";
             break;
           default:
-            value = "Low"
+            value = "Low";
     } 
     
     document.getElementById('sensitivityValue').innerHTML = value + ' Match Sensitivity';
