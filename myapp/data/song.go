@@ -29,35 +29,6 @@ func (a *Song) Table() string {
 	return "songs"
 }
 
-func (a *Song) GetOneID() (int, error) {
-	collection := upper.Collection(a.Table())
-
-	var sng *Song
-
-	res := collection.Find().Limit(1)
-	err := res.One(&sng)
-	if err != nil {
-		return sng.ID, err
-	}
-
-	return sng.ID, nil
-}
-
-// GetAll returns a slice of all songs
-func (a *Song) GetAll() ([]*Song, error) {
-	collection := upper.Collection(a.Table())
-
-	var all []*Song
-
-	res := collection.Find().OrderBy("song_name")
-	err := res.All(&all)
-	if err != nil {
-		return nil, err
-	}
-
-	return all, nil
-}
-
 // GetByName gets one song, by name
 func (a *Song) GetByName(name string) (*Song, error) {
 	var theSong Song
@@ -138,7 +109,9 @@ func (a *Song) Insert(theSong Song) (int, error) {
 	// Make sure this song doesn't already exist
 	song, err := a.GetBySpotifyID(theSong.SpotifyID)
 	if err != nil {
-		return 0, err
+		if err.Error() != "upper: no more rows in this result set" {
+			return 0, err
+		}
 	}
 
 	if song != nil {

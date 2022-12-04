@@ -5,54 +5,6 @@ package data
 
 import "testing"
 
-func TestSong_GetAll(t *testing.T) {
-	a := Song{
-		Name:      "test",
-		SpotifyID: "123",
-	}
-
-	sID, err := a.Insert(a)
-	if err != nil {
-		t.Error(err)
-	}
-	a.ID = sID
-
-	s := Song{
-		SpotifyID:        "test2",
-		Name:             "test2",
-		ArtistName:       "test2",
-		LoudnessAvg:      0.0,
-		TempoAvg:         0.0,
-		TimeSigAvg:       0,
-		Acousticness:     0,
-		Danceability:     0,
-		Energy:           0,
-		Instrumentalness: 0,
-		Mode:             0,
-		Speechiness:      0,
-		Valence:          0,
-	}
-
-	sID2, err := s.Insert(s)
-	if err != nil {
-		t.Error(err)
-	}
-	s.ID = sID2
-
-	songs, err := a.GetAll()
-	if err != nil {
-		t.Error("Failed to collect songs")
-	}
-
-	if SongInArray(a, songs) == false {
-		t.Error("failed to return song")
-	}
-
-	if SongInArray(s, songs) == false {
-		t.Error("failed to return song")
-	}
-}
-
 func TestSong_GetByName(t *testing.T) {
 	s := Song{
 		SpotifyID:        "test3",
