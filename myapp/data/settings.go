@@ -138,6 +138,8 @@ func (s *Settings) Update(settings Settings) error {
 			fmt.Println("problem with query", rows, err)
 			return err
 		}
+
+		rows.Close()
 	}
 
 	collection := upper.Collection(s.Table())
