@@ -235,9 +235,9 @@
     <div id="topbar"
         style="display:flex; flex-direction:row; justify-content: space-between;"
         class="navbar fixed-top bg-light">
-            <div class="btn" onclick="location.href = '/'">
+            <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
-            </div>
+            </a>
             <div class="btn float-right">
                 <a 
                     href="/users/profile" 
