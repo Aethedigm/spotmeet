@@ -2,8 +2,9 @@ package data
 
 import (
 	"fmt"
-	up "github.com/upper/db/v4"
 	"strconv"
+
+	up "github.com/upper/db/v4"
 )
 
 type Settings struct {
@@ -17,6 +18,19 @@ type Settings struct {
 	LatMax                 float64 `db:"lat_max" json:"lat_max"`
 	LongMin                float64 `db:"long_min" json:"long_min"`
 	LongMax                float64 `db:"long_max" json:"long_max"`
+}
+
+func (s *Settings) MatchSensitivityString() string {
+	switch s.MatchSensitivity {
+	case 1:
+		return "Low"
+	case 2:
+		return "Medium"
+	case 3:
+		return "High"
+	}
+
+	return "Low"
 }
 
 func (s *Settings) Table() string {
