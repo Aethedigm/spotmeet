@@ -16,9 +16,9 @@
     <div id="topbar"
 
         class="navbar fixed-top bg-light">
-            <div class="btn" onclick="location.href = '/'">
+            <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
-            </div>
+            </a>
             <a 
                     href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"

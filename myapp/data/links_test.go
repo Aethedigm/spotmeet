@@ -137,9 +137,9 @@ func TestLink_Get_Bad_User_B_ID(t *testing.T) {
 	ua.ID = usID
 
 	s := Song{
-		SpotifyID:   "testA",
-		Name:        "testA",
-		ArtistName:  "testA",
+		SpotifyID:   "testF",
+		Name:        "testF",
+		ArtistName:  "testF",
 		LoudnessAvg: 0.0,
 		TempoAvg:    0.0,
 		TimeSigAvg:  0,
