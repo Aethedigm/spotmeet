@@ -127,7 +127,7 @@ html {
   margin: 20px 0 75px 0;
 }
 
-#rangeValue {
+#rangeValue, #sensitivityValue {
   position: relative;
   display: block;
   text-align: center;
@@ -263,7 +263,7 @@ html {
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-dating" name="btnradio" type="radio" value="dating"/>
         <label for="btn-dating">Dating</label>
-    </div>distance
+    </div>
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-workout-partner" name="btnradio" type="radio" value="workout"/>
         <label for="btn-workout-partner">Exersice Buddy</label>
@@ -279,11 +279,13 @@ html {
 
     <div id="matchSettingsContainer" class="matchSettingsContainer">
 
-        <span id="sensitivityValue">{{ matchSensitivityString }} Match Sensitivity</span>
-        <input class="range" type="range" id="matchSensitivity" step="1" value="{{ matchSensitivity }}" min="1" max="3" onmousemove="matchSlide(this.value)">
+        <div style="text-align:left"><label for="looking-for" class="form-label">Match Sensitivity...</label></div>
+        <span id="sensitivityValue">High</span>
+        <input class="range mb-4" type="range" id="matchSensitivity" step="1" value="{{ matchSensitivity }}" min="1" max="3" oninput="matchSlide(this.value)">
 
+        <div style="text-align:left"><label for="looking-for" class="form-label">Distance...</label></div>
         <span id="rangeValue">{{ distance }} miles</span>
-        <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" onmousemove="rangeSlide(this.value)">
+        <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" oninput="rangeSlide(this.value)">
     </div>
 
     <a href="#" class="save-button" onclick="setUserSettings()">Save Changes</a>
@@ -353,15 +355,14 @@ const matchRangeChange = () => {
 }
 
 const matchSlide = (value) => {
-    document.getElementById('sensitivityValue').innerHTML = matchSensitivitySlide(value) + " Match Sensitivity";
+    document.getElementById('sensitivityValue').innerHTML = matchSensitivitySlide(value);
 }
 
 const rangeSlide = (value) => {
-    document.getElementById('rangeValue').innerHTML = value + ' miles';
+    document.getElementById("rangeValue").innerHTML = value + ' miles';
 }
 
 const matchSensitivitySlide = (value) => {
-    console.log(value);
     switch(value) {
         case '1':
             return "Low";

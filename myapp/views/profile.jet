@@ -65,7 +65,7 @@
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
-            <a href="#" class="btn float-left w-25 button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="/messages" class="btn float-left w-25 button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
             <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
