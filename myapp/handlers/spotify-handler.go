@@ -217,7 +217,6 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		tID, err := temp.Insert(temp)
 		if err != nil {
 			fmt.Println("Error inserting song: ID", tID)
-			continue // Move onto next song
 		}
 
 		// If song already exists in songs table, get the song ID by name, and no need to get song aspects.
@@ -316,10 +315,17 @@ func (h *Handlers) UpdateUserMusicProfile(w http.ResponseWriter, r *http.Request
 
 	// if the user's music profile was updated more than a day ago, update the music profile
 	// fmt.Println("Music profile last updated at: ", musicProfile.UpdatedAt)
-	if musicProfile.UpdatedAt.Before(time.Now().Truncate(time.Hour * 24)) {
+	resetTime := time.Now().Add(-time.Hour * 24)
+	if musicProfile.UpdatedAt.After(resetTime) {
 		updatedMusicProfile, err := h.GetTracksAnalysis(*user)
+		if err != nil {
+			h.App.ErrorLog.Println(err)
+			return
+		}
+
 		_, err = h.Models.UserMusicProfiles.Update(*updatedMusicProfile)
 		if err != nil {
+			h.App.ErrorLog.Println(err)
 			return
 		}
 
