@@ -73,14 +73,16 @@
     <div style="margin-top:5em; margin-bottom:3.6em; text-align:center;" class="justify-content-center">
         <div class="text-center mb-3"><span class="green-font" style="font-size:1.5em;">Edit Profile</span></div>
         <div><h1 class="mt-5">{{ FirstName }}</h1></div>
-        <div class="mt-5">
+        <div class="mt-5 d-flex flex-column align-items-start">
+            <label for="description">Tell us about yourself...</label>
             <input type="text" class="form-control" placeholder="{{ description }}" id="description">
         </div>
 
         <div class="container">
             <a href="#submit" class="btn btn-success mt-5 shadowsRoundEdges" onclick="updateProfile()">Submit</a>
             <a href="#cancel" class="btn btn-danger mt-5 mb-5 shadowsRoundEdges" onclick="cancel()">Cancel</a>
-            <input type="file" title=" " id="image_input" accept="image/png, image/jpg" class ="btn rounded-pill choosefile" onchange="submitImage()">
+            <label for="image_input" class="btn rounded-pill">Upload Image</label>
+            <input type="file" title=" " text="upload image" id="image_input" accept="image/png, image/jpg" class ="btn rounded-pill choosefile" onchange="submitImage()">
         </div>
     </div>
 
