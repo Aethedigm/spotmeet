@@ -217,7 +217,7 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		tID, err := temp.Insert(temp)
 		if err != nil {
 			fmt.Println("Error inserting song: ID", tID)
-			return err
+			continue // Move onto next song
 		}
 
 		// If song already exists in songs table, get the song ID by name, and no need to get song aspects.
@@ -361,7 +361,7 @@ func (h *Handlers) GetTracksAnalysis(user data.User) (*data.UserMusicProfile, er
 	// Analyze songs' musical aspects, add them to songs table, and to current user's liked_songs
 	err = h.SetSpotifySongsForUser(user.ID, *songs)
 	if err != nil {
-		fmt.Println("There was an error setting the Spotify songs for the user: ", user.ID, ".")
+		fmt.Println("There was an error setting the Spotify songs for the user: ", user.ID)
 		return &data.UserMusicProfile{}, err
 	}
 
