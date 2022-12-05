@@ -171,7 +171,7 @@ func (h *Handlers) EditProfile(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 	if !h.App.Session.Exists(r.Context(), "userID") {
-		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 		return
 	}
 
