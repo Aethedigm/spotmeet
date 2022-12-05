@@ -2,7 +2,7 @@
 Capstone - Team E
 
 # Progress
-- [ ] Pages
+- [X] Pages
   - [X]  Home Page
   - [X] Login Page
     - [X] Recover Password / Forgot Login
@@ -14,7 +14,7 @@ Capstone - Team E
     - [X] Logout Button
   - [X] Profiles
     - [X] Edit Profiles
-  - [ ] About
+  - [X] About
 - [X] Backend
   - [X] Models
   - [X] Migrations
