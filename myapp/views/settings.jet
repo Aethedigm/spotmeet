@@ -288,7 +288,8 @@ html {
         <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" oninput="rangeSlide(this.value)">
     </div>
 
-    <a href="#" class="save-button" onclick="setUserSettings()">Save Changes</a>
+    <a href="#" class="save-button mb-5" onclick="setUserSettings()">Save Changes</a>
+    <a href="/about" class="save-button">About SpotMeet</a>
 
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">

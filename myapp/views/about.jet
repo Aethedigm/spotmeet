@@ -4,16 +4,122 @@
 
 {{block css()}}
 
+<style>
+
+        /* back Btn */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
+    
+
+    .back-button::after, .back-button::before {
+    position: absolute;
+    content: "";
+    transition: all 0.2s;
+    }
+
+    .back-button {
+    display: inline-block;
+    padding: 20px 40px;
+    color: white;
+    position: relative;
+    top: 50%;
+    left: 25%;
+    transform: translate(-50%, -50%);
+    vertical-align: middle;
+    font-family: "Rubik One", sans-serif;
+    text-decoration: none;
+    font-size: 4vw;
+    transition: all 0.2s;
+    background-color: #1DB954;
+    }
+
+    .back-button:active, .back-button:focus {
+        color: white;
+    }
+
+    .back-button::before {
+    bottom: -7px;
+    height: 7px;
+    width: 100%;
+    left: 4px;
+    transform: skewX(45deg);
+    background-color: #328419;
+    }
+
+    .back-button::after {
+    right: -7px;
+    height: 100%;
+    width: 7px;
+    bottom: -4px;
+    transform: skewY(45deg);
+    background-color: #1e4c10;
+    }
+
+    .back-button:active {
+    margin-left: 4px;
+    margin-top: 4px;
+    }
+
+    .back-button:active::before {
+    bottom: -5px;
+    height: 5px;
+    left: 3px;
+    }
+
+    .back-button:active::after {
+    right: -5px;
+    width: 5px;
+    bottom: -3px;
+    }
+
+</style>
+
 {{end}}
 
 {{block pageContent()}}
 <div class="col text-center">
-    <h1 class="mb-5 mt-5">About Spotmeet</h1>
-    <p class="mb-5">
-        Spotmeet is a capstone project of 4 Cincinnati State students. 
-        Spotmeet is a place for users to meet with others who share a similar taste in music in their area!
-    </p>
-    <a href="/home" class="btn btn-primary">Return Home</a>
+
+    <div id="topbar"
+        class="navbar fixed-top bg-light">
+            <a href="/matches" class="btn">
+                <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
+            </a>
+            <div class="btn float-right">
+                <a 
+                    href="/users/profile" 
+                    style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                    class="btn float-right"
+                >
+                    <i class="fa-solid fa-user nav-icons"></i>
+                </a>
+                <a 
+                    href="/users/logout" 
+                    style="text-align:right; font-family: 'Fredoka', sans-serif;"
+                    class="btn float-right"
+                    id="btnLogout"
+                >
+                    <i class="fa-solid fa-right-from-bracket nav-icons"></i>
+                </a>
+            </div>
+    </div>
+    <div style="margin-top:15em; margin-bottom:3.6em;" class="justify-content-center">
+        <h1 class="mb-5 mt-5 green-font">About Spotmeet</h1>
+        <p class="mb-5">
+            Spotmeet is a capstone project of 4 Cincinnati State students.
+            Those students are Stephen Sumpter, John Neumeier, Landon Wilson and Zach Kohs 
+            Spotmeet is a place for users to meet with others who share a similar taste in music in their area!
+        </p>
+        <a href="/settings" class="back-button mt-5">Back to Settings</a>
+
+        <div id="footbar" class="navbar fixed-bottom">
+            <div style="font-family: 'Nunito', sans-serif;" class="container">
+                <a href="/messages" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+                <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+                <a href="/settings" class="btn float-right rounded-pill w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 {{end}}
 
