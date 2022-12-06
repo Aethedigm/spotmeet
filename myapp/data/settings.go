@@ -18,6 +18,7 @@ type Settings struct {
 	LatMax                 float64 `db:"lat_max" json:"lat_max"`
 	LongMin                float64 `db:"long_min" json:"long_min"`
 	LongMax                float64 `db:"long_max" json:"long_max"`
+	Theme                  string  `db:"theme" json:"theme"`
 }
 
 func (s *Settings) MatchSensitivityString() string {

@@ -157,6 +157,7 @@ func (h *Handlers) EditProfile(w http.ResponseWriter, r *http.Request) {
 			vars.Set("profileID", profile.ID)
 			vars.Set("description", profile.Description)
 			vars.Set("FirstName", user.FirstName)
+			vars.Set("imgurl", profile.ImageURL)
 
 			err = h.App.Render.JetPage(w, r, "editprofile", vars, nil)
 			if err != nil {

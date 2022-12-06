@@ -20,6 +20,7 @@ func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
 	lookingFor := r.Form.Get("lookingFor")
 	distance := r.Form.Get("distance")
 	sensitivity := r.Form.Get("sensitivity")
+	theme := r.Form.Get("theme")
 
 	if settingsID := chi.URLParam(r, "settingsID"); settingsID != "" {
 		sID, err := strconv.Atoi(settingsID)
@@ -37,6 +38,7 @@ func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
 		}
 
 		settings.LookingFor = lookingFor
+
 		settings.Distance, err = strconv.Atoi(distance)
 		if err != nil {
 			fmt.Println("Error converting distance to int:", err)
@@ -50,6 +52,8 @@ func (h *Handlers) UpdateSettings(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+
+		settings.Theme = theme
 
 		u, err := h.Models.Users.Get(settings.UserID)
 		if err != nil {
@@ -103,6 +107,7 @@ func (h *Handlers) Settings(w http.ResponseWriter, r *http.Request) {
 	vars.Set("lookingFor", settings.LookingFor)
 	vars.Set("matchSensitivity", settings.MatchSensitivity)
 	vars.Set("matchSensitivityString", settings.MatchSensitivityString())
+	vars.Set("theme", settings.Theme)
 
 	err = h.App.Render.JetPage(w, r, "settings", vars, nil)
 	if err != nil {

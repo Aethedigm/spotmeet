@@ -69,7 +69,7 @@
 }
 
 .inputGroup input:checked ~ label:before {
-    transform: translate(-50%, -50%) scale3d(56, 56, 1);
+    transform: translate(-50%, -50%) scale3d(73.5, 18, 1);
     opacity: 1;
 }
 
@@ -94,8 +94,8 @@
 }
 
 .shadowsRoundEdges{
-box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-border-radius: 3vw;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 3vw;
 }
 
 .form {
@@ -233,15 +233,15 @@ html {
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
             </a>
             <div class="btn float-right">
-                <a 
-                    href="/users/profile" 
+                <a
+                    href="/users/profile"
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                 >
                     <i class="fa-solid fa-user nav-icons"></i>
                 </a>
-                <a 
-                    href="/users/logout" 
+                <a
+                    href="/users/logout"
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
                     class="btn float-right"
                     id="btnLogout"
@@ -266,26 +266,33 @@ html {
     </div>
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-workout-partner" name="btnradio" type="radio" value="workout"/>
-        <label for="btn-workout-partner">Exersice Buddy</label>
+        <label for="btn-workout-partner">Exercise Buddy</label>
     </div>
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-musicians" name="btnradio" type="radio" value="music"/>
-        <label for="btn-musicians">Fellow Mucisians</label>
+        <label for="btn-musicians">Fellow Musicians</label>
     </div>
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-concert-goers" name="btnradio" type="radio" value="concert"/>
         <label for="btn-concert-goers">Concert Goers</label>
     </div>
 
-    <div id="matchSettingsContainer" class="matchSettingsContainer">
-
-        <div style="text-align:left"><label for="looking-for" class="form-label">Match Sensitivity...</label></div>
-        <span id="sensitivityValue">High</span>
+    <div id="matchSettingsContainer" class="matchSettingsContainer" style="padding-top:2em">
+        <div style="text-align:left; display:inline-block; width:43%"><label class="form-label">Match Sensitivity:</label></div>
+        <div style="display:inline-block;" id="sensitivityValue"></div>
         <input class="range mb-4" type="range" id="matchSensitivity" step="1" value="{{ matchSensitivity }}" min="1" max="3" oninput="matchSlide(this.value)">
 
-        <div style="text-align:left"><label for="looking-for" class="form-label">Distance...</label></div>
-        <span id="rangeValue">{{ distance }} miles</span>
+        <div style="text-align:left; display:inline-block; width:41%""><label class="form-label">Find me matches within...</label></div>
+        <div style="display:inline-block;" id="rangeValue">{{ distance }} miles</div>
         <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" oninput="rangeSlide(this.value)">
+
+        <div style="text-align:left; padding-top:2em;"><label for="looking-for" class="form-label">App Theme:</label></div>
+        <div style="margin-bottom:2em; width:100%; flex-wrap: wrap; padding-top:1.5em;" class="btn-group btn-group-justified" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="btntheme" id="btn-light" value="light" autocomplete="off">
+            <label class="btn btn-outline-success" for="btn-light">Light</label>
+            <input type="radio" class="btn-check" name="btntheme" id="btn-dark" value="dark" autocomplete="off">
+            <label class="btn btn-outline-success" for="btn-dark">Dark</label>
+        </div>
     </div>
 
     <a href="#" class="save-button mb-5" onclick="setUserSettings()">Save Changes</a>
@@ -325,6 +332,19 @@ window.onload = function() {
             document.getElementById("btn-friends").checked = true;
             break;
     }
+
+    // Set theme
+    var theme = "{{ theme }}";
+    switch (theme) {
+        case "light":
+            document.getElementById("btn-light").checked = true;
+            break;
+        case "dark":
+            document.getElementById("btn-dark").checked = true;
+            break;
+    }
+
+    matchSlide("{{ matchSensitivity }}");
 }
 
 const setUserSettings = () => {
@@ -333,6 +353,7 @@ const setUserSettings = () => {
     data.append("lookingFor", document.querySelector('input[name="btnradio"]:checked').value);
     data.append("distance", document.getElementById('matchRange').value);
     data.append("sensitivity", document.getElementById('matchSensitivity').value);
+    data.append("theme", document.querySelector('input[name="btntheme"]:checked').value);
 
     fetch('/users/settings/{{ settingsID }}', {
         method: 'PUT',
@@ -349,18 +370,12 @@ const setUserSettings = () => {
     })
 }
 
-const matchRangeChange = () => {
-    const matchRange = document.getElementById("matchRange");
-    const matchPercentLabel = document.getElementById("matchPercentLabel");
-    matchPercentLabel.textContent = matchRange.value;
+const rangeSlide = (value) => {
+    document.getElementById("rangeValue").innerHTML = value + ' miles';
 }
 
 const matchSlide = (value) => {
     document.getElementById('sensitivityValue').innerHTML = matchSensitivitySlide(value);
-}
-
-const rangeSlide = (value) => {
-    document.getElementById("rangeValue").innerHTML = value + ' miles';
 }
 
 const matchSensitivitySlide = (value) => {
