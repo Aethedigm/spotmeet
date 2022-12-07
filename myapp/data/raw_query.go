@@ -47,6 +47,7 @@ func (r *RawQuery) MatchQuery(user User, settings Settings) ([]int, error) {
 		rows.Close()
 		return nil, err
 	}
+	defer rows.Close()
 
 	var userIDs []int
 	for rows.Next() {
@@ -54,13 +55,10 @@ func (r *RawQuery) MatchQuery(user User, settings Settings) ([]int, error) {
 		err := rows.Scan(&u)
 		if err != nil {
 			fmt.Println("problem with filling users", u, err)
-			rows.Close()
 			return nil, err
 		}
 		userIDs = append(userIDs, u)
 	}
-
-	rows.Close()
 
 	return userIDs, nil
 }
@@ -80,6 +78,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 		q1rows.Close()
 		return "", "", "", time.Time{}, err
 	}
+	defer q1rows.Close()
 
 	// query to get other-user's profile image url
 	q2 := `select p.profile_image_url
@@ -92,6 +91,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 		fmt.Println("problem with query within func ThreadPreviewQuery", q2rows, err)
 		return "", "", "", time.Time{}, err
 	}
+	defer q2rows.Close()
 
 	// create containers to return
 	var LatestMessagePreview string
@@ -113,9 +113,6 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 
 	q2rows.Next()
 	q2rows.Scan(&OtherUsersImage)
-
-	q1rows.Close()
-	q1rows.Close()
 
 	return LatestMessagePreview, strLatestMessageTimeSent, OtherUsersImage, LatestMessageTimeSent, nil
 }
@@ -148,6 +145,7 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 		fmt.Println("problem with query", rows, err)
 		return []MatchForDisplay{}, err
 	}
+	defer rows.Close()
 
 	var otherUserID int
 	var otherUserName string
@@ -162,7 +160,6 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 		err := rows.Scan(&otherUserID, &otherUserName, &matchID, &percentMatch, &songID, &songName, &artistName)
 		if err != nil {
 			fmt.Println("problem with filling variables from sql query called in MatchesDisplayQuery().", err)
-			rows.Close()
 			return []MatchForDisplay{}, err
 		}
 
@@ -178,8 +175,6 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 
 		matchesForDisplay = append(matchesForDisplay, strct)
 	}
-
-	rows.Close()
 
 	return matchesForDisplay, nil
 }
