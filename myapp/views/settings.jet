@@ -280,7 +280,7 @@ html {
     <div id="matchSettingsContainer" class="matchSettingsContainer" style="padding-top:2em">
         <div style="text-align:left; display:inline-block; width:43%"><label class="form-label">Match Sensitivity:</label></div>
         <div style="display:inline-block;" id="sensitivityValue"></div>
-        <input class="range mb-4" type="range" id="matchSensitivity" step="1" value="{{ matchSensitivity }}" min="1" max="3" oninput="matchSlide(this.value)">
+        <input class="range mb-4" type="range" id="matchSensitivity" step="25" value="{{ matchSensitivity }}" min="25" max="75" oninput="matchSlide(this.value)">
 
         <div style="text-align:left; display:inline-block; width:41%""><label class="form-label">Find me matches within...</label></div>
         <div style="display:inline-block;" id="rangeValue">{{ distance }} miles</div>
@@ -380,11 +380,11 @@ const matchSlide = (value) => {
 
 const matchSensitivitySlide = (value) => {
     switch(value) {
-        case '1':
+        case '25':
             return "Low";
-        case '2':
+        case '50':
             return "Medium";
-        case '3':
+        case '75':
             return "High";
     } 
 }

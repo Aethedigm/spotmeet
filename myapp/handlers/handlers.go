@@ -170,6 +170,7 @@ func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) 
 	s := &data.Settings{
 		UserID:   userID,
 		Distance: 50,
+		Theme:    "light",
 	}
 
 	_, err = s.Insert(*s)
