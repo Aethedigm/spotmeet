@@ -44,6 +44,7 @@ func (r *RawQuery) MatchQuery(user User, settings Settings) ([]int, error) {
 	rows, err := upper.SQL().Query(q)
 	if err != nil {
 		fmt.Println("problem with query", rows, err)
+		rows.Close()
 		return nil, err
 	}
 
@@ -76,6 +77,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	q1rows, err := upper.SQL().Query(q1)
 	if err != nil {
 		fmt.Println("problem with query within func ThreadPreviewQuery", q1rows, err)
+		q1rows.Close()
 		return "", "", "", time.Time{}, err
 	}
 
@@ -86,6 +88,7 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 
 	q2rows, err := upper.SQL().Query(q2)
 	if err != nil {
+		q2rows.Close()
 		fmt.Println("problem with query within func ThreadPreviewQuery", q2rows, err)
 		return "", "", "", time.Time{}, err
 	}
@@ -141,6 +144,7 @@ func (r *RawQuery) MatchesDisplayQuery(userID int) ([]MatchForDisplay, error) {
 
 	rows, err := upper.SQL().Query(q)
 	if err != nil {
+		rows.Close()
 		fmt.Println("problem with query", rows, err)
 		return []MatchForDisplay{}, err
 	}
