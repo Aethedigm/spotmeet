@@ -296,6 +296,7 @@ html {
     </div>
 
     <a href="#" class="save-button mb-5" onclick="setUserSettings()">Save Changes</a>
+    <br>
     <a href="/about" class="save-button">About SpotMeet</a>
 
     <div id="footbar" class="navbar fixed-bottom">
