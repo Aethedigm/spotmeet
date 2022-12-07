@@ -73,7 +73,7 @@
     <div style="margin-top:5em; margin-bottom:3.6em; text-align:center;" class="justify-content-center">
         <div class="text-center mb-3"><span class="green-font" style="font-size:1.5em;">Edit Profile</span></div>
         <div id="profile-picture">
-            <img src="{{ imgurl }}" class="w-25 rounded-circle">
+            <img id="pfp" src="{{ imgurl }}" class="w-25 rounded-circle">
         </div>
         <div style="align:center; margin-bottom:.5em;">
             <label for="image_input" class="btn rounded-pill">Profile photo</label>
@@ -133,6 +133,9 @@ const submitImage = () => {
         mode: 'same-origin',
         method: 'PUT',
         body: inFile.files[0]
+    }).then(() => {
+        let pfp = document.getElementById("pfp");
+        pfp.src = "{{imgurl}}?" + new Date().getTime();
     });
 }
 </script>
