@@ -14,7 +14,6 @@
 
 {{block pageContent()}}
     <div id="topbar"
-
         class="navbar fixed-top bg-light">
             <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
@@ -75,7 +74,26 @@
 {{block js()}}
 <script>
     window.onload = function() {
+        setTheme("{{ theme }}");
         getSongs();
+    }
+
+    const setTheme = (theme) => {
+        switch (theme) {
+            case "light":
+                break;
+            case "dark":
+                document.body.style.setProperty('background-color', 'black');
+                document.body.style.setProperty('color', 'white');
+                document.getElementById("topbar").className = "navbar fixed-top bg-secondary";
+                document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+                var collection = document.getElementsByClassName("songName");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].className = "songName text-light";
+                }
+                break;
+        }
+        return;
     }
 
     const getSongs = () => {
@@ -103,7 +121,7 @@
             songName = songs[i-1];
             songsTemplate = `
                 <tr>
-                    <td>
+                    <td class="songName">
                         ${songName}
                     </td>
                 </tr>
@@ -112,6 +130,7 @@
         }
         songsTemplateAll += `</table></div>`;
         songsContainer.innerHTML = songsTemplateAll;
+        setTheme("{{ theme }}");
     }
 </script>
 {{end}}

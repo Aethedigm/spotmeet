@@ -147,11 +147,26 @@
                     }
                 }
             });
-
+            setTheme("{{ theme }}");
             delay(200).then(() => window.scrollTo(0, document.body.scrollHeight));
     }
 
     setInterval(getMessages, 2000);
     window.onload = getMessages;
+
+    const setTheme = (theme) => {
+        switch (theme) {
+            case "light":
+                break;
+            case "dark":
+                document.body.style.setProperty('background-color', 'black');
+                document.getElementById("header").className = "navbar fixed-top bg-secondary";
+                document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+                document.getElementById("message-input").className = "message-input mr-5 ml-5 mb-2 bg-dark text-white";
+                break;
+        }
+        return;
+    }
+
 </script>
 {{end}}

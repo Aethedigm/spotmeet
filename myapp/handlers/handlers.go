@@ -17,7 +17,28 @@ type Handlers struct {
 }
 
 func (h *Handlers) About(w http.ResponseWriter, r *http.Request) {
-	err := h.App.Render.Page(w, r, "about", nil, nil)
+	// check if user ID exists in current browser session
+	if !h.App.Session.Exists(r.Context(), "userID") {
+		http.Redirect(w, r, "users/login", http.StatusSeeOther)
+		return
+	}
+
+	// get userID
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+
+	// get settings for the current user
+	settings, err := h.Models.Settings.GetByUserID(userID)
+	if err != nil {
+		fmt.Println("Error getting settings:", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// get the desired theme to pass into the view
+	vars := make(jet.VarMap)
+	vars.Set("theme", settings.Theme)
+
+	err = h.App.Render.Page(w, r, "about", vars, nil)
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}

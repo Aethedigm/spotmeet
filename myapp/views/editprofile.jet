@@ -75,9 +75,9 @@
         <div id="profile-picture">
             <img id="pfp" src="{{ imgurl }}" class="w-25 rounded-circle">
         </div>
-        <div style="align:center; margin-bottom:.5em;">
-            <label for="image_input" class="btn rounded-pill">Profile photo</label>
-            <input style="padding-left:15%;" type="file" title=" " text="upload image" id="image_input" accept="image/png, image/jpg" class ="btn rounded-pill choosefile" onchange="submitImage()">
+        <div style="align:center; margin-top:.5em; margin-bottom:.5em;">
+            <span style="display:inline-block;" for="image_input">Change profile photo:
+            <input style="display:inline-block;" type="file" title=" " text="upload image" id="image_input" accept="image/png, image/jpg" class ="btn rounded-pill choosefile" onchange="submitImage()"></span>
         </div>
         <div style="margin-top:.2em"><span style="font-size:2em" class="mt-5">{{ FirstName }}</span></div>
         <div style="margin-top:.2em" class="mt-5 d-flex flex-column align-items-start">
@@ -85,7 +85,7 @@
             <input type="text" class="form-control" placeholder="{{ description }}" id="description">
         </div>
 
-        <div class="container">
+        <div class="container" style="padding-bottom:5em">
             <a href="#submit" class="btn btn-success mt-5 shadowsRoundEdges" onclick="updateProfile()">Submit</a>
             <a href="#cancel" class="btn btn-danger mt-5 shadowsRoundEdges" onclick="cancel()">Cancel</a>
         </div>
@@ -102,6 +102,10 @@
 
 {{block js()}}
 <script>
+window.onload = function() {
+    setTheme("{{ theme }}");
+}
+
 const updateProfile = () => {
     const data = new URLSearchParams();
     data.append("description", document.getElementById("description").value);
@@ -137,6 +141,21 @@ const submitImage = () => {
         let pfp = document.getElementById("pfp");
         pfp.src = "{{imgurl}}?" + new Date().getTime();
     });
+}
+
+const setTheme = (theme) => {
+    switch (theme) {
+        case "light":
+            break;
+        case "dark":
+            document.body.style.setProperty('background-color', 'black');
+            document.body.style.setProperty('color', 'white');
+            document.getElementById("topbar").className = "navbar fixed-top bg-secondary";
+            document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+            document.getElementById("description").className = "form-control bg-dark text-light";
+            break;
+    }
+    return;
 }
 </script>
 {{end}}

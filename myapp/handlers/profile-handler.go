@@ -152,12 +152,19 @@ func (h *Handlers) EditProfile(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
+			// get settings of the user so we can pass the theme preference into the view
+			settings, err := h.Models.Settings.GetByUserID(profile.UserID)
+			if err != nil {
+				h.App.ErrorLog.Println("error getting settings for user:", err)
+			}
+
 			vars := make(jet.VarMap)
 			vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
 			vars.Set("profileID", profile.ID)
 			vars.Set("description", profile.Description)
 			vars.Set("FirstName", user.FirstName)
 			vars.Set("imgurl", profile.ImageURL)
+			vars.Set("theme", settings.Theme)
 
 			err = h.App.Render.JetPage(w, r, "editprofile", vars, nil)
 			if err != nil {
@@ -233,6 +240,12 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
+		// get settings of the user so we can pass the theme preference into the view
+		settings, err := h.Models.Settings.GetByUserID(thisUser)
+		if err != nil {
+			h.App.ErrorLog.Println("error getting settings for user:", err)
+		}
+
 		vars := make(jet.VarMap)
 		vars.Set("userID", thisUser)
 		vars.Set("profileID", profile.ID)
@@ -240,6 +253,7 @@ func (h *Handlers) ProfileByID(w http.ResponseWriter, r *http.Request) {
 		vars.Set("FirstName", user.FirstName)
 		vars.Set("imgurl", profile.ImageURL)
 		vars.Set("description", profile.Description)
+		vars.Set("theme", settings.Theme)
 		vars.Set("numberOfSongNames", numberOfSongNames)
 		for i := range fullSongNames {
 			varName := "song" + strconv.Itoa(i+1)

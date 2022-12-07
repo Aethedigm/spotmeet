@@ -7,77 +7,75 @@
 <style>
 
         /* back Btn */
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
-    
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 
-    .back-button::after, .back-button::before {
-    position: absolute;
-    content: "";
-    transition: all 0.2s;
-    }
+        .back-button::after, .back-button::before {
+          position: absolute;
+          content: "";
+          transition: all 0.2s;
+        }
 
-    .back-button {
-    display: inline-block;
-    padding: 20px 40px;
-    color: white;
-    position: relative;
-    top: 50%;
-    left: 25%;
-    transform: translate(-50%, -50%);
-    vertical-align: middle;
-    font-family: "Rubik One", sans-serif;
-    text-decoration: none;
-    font-size: 4vw;
-    transition: all 0.2s;
-    background-color: #1DB954;
-    }
+        .back-button {
+          display: inline-block;
+          padding: 20px 40px;
+          color: white;
+          position: relative;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          vertical-align: middle;
+          font-family: "Poppins", sans-serif;
+          text-decoration: none;
+          font-size: 4vw;
+          transition: all 0.2s;
+          background-color: #1DB954;
+        }
 
-    .back-button:active, .back-button:focus {
-        color: white;
-    }
+        .back-button:active, .back-button:focus {
+            color: white;
+        }
 
-    .back-button::before {
-    bottom: -7px;
-    height: 7px;
-    width: 100%;
-    left: 4px;
-    transform: skewX(45deg);
-    background-color: #328419;
-    }
+        .back-button::before {
+          bottom: -7px;
+          height: 7px;
+          width: 100%;
+          left: 4px;
+          transform: skewX(45deg);
+          background-color: #328419;
+        }
 
-    .back-button::after {
-    right: -7px;
-    height: 100%;
-    width: 7px;
-    bottom: -4px;
-    transform: skewY(45deg);
-    background-color: #1e4c10;
-    }
+        .back-button::after {
+          right: -7px;
+          height: 100%;
+          width: 7px;
+          bottom: -4px;
+          transform: skewY(45deg);
+          background-color: #1e4c10;
+        }
 
-    .back-button:active {
-    margin-left: 4px;
-    margin-top: 4px;
-    }
+        .back-button:active {
+          margin-left: 4px;
+          margin-top: 4px;
+        }
 
-    .back-button:active::before {
-    bottom: -5px;
-    height: 5px;
-    left: 3px;
-    }
+        .back-button:active::before {
+          bottom: -5px;
+          height: 5px;
+          left: 3px;
+        }
 
-    .back-button:active::after {
-    right: -5px;
-    width: 5px;
-    bottom: -3px;
-    }
+        .back-button:active::after {
+          right: -5px;
+          width: 5px;
+          bottom: -3px;
+        }
 
 </style>
 
 {{end}}
 
 {{block pageContent()}}
-<div class="col text-center">
-
+<div>
     <div id="topbar"
         class="navbar fixed-top bg-light">
             <a href="/matches" class="btn">
@@ -101,28 +99,43 @@
                 </a>
             </div>
     </div>
-    <div style="margin-top:15em; margin-bottom:3.6em;" class="justify-content-center">
-        <h1 class="mb-5 mt-5 green-font">About Spotmeet</h1>
-        <p class="mb-5">
+    <div class="justify-content-center" style="margin-top:15em; margin-bottom:3.6em;">
+        <h1 class="mb-5 mt-5 green-font" style="text-align:center">About Spotmeet</h1>
+        <p class="mb-5" style="text-align:center">
             Spotmeet is a capstone project of 4 Cincinnati State students.
-            Those students are Stephen Sumpter, John Neumeier, Landon Wilson and Zach Kohs 
+            Those students are Stephen Sumpter, John Neumeier, Landon Wilson and Zach Kohs.
             Spotmeet is a place for users to meet with others who share a similar taste in music in their area!
         </p>
         <a href="/settings" class="back-button mt-5">Back to Settings</a>
-
-        <div id="footbar" class="navbar fixed-bottom">
-            <div style="font-family: 'Nunito', sans-serif;" class="container">
-                <a href="/messages" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
-                <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
-                <a href="/settings" class="btn float-right rounded-pill w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
-            </div>
-        </div>
-
     </div>
-
+    <div id="footbar" class="navbar fixed-bottom">
+        <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <a href="/messages" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <a href="/settings" class="btn float-right rounded-pill w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
+        </div>
+    </div>
 </div>
 {{end}}
 
 {{block js()}}
+<script>
+    window.onload = function() {
+         setTheme("{{ theme }}");
+    }
 
-{{end}}
+const setTheme = (theme) => {
+    switch (theme) {
+        case "light":
+            break;
+        case "dark":
+            document.body.style.setProperty('background-color', 'black');
+            document.body.style.setProperty('color', 'white');
+            document.getElementById("topbar").className = "navbar fixed-top bg-secondary";
+            document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+            break;
+    }
+    return;
+}
+ </script>
+ {{end}}

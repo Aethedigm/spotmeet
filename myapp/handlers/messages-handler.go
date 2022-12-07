@@ -172,11 +172,18 @@ func (h *Handlers) Thread(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get settings of the user so we can pass the theme preference into the view
+	settings, err := h.Models.Settings.GetByUserID(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("error getting settings for user:", err)
+	}
+
 	vars := make(jet.VarMap)
 	vars.Set("userID", userID)
 	vars.Set("matchID", otherUserID)
 	vars.Set("matchFirstName", otherUser.FirstName)
 	vars.Set("matchProfileID", profile.ID)
+	vars.Set("theme", settings.Theme)
 
 	// save in match record that current user is viewing the thread for the first time
 	match, err := h.Models.Matches.GetByBothUsers(userID, otherUserID)
@@ -257,10 +264,19 @@ func (h *Handlers) Messages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userID := h.App.Session.GetInt(r.Context(), "userID")
+
+	// get settings of the user so we can pass the theme preference into the view
+	settings, err := h.Models.Settings.GetByUserID(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("error getting settings for user:", err)
+	}
+
 	vars := make(jet.VarMap)
 	vars.Set("userID", h.App.Session.GetInt(r.Context(), "userID"))
+	vars.Set("theme", settings.Theme)
 
-	err := h.App.Render.JetPage(w, r, "messages", vars, nil)
+	err = h.App.Render.JetPage(w, r, "messages", vars, nil)
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)

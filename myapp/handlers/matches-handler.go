@@ -267,10 +267,17 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// get settings of the user so we can pass the theme preference into the view
+	settings, err := h.Models.Settings.GetByUserID(userID)
+	if err != nil {
+		h.App.ErrorLog.Println("error getting settings for user:", err)
+	}
+
 	vars := make(jet.VarMap)
 	vars.Set("userID", userID)
 	vars.Set("isFirstLogin", isFirstLogin)
 	vars.Set("locationUpdateNeeded", locationUpdateNeeded)
+	vars.Set("theme", settings.Theme)
 
 	err = h.App.Render.Page(w, r, "matches", vars, nil)
 	if err != nil {

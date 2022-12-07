@@ -3,6 +3,7 @@
 {{block browserTitle()}}Settings{{end}}
 
 {{block css()}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
@@ -21,7 +22,7 @@
     width: 100%;
     display: block;
     text-align: left;
-    color: #3C454C;
+    color: #6c757d;
     cursor: pointer;
     position: relative;
     z-index: 2;
@@ -178,7 +179,7 @@ html {
   left: 50%;
   transform: translate(-50%, -50%);
   vertical-align: middle;
-  font-family: "Rubik One", sans-serif;
+  font-family: "Poppins", sans-serif;
   text-decoration: none;
   font-size: 4vw;
   transition: all 0.2s;
@@ -255,7 +256,7 @@ html {
 
     <div class="text-center mb-3"><span style="font-size:1.5em; color:#1DB954;">Settings</span></div>
 
-    <div style="text-align:left"><label for="looking-for" class="form-label">Looking for...</label></div>
+    <div style="text-align:left"><label name="settingsLabel" for="looking-for" class="form-label text-muted">Looking for...</label></div>
     <div class="inputGroup shadowsRoundEdges">
         <input id="btn-friends" name="btnradio" type="radio" value="friends"/>
         <label for="btn-friends">Friends</label>
@@ -278,28 +279,28 @@ html {
     </div>
 
     <div id="matchSettingsContainer" class="matchSettingsContainer" style="padding-top:2em">
-        <div style="text-align:left; display:inline-block; width:43%"><label class="form-label">Match Sensitivity:</label></div>
+        <div style="text-align:left; display:inline-block; width:43%"><label name="settingsLabel" class="form-label text-muted">Match Sensitivity:</label></div>
         <div style="display:inline-block;" id="sensitivityValue"></div>
         <input class="range mb-4" type="range" id="matchSensitivity" step="25" value="{{ matchSensitivity }}" min="25" max="75" oninput="matchSlide(this.value)">
 
-        <div style="text-align:left; display:inline-block; width:41%""><label class="form-label">Find me matches within...</label></div>
+        <div style="text-align:left; display:inline-block; width:41%""><label name="settingsLabel" class="form-label text-muted">Find me matches within...</label></div>
         <div style="display:inline-block;" id="rangeValue">{{ distance }} miles</div>
         <input class="range" type="range" id="matchRange" step="5" value="{{ distance }}" min="25" max="100" oninput="rangeSlide(this.value)">
 
-        <div style="text-align:left; padding-top:2em;"><label for="looking-for" class="form-label">App Theme:</label></div>
+        <div style="text-align:left; padding-top:2em;"><label for="looking-for" name="settingsLabel" class="form-label text-muted">App Theme:</label></div>
         <div style="margin-bottom:2em; width:100%; flex-wrap: wrap; padding-top:1.5em;" class="btn-group btn-group-justified" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" name="btntheme" id="btn-light" value="light" autocomplete="off">
+            <input type="radio" class="btn-check" name="btntheme" id="btn-light" value="light" autocomplete="off" onclick="setTheme('light')">
             <label class="btn btn-outline-success" for="btn-light">Light</label>
-            <input type="radio" class="btn-check" name="btntheme" id="btn-dark" value="dark" autocomplete="off">
+            <input type="radio" class="btn-check" name="btntheme" id="btn-dark" value="dark" autocomplete="off" onclick="setTheme('dark')">
             <label class="btn btn-outline-success" for="btn-dark">Dark</label>
         </div>
     </div>
 
-    <a href="#" class="save-button mb-5" onclick="setUserSettings()">Save Changes</a>
+    <a class="save-button mb-5" onclick="setUserSettings()">Save Changes</a>
     <br>
     <a href="/about" class="save-button">About SpotMeet</a>
 
-    <div id="footbar" class="navbar fixed-bottom">
+    <div id="footbar" class="navbar fixed-bottom bg-light">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
             <a href="/messages" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
@@ -312,6 +313,7 @@ html {
 {{block js()}}
 <script>
 window.onload = function() {
+    setTheme("{{ theme }}");
     var lookingFor = "{{ lookingFor }}";
     switch (lookingFor) {
         case "friends":
@@ -334,7 +336,7 @@ window.onload = function() {
             break;
     }
 
-    // Set theme
+    // Set theme radio buttons
     var theme = "{{ theme }}";
     switch (theme) {
         case "light":
@@ -348,6 +350,43 @@ window.onload = function() {
     matchSlide("{{ matchSensitivity }}");
 }
 
+const setTheme = (theme) => {
+    switch (theme) {
+        case "light":
+            document.body.style.setProperty('background-color', '#fff');
+            document.getElementById("topbar").className = "navbar fixed-top bg-light";
+            document.getElementById("footbar").className = "navbar fixed-bottom bg-light";
+            var collection = document.getElementsByName("settingsLabel");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].className = "form-label text-muted";
+            }
+            collection = document.getElementsByClassName("inputGroup");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.setProperty('background-color', '#D1D7DC');
+            }
+            document.getElementById("sensitivityValue").className = "text-dark";
+            document.getElementById("rangeValue").className = "text-dark";
+            break;
+        case "dark":
+            document.body.style.setProperty('background-color', 'black');
+            document.getElementById("topbar").className = "navbar fixed-top bg-secondary";
+            document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+            var collection = document.getElementsByName("settingsLabel");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].className = "form-label text-light";
+                collection[i].style.setProperty('color', '#3C454C');
+            }
+            collection = document.getElementsByClassName("inputGroup");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.setProperty('background-color', '#343a40');
+            }
+            document.getElementById("sensitivityValue").className = "text-secondary";
+            document.getElementById("rangeValue").className = "text-secondary";
+            break;
+    }
+    return;
+}
+
 const setUserSettings = () => {
     const data = new URLSearchParams();
 
@@ -356,6 +395,10 @@ const setUserSettings = () => {
     data.append("sensitivity", document.getElementById('matchSensitivity').value);
     data.append("theme", document.querySelector('input[name="btntheme"]:checked').value);
 
+    // update theme on page without reloading
+    setTheme(document.querySelector('input[name="btntheme"]:checked').value)
+
+    // save the new theme setting in the db
     fetch('/users/settings/{{ settingsID }}', {
         method: 'PUT',
         mode: 'same-origin',
