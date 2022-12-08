@@ -96,7 +96,7 @@
             margin-bottom: 20px;
         }
         .inbox .mail_list .list-group-item:hover {
-            background: #eceeef
+            background: #f3f6f4
         }
 
         .inbox .mail_list .list-group-item .media {
@@ -165,9 +165,6 @@
                 margin-top: 3px
             }
         }
-        .message-container {
-            background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
-        }
     </style>
 {{end}}
 
@@ -218,6 +215,25 @@
 <script>
     window.onload = function() {
         getMessageThreads();
+        setTheme("{{ theme }}");
+    }
+
+    const setTheme = (theme) => {
+        switch (theme) {
+            case "light":
+                break;
+            case "dark":
+                document.body.style.setProperty('background-color', 'black');
+                document.getElementById("topbar").className = "navbar fixed-top bg-secondary";
+                document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+                var collection = document.getElementsByClassName("container-fluid");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.setProperty('color', '#fff');
+                    collection[i].style.setProperty('background-image', 'linear-gradient(to bottom right, #59a666, #9e909d, #59a666)');
+                }
+                break;
+        }
+        return;
     }
 
     const noMessages = () => {
@@ -230,6 +246,7 @@
         `;
 
         document.getElementById("message_container").innerHTML = noMessageTemplate;
+        setTheme("{{ theme }}");
     }
 
     const getMessageThreads = () => {
@@ -265,6 +282,7 @@
                             </li>
                         `
                         msgContainer.innerHTML += threadTemplate;
+                        setTheme("{{ theme }}");
                         }
                 } else {
                     noMessages();

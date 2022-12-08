@@ -3,9 +3,10 @@
 {{block browserTitle()}}Matches{{end}}
 
 {{block css()}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <style id="styleLoading">
         .container-fluid {
-            background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
+            background-color: #c5ffc5;
             background-position: center center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -290,6 +291,41 @@ window.onload = function() {
     showLoadingAnimation(loadingMessage, messageClass);
     getLocationAndMatches(locationUpdateNeeded);
     updateMusicProfile();
+    setTheme("{{ theme }}");
+}
+
+const setTheme = (theme) => {
+    switch (theme) {
+        case "light":
+            document.body.style.setProperty('background-color', '#fff');
+            document.getElementById("topbar").className = "navbar fixed-top bg-light";
+            document.getElementById("footbar").className = "navbar fixed-bottom bg-light";
+            var collection = document.getElementsByClassName("container-fluid");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.setProperty('background-color', '#c5ffc5');
+                collection[i].style.setProperty('color', 'black');
+            }
+            collection = document.getElementsByClassName("noMatches");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.setProperty('color', 'green');
+            }
+            break;
+        case "dark":
+            document.body.style.setProperty('background-color', 'black');
+            document.getElementById("topbar").className = "navbar fixed-top bg-secondary";
+            document.getElementById("footbar").className = "navbar fixed-bottom bg-secondary";
+            var collection = document.getElementsByClassName("container-fluid");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.setProperty('background-color', 'green');
+                collection[i].style.setProperty('color', '#efefef');
+            }
+            collection = document.getElementsByClassName("noMatches");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.setProperty('color', '#c5ffc5');
+            }
+            break;
+    }
+    return;
 }
 
 function updateMusicProfile() {
@@ -365,7 +401,6 @@ function sendLocationToServer(position) {
     })
         .then(response => response.json())
         .then(data => console.log(data));
-        //.then(() => fetchMatches());
 
     // give the server some time to write the location
     delay(1000).then(() => fetchMatches());
@@ -390,6 +425,7 @@ function fetchMatches() {
                 for (let i = 0; i < data.length; i++) {
                     addMatch(data[i]);
                 }
+                setTheme("{{ theme }}");
             } else {
                 noMatches();
             }
@@ -411,6 +447,7 @@ const noMatches = () => {
     `;
 
     document.getElementById("matches_container").innerHTML = noMatchTemplate;
+    setTheme("{{ theme }}");
 }
 
 function geolocationDenied(error) {
@@ -433,20 +470,7 @@ function geolocationDenied(error) {
     `;
 
     document.getElementById("matches_container").innerHTML = noGeoTemplate;
-    removeLoading();
-
-}
-
-const noGeolocation = () => {
-    const noGeoTemplate = `
-        <div class="container">
-            <div class="noMatches">
-                <h1>Unable to ask for your location. Please enable location on your device, or check your browser settings.</h1>
-            </div>
-        </div>
-    `;
-
-    document.getElementById("matches_container").innerHTML = noGeoTemplate;
+    setTheme("{{ theme }}");
     removeLoading();
 }
 
