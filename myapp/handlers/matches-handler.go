@@ -13,9 +13,12 @@ import (
 	"github.com/CloudyKit/jet/v6"
 )
 
-func (h *Handlers) RejectMatch(w http.ResponseWriter, r *http.Request) {
-	matchIDstr := chi.URLParam(r, "matchID")
+// matches-handler.go contains logic relating specifically to the creation and removal of Matches
 
+// RejectMatch processes a user's decision to decline a match
+func (h *Handlers) RejectMatch(w http.ResponseWriter, r *http.Request) {
+	// get the match ID from the url parameter
+	matchIDstr := chi.URLParam(r, "matchID")
 	matchID, err := strconv.Atoi(matchIDstr)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -23,6 +26,7 @@ func (h *Handlers) RejectMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get the match's struct
 	match, err := h.Models.Matches.Get(matchID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -30,8 +34,10 @@ func (h *Handlers) RejectMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// set it as complete, but refrain from creating a "Link" due to this match being declined
 	match.Complete = true
 
+	// update the match in the db by passing it the updated struct
 	err = h.Models.Matches.Update(*match)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -39,13 +45,15 @@ func (h *Handlers) RejectMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// send success message to browser
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": "true"}`))
 }
 
+// AcceptMatch processes a user's decision to accept a match
 func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
+	// get the match ID from the url parameter
 	matchIDstr := chi.URLParam(r, "matchID")
-
 	matchID, err := strconv.Atoi(matchIDstr)
 	if err != nil {
 		h.App.ErrorLog.Println("Error converting matchID to int:", err)
@@ -53,6 +61,7 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get the match's struct
 	match, err := h.Models.Matches.Get(matchID)
 	if err != nil {
 		h.App.ErrorLog.Println("Error getting match:", err)
@@ -60,8 +69,10 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// set it as complete
 	match.Complete = true
 
+	// update the match in the db by passing it the updated struct
 	err = h.Models.Matches.Update(*match)
 	if err != nil {
 		h.App.ErrorLog.Println("Error updating match:", err)
@@ -69,6 +80,7 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// since the match was accepted by the user, create a "Link" as a result.
 	link := data.Link{}
 	link.User_A_ID = match.User_A_ID
 	link.User_B_ID = match.User_B_ID
@@ -84,6 +96,7 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 	}
 	link.CreatedAt = time.Now()
 
+	// insert the new link into the db
 	_, err = h.Models.Links.Insert(link)
 	if err != nil {
 		h.App.ErrorLog.Println("Error inserting link:", err)
@@ -91,11 +104,16 @@ func (h *Handlers) AcceptMatch(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// write success message to the browser
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": "true"}`))
 }
 
+// MyMatchResults creates new matches for a user based on both user's location and preferences
+// designated in their settings. Then, all newly-made matches and previously-existing matches are gathered in the
+// proper way for display to the user.
 func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
+	// get the current user's user-table data as a struct
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	user, err := h.Models.Users.Get(userID)
 	if err != nil {
@@ -115,6 +133,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get a struct of the current user's settings
 	settings, err := h.Models.Settings.GetByUserID(userID)
 	if err != nil {
 		h.App.ErrorLog.Println(err)
@@ -177,6 +196,7 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
+				// insert the new match into the db
 				_, err := h.Models.Matches.Insert(match)
 				if err != nil {
 					h.App.ErrorLog.Println(err)
@@ -187,14 +207,18 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// gather the necessary match-information for displaying matches to the user
 	matchesForDisplay, err := h.Models.RQ.MatchesDisplayQuery(userID)
 	if err != nil {
 		h.App.ErrorLog.Println("Error with MatchesDisplayQuery(), called in matches-handler.go:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+	// initialize json container
 	emptyJSON, err := json.Marshal("")
 
+	// if no matches, send empty container to user
+	// else, convert match information into json and send to the user
 	if matchesForDisplay == nil {
 		w.Header().Set("Content-Type", "application/json")
 		_, err = w.Write(emptyJSON)
@@ -218,13 +242,20 @@ func (h *Handlers) MyMatchResults(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Matches renders the matches page. Actual match information is called from the JS within the page
+// that hits an endpoint, calling MyMatchResults() within this .go file.
 func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
+	// only continue if current user session exists
 	if !h.App.Session.Exists(r.Context(), "userID") {
 		http.Redirect(w, r, "users/login", http.StatusSeeOther)
 		return
 	}
 
+	// get current user's ID
 	userID := h.App.Session.GetInt(r.Context(), "userID")
+
+	// Get current user's Spotify authorization credentials. If they don't exist,
+	// go to Spotify to get them.
 	userSpotTokens, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		h.App.ErrorLog.Println("Error getting spotify token.", err)
@@ -238,6 +269,7 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 	//	h.App.ErrorLog.Println("Error setting spotify artists for user.", err)
 	//}
 
+	// Send the user to renew their Spotify credentials if they expire within the next 5 minutes
 	expiry := userSpotTokens.AccessTokenExpiry.Unix() + 18000
 	fiveMinutesFromNow := time.Now().Add(time.Minute * 5).Unix()
 	if expiry < fiveMinutesFromNow {
@@ -246,9 +278,15 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Create flags that we will pass into the view, so that the JavaScript can call endpoints that
+	// may be needed to be hit.
 	var isFirstLogin bool
 	var locationUpdateNeeded bool
 	musicProfile, _ := h.Models.UserMusicProfiles.GetByUserID(userID)
+
+	// If the user's music profile doesn't exist yet, we know that the user is new, and location data
+	// is still needed. Else, indicate the user is not new and further evaluate whether or not the user
+	// needs to have their location re-gathered.
 	if musicProfile == nil {
 		isFirstLogin = true
 		locationUpdateNeeded = true
@@ -273,22 +311,31 @@ func (h *Handlers) Matches(w http.ResponseWriter, r *http.Request) {
 		h.App.ErrorLog.Println("error getting settings for user:", err)
 	}
 
+	// prepare data needed by the view
 	vars := make(jet.VarMap)
 	vars.Set("userID", userID)
 	vars.Set("isFirstLogin", isFirstLogin)
 	vars.Set("locationUpdateNeeded", locationUpdateNeeded)
 	vars.Set("theme", settings.Theme)
 
+	// send data to the matches view and render the page
 	err = h.App.Render.Page(w, r, "matches", vars, nil)
 	if err != nil {
 		h.App.ErrorLog.Println("error rendering:", err)
 	}
 }
 
+// CompareUserMusicProfiles is the last check in the matching algorithm. This function is called
+// with potential matches (profileA, profileB) that have already passed through location and
+// settings-preferences checks.
+// This function returns a boolean indicating whether or not the users are a successful match (matchOnProfiles),
+// the "percentage" or "strength" the match (matchPercentage), and songIDMatchedOn, the ID of the song between both users' liked-songs
+// that a new musical profile (created from the averaging of both user's musical preferences) matches closest to.
+// the matchOnProfiles, matchPercentage, songIDMatchedOn
 func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 	profileB data.UserMusicProfile, matchSensitivityUserA int, matchSensitivityUserB int) (bool, int, int) {
 
-	// Here are the values of the user_music_profile table that we are checking
+	// Here are the values of the user_music_profile table that we are checking:
 	// Loudness  		float64   `db:"loudness" json:"loudness"`
 	// Tempo     		float64   `db:"tempo" json:"tempo"`
 	// TimeSig   		int       `db:"time_sig" json:"time_sig"`
@@ -467,6 +514,8 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 			songs = append(songs, *song)
 		}
 
+		// Initialize variables that will hold song IDs of songs that--given their designated musical aspect--
+		// match closest to the aggregate music profile.
 		var loudnessClosestSongID int
 		var loudnessClosestSongID2 int
 		// var loudnessClosestSongID3 int
@@ -503,19 +552,33 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 		var modesMatchingSongIDs []int
 		var differences []float64
 
-		// find the song that is closest to the aggregate music profile
+		// find the song that is closest to the aggregate music profile.
+
+		// *** Commenting within Loudness should be considered for blocks of code after it that
+		// are similar. ***
+
 		// get songs with closest Loudness
+		// Create a map (key-value pairs) to store--for each song iterated through--the difference between
+		// the aggregate music profile's given song aspect and the currently-iterated song's given aspect.
 		var diffMap = make(map[float64]int)
+		// iterate through each liked-song of both users
 		for i := range songs {
+			// get the difference in the aggregate profile's preference and the actual song's level of the aspect
+			// (Lower difference == higher chance the song will be considered a closest-song within the given aspect)
 			difference := aggregateMusicProfile.Loudness - songs[i].LoudnessAvg
 			if difference < 0 {
 				difference *= -1
 			}
+			// add the difference as a key and the song ID as a value to the map
 			diffMap[difference] = songs[i].ID
+			// append just the difference to a slice (dynamic array) so we can sort them later to find the smallest
 			differences = append(differences, difference)
 		}
+		// Sort the slice and find its length. Sorts by highest to lowest.
 		sort.Float64s(differences)
 		length := len(differences)
+		// use the tail-end 2 values of the differences slice as keys to the map in order to find the song IDs
+		// of songs that are the closest to the aggregate musical profile in the given musical aspect.
 		loudnessClosestSongID = diffMap[differences[length-1]]
 		loudnessClosestSongID2 = diffMap[differences[length-2]]
 		// loudnessClosestSongID3 = diffMap[differences[length-3]]
@@ -706,6 +769,7 @@ func (h *Handlers) CompareUserMusicProfiles(profileA data.UserMusicProfile,
 	return matchOnProfiles, matchPercentage, songIDMatchedOn
 }
 
+// Mode finds the highest-occurring integer within a slice (dynamic array)
 func (h *Handlers) Mode(IDs []int, size int) int {
 	if size == 0 {
 		return 0

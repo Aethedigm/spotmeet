@@ -16,6 +16,7 @@ type Handlers struct {
 	Models data.Models
 }
 
+// About displays the About page
 func (h *Handlers) About(w http.ResponseWriter, r *http.Request) {
 	// check if user ID exists in current browser session
 	if !h.App.Session.Exists(r.Context(), "userID") {
@@ -44,13 +45,17 @@ func (h *Handlers) About(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Location is an endpoint that gets the location from the browser and saves it to the db
+// in relation to the current user.
 func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
+	// get info from the page that is hitting this endpoint
 	err := r.ParseForm()
 	if err != nil {
 		h.App.ErrorLog.Println("error parsing form:", err)
 		return
 	}
 
+	// extract the userID from the page
 	userIDstr := r.Form.Get("userID")
 	userID, err := strconv.Atoi(userIDstr)
 	if err != nil {
@@ -58,21 +63,25 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// get currentUser struct from the userID
 	currentUser, err := h.Models.Users.Get(userID)
 	if err != nil {
 		h.App.ErrorLog.Println("error getting user object:", err)
 		return
 	}
 
+	// get settings of current user
 	currentUserSettings, err := h.Models.Settings.GetByUserID(userID)
 	if err != nil {
 		h.App.ErrorLog.Println("error getting settings object:", err)
 		return
 	}
 
+	// get location data from the page
 	lat := r.Form.Get("lat")
 	lng := r.Form.Get("long")
 
+	// convert location data to correct type for calculations
 	latFloat, err := strconv.ParseFloat(lat, 64)
 	if err != nil {
 		h.App.ErrorLog.Println("error converting lat to float64:", err)
@@ -85,6 +94,8 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If new user, perform calculations on user location data that was just acquired
+	// in order to provide settings parameters for matching based on location.
 	if currentUser.Latitude == 0 && currentUser.Longitude == 0 {
 		defaultDistance := 50
 		latMod := float64(defaultDistance) * 0.01492753623
@@ -102,19 +113,23 @@ func (h *Handlers) Location(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	// set the lat and long that was gathered from the browser, to the current user struct
 	currentUser.Latitude = latFloat
 	currentUser.Longitude = lngFloat
 
+	// update the db entry for the user with the current user struct
 	err = currentUser.Update(*currentUser)
 	if err != nil {
 		h.App.ErrorLog.Println("error updating user ", userID, err)
 		return
 	}
 
+	// write success message back to browser
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte(fmt.Sprintf("%d", userID)))
 }
 
+// Home renders the home page
 func (h *Handlers) Home(w http.ResponseWriter, r *http.Request) {
 	err := h.App.Render.Page(w, r, "home", nil, nil)
 
@@ -153,6 +168,7 @@ func (h *Handlers) SessionTest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// CreateUserAndProfile ensures that a new user has a record created within the user and profile tables
 func (h *Handlers) CreateUserAndProfile(w http.ResponseWriter, r *http.Request) {
 
 	u := &data.User{}

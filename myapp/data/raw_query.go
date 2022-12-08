@@ -106,7 +106,11 @@ func (r *RawQuery) ThreadPreviewQuery(userID int, otherUserID int) (string, stri
 	if len(LatestMessagePreview) > 35 {
 		LatestMessagePreview = LatestMessagePreview[:35] + " . . ."
 	}
-	strLatestMessageTimeSent := LatestMessageTimeSent.Format("Jan 2 3:04PM")
+
+	// if using Google Cloud hosting, use first line. If running locally, use second line.
+	strLatestMessageTimeSent := LatestMessageTimeSent.Add(time.Hour * -5).Format("Jan 2 3:04PM")
+	//strLatestMessageTimeSent := LatestMessageTimeSent.Format("Jan 2 3:04PM")
+
 	if LatestMessagePreview == "" {
 		strLatestMessageTimeSent = "No messages sent yet"
 	}

@@ -19,10 +19,15 @@ import (
 var auth = spotify.Authenticator{}
 var state string
 
+// Set the scopes for our Spotify authorization. "Scopes" refers to how many permissions from the user we are asking for.
 var spotScopes = []string{spotify.ScopeUserTopRead, spotify.ScopeUserReadRecentlyPlayed, spotify.ScopeUserFollowRead}
 
+// SpotifyAuthorization formulates a URL that will be used as a redirect to Spotify's authorization endpoint.
 func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) {
+	// define the url on our server where we'd like the user to come back to after authorizing with Spotify
 	callback := os.Getenv("URL") + "/spotauth/callback"
+
+	// create an "authenticator", which will formulate a url for the user to redirect to Spotify's auth endpoint
 	auth = spotify.NewAuthenticator(callback, spotScopes...)
 	randomBytes := make([]byte, 16)
 	_, err := rand.Read(randomBytes)
@@ -32,15 +37,24 @@ func (h *Handlers) SpotifyAuthorization(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Define a "state", which is a complex code string that provides another layer of protection, ensuring
+	// to our server that incoming requests from Spotify are legitimate.
 	state = base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(randomBytes)
 
+	// Include the state string with the call to create a redirect url. This url will be unique only to this
+	// user and redirect instance.
 	url := auth.AuthURL(state)
 	url = url + "&show_dialog=true"
 
+	// redirect the user to Spotify for authorization
 	http.Redirect(w, r, url, http.StatusSeeOther)
 }
 
+// SpotifyAuthorizationCallback is called when authorization information comes back from Spotify. This
+// function updates/inserts that information into our database for the user.
 func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.Request) {
+	// get a token struct, formulated from the information received via http request from Spotify.
+	// (The state code string is needed here in order for the information to be decoded.)
 	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
@@ -49,6 +63,8 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// Check if the state value recieved from Spotify is the same one that was sent out with the initial redirect
+	// to Spotify for authorization. If it doesn't match, then redirect back to spotauth for re-authorization.
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
@@ -56,9 +72,11 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// create a new client struct from the token we recieved from Spotify
 	spotclient := auth.NewClient(tok)
 	fmt.Fprintf(w, "Login Completed!")
 
+	// use that client struct with CurrentUser() in order to validate that the user (with Spotify) actually exists
 	_, err = spotclient.CurrentUser()
 	if err != nil {
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
@@ -66,6 +84,7 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// get the user ID from the session
 	userID := h.App.Session.GetInt(r.Context(), "userID")
 	if userID == 0 || userID == -1 {
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
@@ -73,6 +92,7 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// populate struct with the token information that we received
 	spottoken := data.SpotifyToken{
 		UserID:            userID,
 		AccessToken:       tok.AccessToken,
@@ -80,15 +100,19 @@ func (h *Handlers) SpotifyAuthorizationCallback(w http.ResponseWriter, r *http.R
 		AccessTokenExpiry: tok.Expiry,
 	}
 
+	// update/insert the related information in the db, using the struct
 	_, err = spottoken.Upsert(spottoken)
 	if err != nil {
 		http.Redirect(w, r, "/users/spotauth", http.StatusSeeOther)
 		fmt.Println(err)
 	}
 
+	// call the matches endpoint in order to begin rendering the matches page
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
+// NewAccessTokenRequest facilitates the acquisition of a new access token from Spotify,
+// given that the user already has a refresh token to validate the new-token request.
 func (h *Handlers) NewAccessTokenRequest(w http.ResponseWriter, r *http.Request) {
 	callback := os.Getenv("URL") + "/newspotaccesstoken/callback"
 	auth = spotify.NewAuthenticator(callback, spotScopes[0], spotScopes[1])
@@ -121,6 +145,7 @@ func (h *Handlers) NewAccessTokenRequest(w http.ResponseWriter, r *http.Request)
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
+// NewAccessTokenAssign is a depricated version of NewAccessTokenRequest(), defined above.
 func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) {
 	tok, err := auth.Token(state, r)
 	if err != nil {
@@ -160,18 +185,23 @@ func (h *Handlers) NewAccessTokenAssign(w http.ResponseWriter, r *http.Request) 
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
+// SetSpotifySongsForUser
 func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPage) error {
+	// get the Spotify tokens for the current user
 	SpotTok, err := h.Models.SpotifyTokens.GetSpotifyTokenForUser(userID)
 	if err != nil {
 		fmt.Println("No spotify token found for user")
 		return err
 	}
 
+	// create an oauth2 token with our Spotify tokens
 	spotifyToken := &oauth2.Token{
 		AccessToken:  SpotTok.AccessToken,
 		RefreshToken: SpotTok.RefreshToken,
 	}
 
+	// Use the oauth2 token to see if the current user has that token information in their browser
+	// in order to confirm them as a current user.
 	client := auth.NewClient(spotifyToken)
 	_, err = client.CurrentUser()
 	if err != nil {
@@ -186,11 +216,13 @@ func (h *Handlers) SetSpotifySongsForUser(userID int, songs spotify.FullTrackPag
 		return err
 	}
 
+	// save all Spotify song IDs from the songs that were passed in
 	var songIDs []spotify.ID
 	for i := range songs.Tracks {
 		songIDs = append(songIDs, songs.Tracks[i].ID)
 	}
 
+	// get audio features of the songs
 	var allTracksFeatures []*spotify.AudioFeatures
 	if songIDs != nil {
 		allTracksFeatures, err = client.GetAudioFeatures(songIDs...)
