@@ -9,6 +9,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 /*@import 'https://fonts.googleapis.com/css?family=Rubik+One'; */
 
+/* styles for the page */
 .inputGroup {
     background-color: #D1D7DC;
     display: block;
@@ -230,12 +231,16 @@ html {
 {{end}}
 
 {{block pageContent()}}
+    <!-- top navbar for app -->
     <div id="topbar"
         class="navbar fixed-top bg-light">
+            <!-- logo/link to home/matches page page -->
             <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
             </a>
+            <!-- buttons on right side of navbar -->
             <div class="btn float-right">
+                <!-- button to take user to their own profile -->
                 <a
                     href="/users/profile"
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -243,6 +248,7 @@ html {
                 >
                     <i class="fa-solid fa-user nav-icons"></i>
                 </a>
+                <!-- button to log user out of the app -->
                 <a
                     href="/users/logout"
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -254,6 +260,7 @@ html {
             </div>
     </div>
 
+<!-- Main body of the about page -->
 <div style="margin-top:5em; margin-bottom:3.6em;" class="justify-content-center">
 
     <div class="text-center mb-3"><span style="font-size:1.5em; color:#1DB954;">Settings</span></div>
@@ -302,10 +309,14 @@ html {
     <br>
     <a href="/about" class="save-button">About SpotMeet</a>
 
+    <!-- navbar at bottom of app -->
     <div id="footbar" class="navbar fixed-bottom bg-light">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <!-- link to messages -->
             <a href="/messages" class="btn float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <!-- link to matches -->
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <!-- link to settings -->
             <a href="/settings" class="btn float-right rounded-pill w-25 green-font button-active no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
@@ -315,7 +326,9 @@ html {
 {{block js()}}
 <script>
 window.onload = function() {
+    // Make theme dark or light depending on the user's preference
     setTheme("{{ theme }}");
+    // variable for 'looking for' selection
     var lookingFor = "{{ lookingFor }}";
     switch (lookingFor) {
         case "friends":
@@ -352,6 +365,7 @@ window.onload = function() {
     matchSlide("{{ matchSensitivity }}");
 }
 
+// Setting the theme of the page
 const setTheme = (theme) => {
     switch (theme) {
         case "light":
@@ -389,6 +403,7 @@ const setTheme = (theme) => {
     return;
 }
 
+// Function to set all of the user's settings
 const setUserSettings = () => {
     const data = new URLSearchParams();
 
@@ -416,14 +431,17 @@ const setUserSettings = () => {
     })
 }
 
+// Set the range slider text value based on where the slider is
 const rangeSlide = (value) => {
     document.getElementById("rangeValue").innerHTML = value + ' miles';
 }
 
+// Set the match slider text value based on where the slider is
 const matchSlide = (value) => {
     document.getElementById('sensitivityValue').innerHTML = matchSensitivitySlide(value);
 }
 
+// Set the the sensitivity to 'Low', 'Medium', or 'High'
 const matchSensitivitySlide = (value) => {
     switch(value) {
         case '25':

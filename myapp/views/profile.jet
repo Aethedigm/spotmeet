@@ -4,6 +4,7 @@
 
 {{block css()}}
 <style>
+    /* style for the page */
     .shadows{
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     }
@@ -13,11 +14,14 @@
 {{end}}
 
 {{block pageContent()}}
+    <!-- top navbar for app -->
     <div id="topbar"
         class="navbar fixed-top bg-light">
+            <!-- logo/link to home/matches page page -->
             <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
             </a>
+            <!-- button to log user out of the app -->
             <a 
                     href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -27,6 +31,7 @@
             </a>
     </div>
 
+    <!-- Main body of the profile page -->
     <div style="margin-top:5em; margin-bottom:3.6em; text-align:center;" class="justify-content-center">
         <div class="text-center mb-3"><span class="green-font" style="font-size:1.5em;">Profile</span></div>
 
@@ -62,10 +67,14 @@
         <div id="songs_container" class="mt-5 container w-50"></div>
     </div>
 
+    <!-- navbar at bottom of app -->
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <!-- link to messages -->
             <a href="/messages" class="btn float-left w-25 button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <!-- link to matches -->
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <!-- link to settings -->
             <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
@@ -74,10 +83,13 @@
 {{block js()}}
 <script>
     window.onload = function() {
+        // Make theme dark or light depending on the user's preference
         setTheme("{{ theme }}");
+        // Calling function to get users top songs
         getSongs();
     }
 
+    // Setting the theme of the page
     const setTheme = (theme) => {
         switch (theme) {
             case "light":
@@ -96,6 +108,7 @@
         return;
     }
 
+    // function to get users top songs and display them on the page
     const getSongs = () => {
         const songsContainer = document.getElementById("songs_container");
         const songs = ["{{song1}}", "{{song2}}", "{{song3}}", "{{song4}}", "{{song5}}"];

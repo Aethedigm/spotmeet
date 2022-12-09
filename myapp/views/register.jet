@@ -5,6 +5,7 @@
 {{block css()}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <style>
+        /* style for the page */
         .modal {
             background: #4285F4;
         }
@@ -13,6 +14,7 @@
 
 {{block pageContent()}}
 <div class="col">
+    <!-- Title at the top of the page -->
     <div class="d-flex align-items-center justify-content-center mt-5 mb-2">
         <div>
             <h3 class="font-weight-bold">sp<span class="green-font">o</span>tmeet</h3>
@@ -20,32 +22,38 @@
     </div>
 
     <hr>
-
+    
+    <!-- text that says 'sign up' -->
     <div class="mb-3"><span class="green-font" style="font-size:1.5em;">Sign Up</span></div>
 
+    <!-- form to submit user signing up for an account -->
     <form method="post" action=""
         name="register-form" id="register-form"
         class="d-block needs-validation"
         autocomplete="off" novalidate="">
 
+        <!-- first name input -->
         <div class="mb-3">
             <label for="first_name">First Name</label>
             <input type="text" class="form-control" id="first_name" name="first_name"
                 required="" autocomplete="given-name" autofocus>
         </div>
 
+        <!-- last name input --> 
         <div class="mb-3">
             <label for="last_name">Last Name</label>
             <input type="text" class="form-control" id="last_name" name="last_name"
                 required="" autocomplete="family-name">
         </div>
 
+        <!-- email input -->
         <div class="mb-3">
             <label for="email">Email</label>
             <input type="email" class="form-control" id="email" name="email"
                 required="" autocomplete="email">
         </div>
 
+        <!-- create a user password -->
         <div class="mb-3">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password"
@@ -79,6 +87,7 @@
 {{block js()}}
 
     <script>
+        // On clicking the enter key, go through the logic to register user
         document.onkeydown = function(e){
             var popup = document.getElementById('popup');
             if(e.keyCode == 13){
@@ -90,6 +99,7 @@
             }
         };
 
+        // see if form is filled out properly
         const evaluateRegisterForm = () => {
             const form = document.getElementById('register-form');
             if (form.checkValidity() === false) {
@@ -103,6 +113,7 @@
             $('#popup').modal('show');
         }
 
+        // Create user
         const submitRegisterForm = () => {
             const form = document.getElementById('register-form');
 
@@ -115,6 +126,7 @@
             register(creds);
         }
 
+        // register user
         const register = (creds) => {
             fetch('/users/create', {
                 method: 'POST',

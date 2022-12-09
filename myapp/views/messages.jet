@@ -5,6 +5,7 @@
 {{block css()}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <style>
+        /* styles for page */
         .container-fluid {
             background-image: linear-gradient(to bottom right, #f3f6f4, #c5ffc5, #f3f6f4);
             background-position: center center;
@@ -169,12 +170,16 @@
 {{end}}
 
 {{block pageContent()}}
+    <!-- top navbar for app -->
     <div id="topbar"
         class="navbar fixed-top bg-light topbar">
+            <!-- logo/link to home/matches page page -->
             <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
             </a>
+            <!-- buttons on right side of navbar -->
             <div class="btn float-right">
+                <!-- button to take user to their own profile -->
                 <a 
                     href="/users/profile" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -182,6 +187,7 @@
                 >
                     <i class="fa-solid fa-user nav-icons"></i>
                 </a>
+                <!-- button to log user out of the app -->
                 <a 
                     href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -192,6 +198,7 @@
             </div>
     </div>
 
+    <!-- Main body of the messages page -->
     <section style="margin-top:3.6em; margin-bottom:3.6em;" class="content inbox">
             <div class="row clearfix">
                 <div class="col-md-12 col-lg-12 col-xl-12">
@@ -200,10 +207,14 @@
             </div>
     </section>
 
+    <!-- navbar at bottom of app -->
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <!-- link to messages -->
             <a href="#" class="btn float-left w-25 green-font button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <!-- link to matches -->
             <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <!-- link to settings -->
             <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
@@ -214,10 +225,13 @@
 {{block js()}}
 <script>
     window.onload = function() {
+        // Get the different message threads when loading the page
         getMessageThreads();
+        // Make theme dark or light depending on the user's preference
         setTheme("{{ theme }}");
     }
 
+    // Setting the theme of the page
     const setTheme = (theme) => {
         switch (theme) {
             case "light":
@@ -236,6 +250,7 @@
         return;
     }
 
+    // Run if user does not have any messages yet
     const noMessages = () => {
         const noMessageTemplate = `
             <div class="container-fluid">
@@ -249,6 +264,7 @@
         setTheme("{{ theme }}");
     }
 
+    // See if user has any message threads with other users and display that one by one
     const getMessageThreads = () => {
         const msgContainer = document.getElementById("message_container");
 

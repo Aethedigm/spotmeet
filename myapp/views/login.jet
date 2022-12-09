@@ -6,6 +6,7 @@ Login
 
 {{block css()}}
 <style>
+    /* styles for the page */
     .hidden {
         display: none;
     }
@@ -30,6 +31,8 @@ Login
 {{end}}
 
 {{block pageContent()}}
+
+<!-- title user sees at the top of the page -->
 <div class="col">
     <div class="d-flex align-items-center justify-content-center mt-5 mb-2">
         <div>
@@ -39,8 +42,10 @@ Login
 
     <hr>
 
+    <!-- login text -->
     <div class="mb-3"><span class="green-font" style="font-size:1.5em;">Login</span></div>
 
+    <!-- form user uses to log in to the app -->
     <form method="post" action="/users/login"
         name="login-form" id="login-form"
         class="d-block needs-validation"
@@ -48,22 +53,26 @@ Login
 
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
 
+        <!-- only appears if the user inputs wrong username and/or password -->
         <div class="hidden" id="login-status">
             Login Failed
         </div>
 
+        <!-- only visible if failure to connect to spotify account -->
         <div id="spotify-conn-failed" class="container hidden">
             <div id="spotify-conn-failed">
                 <span>Spotify authentication failed. Please try again.<span>
             </div>
         </div>
 
+        <!-- Email Input -->
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control" id="email" name="email"
                 required="" autocomplete="email-new">
         </div>
-
+        
+        <!-- Password Input -->
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input type="password" class="form-control" id="password" name="password"
@@ -71,8 +80,11 @@ Login
         </div>
         <hr>
         <br>
+        <!-- Log in button -->
         <a href="javascript:void(0)" class="btn btn-primary w-100 mb-5 shadowsRoundEdges" onclick="val()">Log in</a>
+        <!-- Forgot password button -->
         <a href="/users/forgot-password" class="btn btn-secondary w-100 mb-5 shadowsRoundEdges">Forgot password?</a>
+        <!-- back button -->
         <a href="/" class="btn btn-secondary w-100 mb-5 shadowsRoundEdges">Back</a>
 
     </form>
@@ -83,28 +95,34 @@ Login
 {{block js()}}
 <script>
 window.onload = function() {
+    // get the spotConnFailed
     const spotConnFailed = new URLSearchParams(window.location.search)
         .get('spotConnFailed');
 
+    // Show error if failed to connect to spotify account
     if (spotConnFailed) {
         document.getElementById("spotify-conn-failed").classList.remove("hidden");
     }
 
+    // get loginFailed
     const loginFailed = new URLSearchParams(window.location.search)
         .get('loginFailed');
 
+    // show error on page if the login process failed
     if (loginFailed) {
         document.getElementById("login-status").classList.remove("hidden");
         document.getElementById("login-status").classList.add("login-failed");
     }
 }
 
+// Run val function if the enter key is pressed
 document.onkeydown = function(e){
     if(e.keyCode == 13){
         val();
     }
 };
 
+// Go through the logic for the user to log in to the app
 const val = () => {
     document.getElementById("spotify-conn-failed").classList.add("hidden");
     let form = document.getElementById("login-form");
