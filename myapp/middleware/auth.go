@@ -1,3 +1,6 @@
+// Spotmeet - (Capstone Team E)
+// 2022 Stephen Sumpter, John Neumeier,
+// Zach Kods, Landon Wilson
 package middleware
 
 import "net/http"

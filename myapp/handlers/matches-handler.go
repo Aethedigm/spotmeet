@@ -1,14 +1,18 @@
+// Spotmeet - (Capstone Team E)
+// 2022 Stephen Sumpter, John Neumeier,
+// Zach Kods, Landon Wilson
 package handlers
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"myapp/data"
 	"net/http"
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 
 	"github.com/CloudyKit/jet/v6"
 )
