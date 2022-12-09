@@ -26,9 +26,11 @@
           vertical-align: middle;
           font-family: "Poppins", sans-serif;
           text-decoration: none;
-          font-size: 4vw;
+          font-size: 1em;
           transition: all 0.2s;
           background-color: #1DB954;
+          max-height: 100px;
+          max-width: 300px;
         }
 
         .back-button:active, .back-button:focus {
