@@ -181,7 +181,9 @@ html {
   vertical-align: middle;
   font-family: "Poppins", sans-serif;
   text-decoration: none;
-  font-size: 4vw;
+  font-size: 1em;
+  max-width: 250px;
+  max-height: 100px;
   transition: all 0.2s;
   background-color: #1DB954;
 }
