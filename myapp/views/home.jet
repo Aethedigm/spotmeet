@@ -4,6 +4,7 @@
 
 {{block css()}}
 <style>
+/* styles for the page */
 span.avoidwrap {
     display:inline-block;
 }
@@ -28,6 +29,7 @@ span.avoidwrap {
 
 {{block pageContent()}}
 
+<!-- Title of the page to appear when users first enter the site -->
 <div class="col text-center">
     <div class="d-flex align-items-center justify-content-center mt-5 mb-2">
         <div>
@@ -39,7 +41,7 @@ span.avoidwrap {
     </div>
 
     
-
+    <!-- If user is not logged in already, display log in and sign up buttons -->
     {{ if !.IsAuthenticated}}
     <a href="/users/login" class="btn btn-secondary rounded-pill mb-3 w-25 mt-5 shadows">Log In</a>
     <br>

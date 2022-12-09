@@ -5,6 +5,7 @@
 {{block css()}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
     <style>
+        /* styles for the page */
         .message-input {
             width: 80%;
             display: inline;
@@ -51,6 +52,7 @@
 {{end}}
 
 {{block pageContent()}}
+<!-- top navbar for app -->
 <div id="header" class="navbar fixed-top bg-light">
     <div class="container-fluid">
         <div id="navbar-top">
@@ -60,18 +62,25 @@
     </div>
 </div>
 
+<!-- containter to display all of the messages in the thread -->
 <div id="message_container" class="messageContainer mp-5 mt-5 flexbox mb-5">
 </div>
 
+
 <div id="footbar" class="navbar fixed-bottom bg-light">
+    <!-- input for the messages -->
     <div class="container-fluid w-100 pull-left">
         <input type="text" id="message-input" class="message-input mr-5 ml-5 mb-2">
         <a href="#" class="btn btn-success message-btn" onclick="sendClick()">Send</button></a>
     </div>
     <br />
+    <!-- navbar at bottom of app -->
     <div class="container-fluid">
+        <!-- link to messages -->
         <a href="#" class="btn btn-primary float-left w-25 green-font button-active no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+        <!-- link to matches -->
         <a href="/matches" class="btn rounded-pill w-25 no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+        <!-- link to settings -->
         <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
     </div>
 </div>
@@ -80,16 +89,21 @@
 
 {{block js()}}
 <script>
+    // Get the user id
     const userID = {{ userID }};
+    // Get the messagee container element
     const messageContainer = document.getElementById('message_container');
+    // Have cursor on message input
     document.getElementById("message-input").focus();
 
+    // When the enter key is pressed, run the sendClick function
     document.onkeydown = function(e){
         if(e.keyCode == 13){
             sendClick();
         }
     };
 
+    // Function for sending message to other user
     const sendClick = () => {
         const msgInput = document.getElementById('message-input').value;
 
@@ -110,10 +124,12 @@
         delay(50).then(() => window.scrollTo(0, document.body.scrollHeight));
     }
 
+    // set time for the page to refresh for new messages to appear
     function delay(time) {
         return new Promise(resolve => setTimeout(resolve, time));
     }
 
+    // Function for getting messages from other users
     const getMessages = () => {
         fetch("/messages/between/{{ userID }}/{{ matchID }}")
             .then(response => response.json())

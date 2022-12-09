@@ -5,6 +5,7 @@
 {{block css()}}
 
 <style>
+    /* Styling for input elements */
     .shadowsRoundEdges{
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 3vw;
@@ -47,12 +48,16 @@
 {{end}}
 
 {{block pageContent()}}
+    <!-- top navbar for app -->
     <div id="topbar"
         class="navbar fixed-top bg-light">
+                <!-- logo/link to home/matches page page -->
                 <a href="/matches" class="btn">
                     <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
                 </a>
+            <!-- buttons on right side of navbar -->
             <div class="btn float-right">
+                <!-- button to take user to their own profile -->
                 <a 
                     href="/users/profile" 
                     class="me-3"
@@ -60,6 +65,7 @@
                 >
                     <i class="fa-solid fa-arrow-left-long nav-icons"></i>
                 </a>
+                <!-- button to log user out of the app -->
                 <a 
                     href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -70,6 +76,7 @@
             </div>
     </div>
 
+    <!-- Main body of the edit profile page -->
     <div style="margin-top:5em; margin-bottom:3.6em; text-align:center;" class="justify-content-center">
         <div class="text-center mb-3"><span class="green-font" style="font-size:1.5em;">Edit Profile</span></div>
         <div id="profile-picture">
@@ -91,10 +98,14 @@
         </div>
     </div>
 
+    <!-- navbar at bottom of app -->
     <div id="footbar" class="navbar fixed-bottom">
         <div style="font-family: 'Nunito', sans-serif;" class="container">
+            <!-- link to messages -->
             <a href="/messages" class="btn float-left w-25"><i class="fa-solid fa-message nav-icons"></i></a>
+            <!-- link to matches -->
             <a href="/matches" class="btn rounded-pill w-25"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <!-- link to settings -->
             <a href="/settings" class="btn float-right rounded-pill w-25"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
@@ -102,10 +113,12 @@
 
 {{block js()}}
 <script>
+// Make theme dark or light depending on the user's preference
 window.onload = function() {
     setTheme("{{ theme }}");
 }
 
+// Setting the theme of the page
 const updateProfile = () => {
     const data = new URLSearchParams();
     data.append("description", document.getElementById("description").value);
@@ -126,10 +139,12 @@ const updateProfile = () => {
     })
 }
 
+// Cancel and go back to the user's profile page
 const cancel = () => {
     window.location.href = "/users/profile/{{ profileID }}";
 }
 
+// logic to input an image 
 const submitImage = () => {
     var inFile = document.querySelector('input[type="file"]');
     
@@ -143,6 +158,7 @@ const submitImage = () => {
     });
 }
 
+// Setting the theme of the page
 const setTheme = (theme) => {
     switch (theme) {
         case "light":

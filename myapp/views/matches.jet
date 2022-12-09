@@ -5,6 +5,7 @@
 {{block css()}}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <style id="styleLoading">
+        /* styles for the page */
         .container-fluid {
             background-color: #c5ffc5;
             background-position: center center;
@@ -233,13 +234,17 @@
 {{end}}
 
 {{block pageContent()}}
+    <!-- top navbar for app -->
     <div id="topbar"
         style="display:flex; flex-direction:row; justify-content: space-between;"
         class="navbar fixed-top bg-light">
+            <!-- logo/link to home/matches page page -->
             <a href="/matches" class="btn">
                 <h3 class="font-weight-bold">&nbsp;&nbsp;sp<span class="green-font">o</span>tmeet</h3>
             </a>
+            <!-- buttons on right side of navbar -->
             <div class="btn float-right">
+                <!-- button to take user to their own profile -->
                 <a 
                     href="/users/profile" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -247,6 +252,7 @@
                 >
                     <i class="fa-solid fa-user nav-icons"></i>
                 </a>
+                <!-- button to log user out of the app -->
                 <a 
                     href="/users/logout" 
                     style="text-align:right; font-family: 'Fredoka', sans-serif;"
@@ -257,6 +263,7 @@
             </div>
     </div>
 
+    <!-- Main body of the matches page -->
     <section style="margin-top:2.6em; margin-bottom:3.6em;" class="content matchlist">
             <div class="row clearfix">
                 <div class="col-md-12 col-lg-12 col-xl-12">
@@ -265,10 +272,14 @@
             </div>
     </section>
 
+    <!-- navbar at bottom of app -->
     <div id="footbar" style="" class="navbar fixed-bottom">
         <div class="container">
+            <!-- link to messages -->
             <a href="/messages" class="btn rounded-pill float-left w-25 no-outline"><i class="fa-solid fa-message nav-icons"></i></a>
+            <!-- link to matches -->
             <a href="#" class="btn w-25 green-font button-active no-outline"><i class="fa-solid fa-user-group nav-icons"></i></a>
+            <!-- link to settings -->
             <a href="/settings" class="btn float-right rounded-pill w-25 no-outline"><i class="fa-solid fa-gear nav-icons"></i></a>
         </div>
     </div>
@@ -291,9 +302,11 @@ window.onload = function() {
     showLoadingAnimation(loadingMessage, messageClass);
     getLocationAndMatches(locationUpdateNeeded);
     updateMusicProfile();
+    // Make theme dark or light depending on the user's preference
     setTheme("{{ theme }}");
 }
 
+// Setting the theme of the page
 const setTheme = (theme) => {
     switch (theme) {
         case "light":
@@ -328,10 +341,12 @@ const setTheme = (theme) => {
     return;
 }
 
+// Update the music profile
 function updateMusicProfile() {
     fetch("/updateMusicProfile");
 }
 
+// Show loading animation before data loaded
 function showLoadingAnimation(loadingMessage, messageClass) {
     if (document.getElementById("divWheelFrame") != null) {
         return;
@@ -369,6 +384,7 @@ function showLoadingAnimation(loadingMessage, messageClass) {
     }
 };
 
+// Get matches that are within your distance 
 function getLocationAndMatches(locationUpdateNeeded) {
     if (locationUpdateNeeded == true) {
         if (navigator.geolocation) {
@@ -383,6 +399,7 @@ function getLocationAndMatches(locationUpdateNeeded) {
     }
 }
 
+// Get users location and send to the server
 function sendLocationToServer(position) {
     console.log("Started running sendLocationToServer()");
     const data = new URLSearchParams();
@@ -432,11 +449,13 @@ function fetchMatches() {
         }).then(() => removeLoading());
 }
 
+// hide the loading screen 
 function removeLoading() {
     document.body.removeChild(document.getElementById("divWheelFrame"));
     document.body.removeChild(document.getElementById("styleLoading"));
 };
 
+// Display when there are no matches for the user
 const noMatches = () => {
     const noMatchTemplate = `
         <div class="container-fluid">
@@ -450,6 +469,7 @@ const noMatches = () => {
     setTheme("{{ theme }}");
 }
 
+// When the users location data cannot be obtained
 function geolocationDenied(error) {
     var message = "";
     if (error.code == error.PERMISSION_DENIED) {
@@ -474,6 +494,7 @@ function geolocationDenied(error) {
     removeLoading();
 }
 
+// adding each match element to the page with the users matches
 const addMatch = (match) => {
     const matchTemplate = `
        <li id="match_container-${match.match_id}" class="media media-body container-fluid mt-3 list-group-item align-items-center p-2">
@@ -509,6 +530,7 @@ const addMatch = (match) => {
     matchContainer.innerHTML += matchTemplate;
 }
 
+// When the user clicks the accept match button
 const acceptMatch = (matchID) => {
     fetch("/matches/accept/" + matchID)
         .then(response => response.json())
@@ -519,6 +541,8 @@ const acceptMatch = (matchID) => {
         });
 }
 
+
+// When the user clicks the decline match button
 const declineMatch = (matchID) => {
     fetch("/matches/reject/" + matchID)
         .then(response => response.json())
