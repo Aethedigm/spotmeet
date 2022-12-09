@@ -12,6 +12,7 @@ type PasswordRequest struct {
 	Password string `json:"password"`
 }
 
+// ChangePassword handles the request for a different password to be implemented
 func (h *Handlers) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	var p PasswordRequest
 
@@ -47,6 +48,7 @@ func (h *Handlers) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UserRegister displays the registration view
 func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 	err := h.App.Render.Page(w, r, "register", nil, nil)
 	if err != nil {
@@ -54,6 +56,7 @@ func (h *Handlers) UserRegister(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UserLogin displays the login view
 func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
 	err := h.App.Render.Page(w, r, "login", nil, nil)
 	if err != nil {
@@ -61,7 +64,9 @@ func (h *Handlers) UserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PostUserLogin handles login form information by validating it, t
 func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
+	// get user input from the form
 	err := r.ParseForm()
 	if err != nil {
 		h.App.ErrorLog.Println("Error parsing form", err)
@@ -69,9 +74,11 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// break out user input from the form
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
 
+	// get User's information while simultaneously checking if they exist in db
 	user, err := h.Models.Users.GetByEmail(email)
 	if err != nil {
 		h.App.ErrorLog.Println("Error getting user by email", err)
@@ -79,6 +86,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// verify if the password is correct
 	matches, err := user.PasswordMatches(password)
 	if err != nil {
 		h.App.ErrorLog.Println("Error checking password", err)
@@ -92,8 +100,11 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// put the user's id into the browser session for later use
 	h.App.Session.Put(r.Context(), "userID", user.ID)
 
+	// verify if the user already has been authorized with Spotify. If not, send them to Spotify
+	// to get authorized.
 	_, err = h.Models.SpotifyTokens.GetSpotifyTokenForUser(user.ID)
 	if err != nil {
 		h.App.ErrorLog.Println("Spotify token for user does not exist. Going to /users/spotauth to get one.", err)
@@ -107,6 +118,7 @@ func (h *Handlers) PostUserLogin(w http.ResponseWriter, r *http.Request) {
 	//	return
 	//}
 
+	// go to matches page
 	http.Redirect(w, r, "/matches", http.StatusSeeOther)
 }
 
